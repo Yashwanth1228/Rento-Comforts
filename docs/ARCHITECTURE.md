@@ -1,0 +1,59 @@
+# Architecture
+
+> The frontend foundation and initial visual shell are implemented. No backend, database schema, authentication, or business workflows are implemented. Integrations below remain planned only.
+
+## Implemented application
+
+- Next.js `16.4.2` App Router with React `19.3.0`.
+- JavaScript and JSX; there are no TypeScript source or configuration files.
+- Tailwind CSS `4.3.3`, ESLint `9.39.5`, npm, and the `@/*` import alias.
+- `app/layout.js` provides the root document and page metadata. `app/page.js` renders the hero carousel, category discovery, Rent/Buy explanations, and the informational three-step journey. `components/category-discovery.jsx` owns the category grid and frontend-only category-family filters. `app/globals.css` contains Tailwind imports, semantic design tokens, global styles, and responsive rules.
+- `components/site-header.jsx` renders the original logo, a compact responsive commerce header, category-only search suggestions, a PIN-code form with an explicit unverified-serviceability response, and informational account/wishlist/cart states. No catalogue query, PIN validation service, account, wishlist, or cart is connected.
+- `components/hero-carousel.jsx` renders three manually controlled hero slides. It uses the existing Motion for React package and Next.js image handling; controls include previous/next buttons, slide indicators, and left/right keyboard keys while the viewport is focused. Autoplay is not enabled. Each slide's local image is explicitly labeled illustrative.
+- `components/site-footer.jsx` renders brand identity, category and Rent/Buy navigation, Bengaluru as the initial service region, and a note that policy/help details await approval. `components/ui/button.jsx` remains the configured JavaScript shadcn/ui button primitive; `lib/utils.js` provides its shared class-name helper.
+- `public/images/rento-living-room.webp`, `public/images/furniture-bedroom.webp`, and `public/images/home-appliances.webp` are locally stored, optimized AI-generated illustrative interiors for category discovery. `public/images/hero-living-room-cutout.webp`, `public/images/hero-bedroom-cutout.webp`, and `public/images/hero-appliances-cutout.webp` are transparent illustrative cutouts for the hero carousel. None represent actual inventory or catalogue records. Design and asset origin/usage notes are in [Design System](DESIGN_SYSTEM.md).
+- Ten `public/images/category-*-cutout.webp` files provide transparent illustrative category cutouts for sofas, beds, wardrobes, dining tables, study tables, refrigerators, washing machines, televisions, air conditioners, and microwaves. They are not product listings or availability indicators. `CategoryDiscovery` is a server-rendered component; its accessible links target the homepage Rent/Buy information section because catalogue routes have not been implemented.
+- `public/brand/rento-comforts.jpeg` is the original supplied JPEG logo copied without modification. It is shown at its original proportions on a white surface.
+- `components.json` configures shadcn/ui for JavaScript and the existing aliases. React Icons supply the icons in the current shell. Motion for React animates the mobile navigation.
+- `jsconfig.json`, `next.config.mjs`, `eslint.config.mjs`, `.gitignore`, `package.json`, and `package-lock.json` configure aliases, framework behavior, linting, ignored files, and npm scripts/dependencies.
+- React Compiler remains disabled. No optional experimental Next.js features are enabled.
+
+The current UI is a commerce-facing visual foundation, not a working catalogue or sales/rental service. Category search matches only approved category examples and links to those labels; PIN entry always discloses that serviceability is not validated. Account, wishlist, and cart buttons provide informational states only. No product data, inventory, customer information, serviceability checks, or transaction processing exists.
+
+## Planned integrations and stack
+
+- Supabase Auth for authentication and Supabase PostgreSQL as the planned database.
+- Prisma as the planned data access/schema tooling.
+- Cloudinary for product media.
+- Razorpay for payment processing.
+
+These are planned only; no services, schemas, secrets, or integrations have been configured. Compatibility, responsibilities, hosting, and deployment details must be confirmed during later implementation.
+
+## Planned application areas
+
+1. **Storefront:** product discovery, search/filter, product detail, rent/buy options, stock and rental availability status.
+2. **Customer account and checkout:** account access, requests/orders, payment flow, rental lifecycle, delivery/pickup details, deposit visibility, and support.
+3. **Admin operations:** controlled tools for products, inventory, orders, rentals, payments, support, and operational records.
+4. **Delivery team portal:** responsive task views for delivery and pickup workflows, with access limited to information and actions needed for assigned work.
+5. **Backend and integrations:** server-side business logic and trusted integration boundaries for database, auth, media, and payment services.
+
+These are future conceptual boundaries. They are not implemented routes, modules, or APIs.
+
+## Security and workflow principles
+
+- Treat browser input as untrusted. Enforce authorization, pricing, inventory, payment state, and critical workflow transitions on trusted server-side code.
+- Do not rely on the UI to prevent overselling or unauthorized admin actions.
+- Use transaction-safe stock checks/reservations appropriate to the selected inventory model. Record important inventory and payment changes for audit and support.
+- Distinguish a rental request from confirmed availability and fulfillment. Surface pending manual confirmation where arranging stock is needed.
+- Model quantity-based inventory and individually tracked units as appropriate; the final data model and transition rules require business decisions.
+- Keep secrets out of source control and client-visible code. Use provider-supported secret storage and environment configuration when setup is approved.
+- Verify payment outcomes through trusted provider mechanisms before treating payment as settled; define idempotent handling and reconciliation during implementation.
+- Apply least privilege to customer, admin, and delivery team access. Specify roles and sensitive actions before building permissions.
+
+## Data concepts to evaluate later
+
+Potential concepts include products, product media/specifications, inventory groups and tracked units, customers, carts or requests, orders, rental periods, delivery/pickup tasks, payments, deposits, support cases, staff roles, and audit events. This list is not a database schema. Fields, relationships, lifecycle rules, retention, and ownership are unapproved and unimplemented.
+
+## Not yet decided
+
+Hosting/deployment, environments, database migration and backup process, exact boundary between Supabase and Prisma responsibilities, availability/reservation algorithm, rental and order state machines, provider webhook strategy, audit retention, and role matrix. Resolve these incrementally before the relevant implementation phase.
