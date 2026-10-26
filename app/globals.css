@@ -204,13 +204,14 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 }
 
 .discovery-option--buy {
-  background: var(--deep-forest);
-  color: var(--warm-ivory);
+  background: #fff;
+  color: var(--deep-forest);
 }
 
 .discovery-option__content {
   position: relative;
   z-index: 2;
+  align-self: stretch;
   width: 57%;
   min-width: 0;
   display: flex;
@@ -224,7 +225,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 }
 
 .discovery-option--buy .discovery-option__content .eyebrow {
-  color: #d3e4d5;
+  color: var(--brand-green);
 }
 
 .discovery-option__content h3 {
@@ -247,27 +248,28 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 
 .discovery-option__button {
   min-height: 44px;
+  margin-top: auto;
   border-radius: 999px;
 }
 
 .discovery-option--buy .discovery-option__button {
-  border-color: rgb(248 247 242 / 55%);
+  border-color: rgb(18 71 52 / 30%);
   background: transparent;
-  color: var(--warm-ivory);
+  color: var(--deep-forest);
 }
 
 .discovery-option--buy .discovery-option__button:hover {
-  border-color: var(--warm-ivory);
-  background: var(--warm-ivory);
-  color: var(--deep-forest);
+  border-color: var(--deep-forest);
+  background: var(--deep-forest);
+  color: #fff;
+  transform: translateY(-1px);
 }
 
 .discovery-option__visual {
   position: absolute;
   z-index: 1;
-  inset: 0 -3% 0 auto;
-  width: 62%;
-  height: 100%;
+  inset: 12px 18px 12px auto;
+  width: 56%;
   pointer-events: none;
 }
 
@@ -322,9 +324,9 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   }
 
   .discovery-option__visual {
-    right: -5%;
-    width: 62%;
-  }
+  right: 12px;
+  width: 54%;
+}
 
   .discovery-option__button {
     min-height: 42px;

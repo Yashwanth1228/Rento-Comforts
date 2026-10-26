@@ -28,7 +28,7 @@ export default function Home() {
           <div className="page-container">
             <header className="discovery-heading">
               <p className="eyebrow">Rent or buy</p>
-              <h2 id="discovery-heading">Choose how you shop</h2>
+              <h2 id="discovery-heading">Choose How You Shop</h2>
             </header>
 
             <div className="discovery-options">
@@ -38,9 +38,9 @@ export default function Home() {
               >
                 <div className="discovery-option__content">
                   <p className="eyebrow">Furniture &amp; appliances</p>
-                  <h3>Explore rentals</h3>
+                  <h3>Rent for Your Home</h3>
                   <p>
-                    Browse rental categories for your home.
+                    Browse furniture and home appliances available for rental.
                   </p>
                   <a
                     href="#categories"
@@ -68,9 +68,9 @@ export default function Home() {
               >
                 <div className="discovery-option__content">
                   <p className="eyebrow">Furniture &amp; appliances</p>
-                  <h3>Shop to buy</h3>
+                  <h3>Make It Yours</h3>
                   <p>
-                    Explore categories with purchase options where available.
+                    Explore furniture and home appliances available for purchase.
                   </p>
                   <a
                     href="#categories"
