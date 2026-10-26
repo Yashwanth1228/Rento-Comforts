@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { HeroCarousel } from "@/components/hero-carousel";
 import { CategoryDiscovery } from "@/components/category-discovery";
 import Image from "next/image";
+import { FeaturedRentalProducts } from "@/components/featured-rental-products";
 
 const steps = [
   { number: "01", title: "Explore", text: "Browse furniture and appliances by category." },
@@ -12,7 +13,15 @@ const steps = [
   { number: "03", title: "Continue with confidence", text: "Review the applicable details before placing an order or rental request." },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const isDevelopmentPreview = process.env.NODE_ENV === "development";
+
+  const featuredRentalProducts = isDevelopmentPreview
+    ? (
+        await import("@/data/featured-rental-products.preview")
+      ).rentalCardPreviewProducts
+    : [];
+
   return (
     <div id="top" className="site-shell">
       <SiteHeader />
@@ -94,6 +103,11 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <FeaturedRentalProducts
+  products={featuredRentalProducts}
+  isDevelopmentPreview={isDevelopmentPreview}
+/>
 
         <section className="how-section page-container" aria-labelledby="how-heading">
           <div className="how-section__intro"><p className="eyebrow">A straightforward journey</p><h2 id="how-heading">A better fit for your home starts here.</h2><p>Clear choices at every step, whether you are renting or buying.</p></div>
