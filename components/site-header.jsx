@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { FiArrowUpRight, FiHeart, FiMapPin, FiMenu, FiSearch, FiShoppingBag, FiUser, FiX } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/components/cart-provider";
 
 const navItems = [
   { label: "Furniture", href: "#furniture" },
@@ -24,6 +25,7 @@ function BrandLink() {
 }
 
 export function SiteHeader() {
+  const { items: cartItems } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -97,7 +99,13 @@ export function SiteHeader() {
         <div className="header-actions" aria-label="Shopping tools">
           <button type="button" onClick={() => setNotice("Account access is not available yet.")} aria-label="Account, not available yet"><FiUser aria-hidden="true" /><span>Account</span></button>
           <button type="button" onClick={() => setNotice("Wishlist is not available yet.")} aria-label="Wishlist, not available yet"><FiHeart aria-hidden="true" /><span>Wishlist</span></button>
-          <button type="button" onClick={() => setNotice("Cart is not available yet.")} aria-label="Cart, not available yet"><FiShoppingBag aria-hidden="true" /><span>Cart</span></button>
+          <Link href="/cart" className="cart-action" aria-label={`Cart, ${cartItems.length} ${cartItems.length === 1 ? "item" : "items"}`}>
+            <span className="cart-action__icon">
+              <FiShoppingBag aria-hidden="true" />
+              {cartItems.length > 0 && <span className="cart-action__count" aria-hidden="true">{cartItems.length}</span>}
+            </span>
+            <span>Cart</span>
+          </Link>
         </div>
 
         <Button ref={menuButtonRef} type="button" variant="ghost" size="icon" className="menu-toggle" aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"} aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => setMenuOpen((open) => !open)}>

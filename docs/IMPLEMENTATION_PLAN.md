@@ -72,6 +72,60 @@ This plan is intentionally incremental for a single developer. A phase is comple
 
 **Verification evidence:** `npm.cmd run lint` and `npm.cmd run build` passed. Generated PNG dimensions are 1774×887; PNG color type 6 confirms alpha support. A browser UI was not available in this session, so responsive appearance, CTA interaction, browser console, and horizontal-overflow checks remain outstanding.
 
+### Phase 3H — Rental card actions and in-memory cart foundation
+
+**Status: IMPLEMENTED — lint/build and local HTTP checks passed; browser interaction checks incomplete**
+
+**Implemented:** Rental cards keep the product image, one ellipsized product-name line, and monthly INR price on the following line. The featured grid uses two columns on mobile/tablet and four on wide desktop; mobile card actions stack vertically for touch use. Hover-capable screens scale the card up subtly. On wide screens, Quick View and Add to Cart appear in a panel visually attached below the card without shifting other page content; keyboard focus reveals the same state and mouse leave collapses it. Added a lightweight app-session cart and `/cart` view with removal. Sample preview records are blocked from the cart outside development; adding an item does not reserve inventory or create a booking. No product-detail route exists, so no View Details action is shown.
+
+**Verification evidence:** `npm.cmd run lint` and `npm.cmd run build` passed. Local development homepage and production homepage/cart returned HTTP 200; the production development-preview route returned 404, and sample product labels were absent from the production homepage. Browser visual and interaction checks remain outstanding because no supported browser surface is available in this session.
+
+**Limitations:** Cart contents are not persisted and there is no backend pricing validation, rental plan/date selection, availability check, reservation, checkout, or payment processing.
+
+### Phase 3I — Featured purchase products
+
+**Status: IMPLEMENTED — lint/build and desktop browser interaction checks passed; mobile/tablet and console QA incomplete**
+
+**Implemented:** Added a Featured Products to Buy section after rental products. It reuses the existing product-card design and Quick View dialog, showing a one-time INR amount without rental suffixes or rental-only terms. Local development loads four clearly labeled illustrative records and sample prices from a separate preview fixture. Production omits that fixture and shows the verified-catalogue empty state. The in-memory cart now separates rental and purchase line items; its cart view labels modes and displays the corresponding price type. Sample products remain blocked from the cart outside development. No order or inventory reservation is created.
+
+**Verification evidence:** ESLint and the optimized production build passed. The production homepage artifact contains the purchase section and empty state, with no preview product name, sample amount, or preview notice. The development homepage and cart routes returned HTTP 200 and showed all four purchase previews with INR amounts and no `/mo` label. In Chrome at a 1140px window, the purchase cards rendered in a four-column row; hovering revealed the actions below the details, Quick View opened with one-time purchase pricing and no rental terms, and Add to Cart changed the header count and disabled the duplicate action. Mobile/tablet layout and browser-console checks remain incomplete. A focus change during a later cart-view attempt ended UI testing before the cart route could be inspected.
+
+**Limitations:** Illustrative preview amounts are not approved purchase prices. Real purchase catalogue data, verified stock, server-side price validation, cart persistence, order creation, checkout, payment, and inventory reservation are not implemented.
+
+### Phase 3J — Unified Rent / Buy featured products
+
+**Status: IMPLEMENTED — lint, production build, and desktop browser interactions verified; responsive and console checks pending**
+
+**Implemented:** Replaced the two adjacent homepage product sections with one Featured Products section. Rent is the initial selection; the Rent and Buy controls switch the visible collection in client-side React state. The existing `ProductCard` component and its card styling, Quick View, cart mode separation, development-only fixtures, and production preview-data filter are reused. The purchase-only homepage wrapper was removed; the rental wrapper remains for the dedicated development preview route.
+
+**Verified:** ESLint and production build pass. Desktop browser checks confirmed each tab displays only its mode, rent prices include `/mo`, purchase prices do not, Quick View presents purchase pricing without rental terms, and Add to Cart updates cart state while preserving the selected mode. Production homepage output excludes preview records and sample prices. The existing long-running development server retained stale CSS during this check; restart it before visual review. Mobile/tablet and browser-console checks remain pending.
+
+**Limitations:** Real catalogue data, verified pricing/stock, backend price validation, cart persistence, order creation, checkout, payment, and inventory reservation are not implemented.
+
+### Phase 3K — Renting Made Simple homepage journey
+
+  **Status: IMPLEMENTED — lint and production build passed for the latest UI refinements; browser layout checks pending**
+
+  **Implemented:** Replaced the old informational three-step block with the four requested rental-journey steps, numbered 01–04 and paired with custom colorful furniture-rental illustrations. The subtitle is “Discover how renting with Rento Comforts works.” The unified section uses warm-ivory process cards: four columns on desktop, two on tablet, and one on mobile. The marker-to-heading gap is reduced. Each original transparent illustration is split from the source sprite into its own equal-sized PNG and displayed with `object-fit: contain`, preserving the artwork and proportions. The copy is informational and does not implement booking or promise operational behavior. Artwork was generated specifically for this project using the supplied screenshot as a style reference; source sprite: `public/images/renting-journey-illustrations.png`.
+
+  **Verification:** ESLint and the production build passed after these refinements. CSS breakpoints define the desktop, tablet, and mobile layouts. Desktop/tablet/mobile visual checks and browser-console checks remain pending because no browser surface is available in this session.
+
+### Phase 3L — Why Choose Rento Comforts homepage section
+
+**Status: IMPLEMENTED — lint/build and source review passed; responsive browser checks pending**
+
+**Implemented:** Added the editorial split section after Renting Made Simple. It pairs the existing illustrative living-room image with four approved factual points and restrained soft-sage React Icons. The pricing copy describes a planned display capability, and the image caption states that it is illustrative rather than a catalogue listing. At tablet widths, the heading and image sit side by side with the two-column benefits below. On mobile, the image sits between the introduction and the single-column benefits list. No operational business workflow was added.
+
+**Verification:** ESLint and the production build passed. Desktop and tablet screenshots were inspected, and a mobile screenshot confirmed the intended heading → image → benefits order. The headless mobile capture reported a 512 CSS-pixel viewport despite a 375-pixel screenshot width, so exact 375 CSS-pixel visual verification remains outstanding. Browser-console checks remain pending.
+
+### Phase 3M — Homepage FAQ section
+
+**Status: IMPLEMENTED — ESLint and production build passed; browser interaction and responsive checks pending**
+
+**Implemented:** Added `components/faq-section.jsx` after Why Choose Rento Comforts. The five approved FAQ entries use a single-open accessible accordion, with client-side search across question and answer text and an empty result state. The left visual uses the new transparent `public/images/faq-lounge-cutout-v2.webp` illustration, with the plant left and chair oriented to the right, plus CSS chat details. The support banner is present, but Contact Support is disabled because no support route or contact method is configured. No backend workflow or new dependency was added.
+
+**Verification:** `npm.cmd run lint` and `npm.cmd run build` passed. Source review confirmed the FAQ is after Why Choose in the homepage and the approved answers are used. A stale dev-server CSS artifact caused the initial unstyled render; restarting Next.js rebuilt the stylesheet, and the current server now returns the FAQ selectors. The new image also returns HTTP 200. Browser interaction, keyboard operation, responsive visual checks, overflow and console checks remain pending.
+
 ## Phase 4 — Establish data, identity, and authorization foundations
 
 **Status: NOT STARTED**

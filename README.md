@@ -4,7 +4,7 @@ Rento Comforts is a company-owned furniture and home-appliance rental and sales 
 
 ## Current project status
 
-The JavaScript Next.js App Router foundation and an initial responsive customer-facing visual shell are implemented. The homepage is an early design foundation with working in-page navigation. Catalogue, account, wishlist, cart, checkout, backend, database schema, authentication, and third-party integrations are not implemented.
+The JavaScript Next.js App Router foundation and an initial responsive customer-facing visual shell are implemented. The homepage includes a development-only rental-card preview and a frontend-only in-memory cart with a `/cart` view. Catalogue data, account, wishlist, checkout, backend, database schema, authentication, and third-party integrations are not implemented. The cart is not persisted and does not validate prices, check availability, reserve inventory, or create bookings.
 
 ## Run locally
 
@@ -38,8 +38,8 @@ Planned for later, not connected: Supabase Auth, Supabase PostgreSQL, Prisma, Cl
 
 ## Project structure
 
-- `app/` — root layout, homepage, and global stylesheet.
-- `components/` — customer website header, footer, and the configured shadcn button.
+- `app/` — root layout, homepage, cart route, and global stylesheet.
+- `components/` — customer website header/footer, rental product cards, in-memory cart provider, and configured shadcn button.
 - `lib/` — small shared class-name utility used by the button.
 - `public/brand/` — original Rento Comforts logo JPEG, preserved unchanged.
 - `docs/` — project scope, visual guidance, architecture notes, and phased plan.

@@ -1,16 +1,39 @@
 
-import { FiArrowRight, FiCheck, FiChevronRight } from "react-icons/fi";
+import { FiArrowRight } from "react-icons/fi";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { HeroCarousel } from "@/components/hero-carousel";
 import { CategoryDiscovery } from "@/components/category-discovery";
 import Image from "next/image";
-import { FeaturedRentalProducts } from "@/components/featured-rental-products";
+import { FeaturedProducts } from "@/components/featured-products";
+import { WhyChooseRento } from "@/components/why-choose-rento";
+import { FAQSection } from "@/components/faq-section";
 
-const steps = [
-  { number: "01", title: "Explore", text: "Browse furniture and appliances by category." },
-  { number: "02", title: "Choose your way", text: "Select Rent or Buy where that option is available." },
-  { number: "03", title: "Continue with confidence", text: "Review the applicable details before placing an order or rental request." },
+const rentalSteps = [
+  {
+    number: "01",
+    title: "Explore Products",
+    description: "Browse furniture and home appliances.",
+    image: "/images/renting-step-explore.png",
+  },
+  {
+    number: "02",
+    title: "Choose Your Dates",
+    description: "Select your preferred rental period.",
+    image: "/images/renting-step-dates.png",
+  },
+  {
+    number: "03",
+    title: "Review & Confirm",
+    description: "Check availability and applicable rental terms.",
+    image: "/images/renting-step-review.png",
+  },
+  {
+    number: "04",
+    title: "Delivery & Management",
+    description: "Track delivery and manage your rental.",
+    image: "/images/renting-step-manage.png",
+  },
 ];
 
 export default async function Home() {
@@ -20,6 +43,11 @@ export default async function Home() {
     ? (
         await import("@/data/featured-rental-products.preview")
       ).rentalCardPreviewProducts
+    : [];
+  const featuredPurchaseProducts = isDevelopmentPreview
+    ? (
+        await import("@/data/featured-purchase-products.preview")
+      ).purchaseCardPreviewProducts
     : [];
 
   return (
@@ -104,17 +132,50 @@ export default async function Home() {
           </div>
         </section>
 
-        <FeaturedRentalProducts
-  products={featuredRentalProducts}
-  isDevelopmentPreview={isDevelopmentPreview}
-/>
+        <FeaturedProducts
+          rentalProducts={featuredRentalProducts}
+          purchaseProducts={featuredPurchaseProducts}
+          isDevelopmentPreview={isDevelopmentPreview}
+        />
 
-        <section className="how-section page-container" aria-labelledby="how-heading">
-          <div className="how-section__intro"><p className="eyebrow">A straightforward journey</p><h2 id="how-heading">A better fit for your home starts here.</h2><p>Clear choices at every step, whether you are renting or buying.</p></div>
-          <ol className="steps-list">
-            {steps.map((step) => <li key={step.number}><span className="steps-list__number">{step.number}</span><div><h3>{step.title}</h3><p>{step.text}</p></div></li>)}
-          </ol>
+        <section className="renting-journey" aria-labelledby="renting-journey-heading">
+          <div className="page-container">
+            <header className="renting-journey__header">
+              <div>
+                <p className="eyebrow">The rental journey</p>
+                <h2 id="renting-journey-heading">Renting Made Simple</h2>
+              </div>
+              <p className="renting-journey__summary">
+                Discover how renting with Rento Comforts works.
+              </p>
+            </header>
+            <ol className="renting-journey__steps">
+              {rentalSteps.map(({ number, title, description, image }) => (
+                <li className="renting-journey__step" key={number}>
+                  <div className="renting-journey__step-marker">
+                    <span className="renting-journey__icon" aria-hidden="true">
+                      <Image
+                        src={image}
+                        alt=""
+                        fill
+                        sizes="(max-width: 640px) 62px, (max-width: 1000px) 78px, 88px"
+                        className="renting-journey__icon-image"
+                      />
+                    </span>
+                    <span className="renting-journey__number">{number}</span>
+                  </div>
+                  <div className="renting-journey__step-copy">
+                    <h3>{title}</h3>
+                    <p>{description}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
         </section>
+
+        <WhyChooseRento />
+        <FAQSection />
       </main>
       <SiteFooter />
     </div>

@@ -1,4 +1,5 @@
 import "./globals.css";
+import { CartProvider } from "@/components/cart-provider";
 
 export const metadata = {
   title: "Rento Comforts",
@@ -8,7 +9,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <CartProvider>{children}</CartProvider>
+      </body>
     </html>
   );
 }
