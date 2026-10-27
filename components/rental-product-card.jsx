@@ -106,7 +106,7 @@ export function ProductCard({ product }) {
           )}
         </div>
 
-        <div className="rental-product-card__actions grid grid-cols-1 items-center gap-2 overflow-hidden px-1 transition-[max-height,opacity,transform,padding-top,padding-bottom,border-color] duration-200 motion-reduce:transition-none sm:grid-cols-2">
+        <div className="rental-product-card__actions grid grid-cols-1 items-center gap-2 overflow-hidden px-1 transition-[max-height,opacity,transform,padding-bottom,border-color] duration-200 motion-reduce:transition-none sm:grid-cols-2">
           <button
             type="button"
             onClick={() => setIsQuickViewOpen(true)}

@@ -122,9 +122,17 @@ This plan is intentionally incremental for a single developer. A phase is comple
 
 **Status: IMPLEMENTED — ESLint and production build passed; browser interaction and responsive checks pending**
 
-**Implemented:** Added `components/faq-section.jsx` after Why Choose Rento Comforts. The five approved FAQ entries use a single-open accessible accordion, with client-side search across question and answer text and an empty result state. The left visual uses the new transparent `public/images/faq-lounge-cutout-v2.webp` illustration, with the plant left and chair oriented to the right, plus CSS chat details. The support banner is present, but Contact Support is disabled because no support route or contact method is configured. No backend workflow or new dependency was added.
+**Implemented:** Added `components/faq-section.jsx` after Why Choose Rento Comforts. The five approved FAQ entries use a single-open accessible accordion, with client-side search across question and answer text and an empty result state. The left visual uses the transparent `public/images/faq-lounge-cutout-v3.webp` illustration, with the plant left and chair facing right, plus CSS chat details. Two overlapping soft-sage organic forms extend behind the plant and chair; both remain clipped to the illustration area below the search field and above the support banner. The support banner is present, but Contact Support is disabled because no support route or contact method is configured. No backend workflow or new dependency was added.
 
 **Verification:** `npm.cmd run lint` and `npm.cmd run build` passed. Source review confirmed the FAQ is after Why Choose in the homepage and the approved answers are used. A stale dev-server CSS artifact caused the initial unstyled render; restarting Next.js rebuilt the stylesheet, and the current server now returns the FAQ selectors. The new image also returns HTTP 200. Browser interaction, keyboard operation, responsive visual checks, overflow and console checks remain pending.
+
+### Phase 3N — Approved dark-green footer
+
+**Status: IMPLEMENTED — lint/build passed; browser visual and interaction checks pending**
+
+**Implemented:** Replaced the compact footer placeholder with the approved deep-forest layout, ivory SVG wave, original logo presented unchanged on a light tile, four navigation groups using only available homepage anchors, pending labels for unimplemented About/Support/Delivery/Legal destinations, a unique optimized footer illustration, four confirmed business highlights, and the current-year copyright line. No newsletter form, contact details, social links, or fake legal destinations were added.
+
+**Verification:** ESLint and production build passed. Source review confirmed the logo source remains the original JPEG and all footer links target existing page anchors. The new generated artwork is a separate 1200×800 WebP and is identified as illustrative in project documentation. Desktop/tablet/mobile browser rendering, link activation, keyboard focus, console, and horizontal-overflow checks remain pending because the browser surface was unavailable in this implementation session.
 
 ## Phase 4 — Establish data, identity, and authorization foundations
 
