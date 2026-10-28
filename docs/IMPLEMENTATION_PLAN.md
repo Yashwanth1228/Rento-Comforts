@@ -118,6 +118,16 @@ This plan is intentionally incremental for a single developer. A phase is comple
 
 **Verification:** ESLint and the production build passed. Desktop and tablet screenshots were inspected, and a mobile screenshot confirmed the intended heading → image → benefits order. The headless mobile capture reported a 512 CSS-pixel viewport despite a 375-pixel screenshot width, so exact 375 CSS-pixel visual verification remains outstanding. Browser-console checks remain pending.
 
+### Phase 3M — Editorial navbar and category mega menus
+
+**Status: IMPLEMENTED — lint/build passed; 1280px desktop default and open Furniture menu visually inspected; smaller viewport visual checks pending**
+
+**Implemented:** Replaced the compact header with a dark-green utility strip, ivory editorial row, and four-category navigation row. The original logo image and existing cart provider are reused. Search remains category-example-only; PIN entry accepts six digits but explicitly does not verify delivery serviceability. Furniture and Appliances menus use existing category anchors and the local illustrative living-room asset. Combos and Packers & Movers show pending setup information. Mobile/tablet navigation exposes touch-friendly expandable category groups. No dependencies were added.
+
+**Verification:** ESLint and production build pass. Chrome at a 1280 × 672 window was inspected in the default state and with the Furniture mega menu open. Responsive breakpoints are defined for tablet and mobile, but browser screenshots and interaction checks at 768px and 375px, browser-console inspection, keyboard sequence testing, and PIN/search interaction checks remain pending. Headless Chrome screenshot capture was attempted but failed before generating images in this environment.
+
+**Limitations:** Real product search, serviceability results, account, wishlist, order tracking, Contact Us route, live catalogue routes, combo inventory, Packers & Movers service details, and backend/cart persistence are not implemented.
+
 ### Phase 3M — Homepage FAQ section
 
 **Status: IMPLEMENTED — ESLint and production build passed; browser interaction and responsive checks pending**
@@ -128,11 +138,25 @@ This plan is intentionally incremental for a single developer. A phase is comple
 
 ### Phase 3N — Approved dark-green footer
 
-**Status: IMPLEMENTED — lint/build passed; desktop cutout rendering inspected; tablet/mobile and link/keyboard checks pending**
+**Status: IMPLEMENTED — initial lint/build passed; superseded by Phase 3O refinements**
 
-**Implemented:** Replaced the compact footer placeholder with the approved deep-forest layout, ivory SVG wave, original logo presented unchanged on a light tile, Shop/Company/Help navigation using available homepage anchors, decorative social icons pending verified account URLs, a Get Updates column with a disabled email field pending an approved signup workflow, a transparent furniture cutout placed over the continuous green background, four confirmed business highlights, and the current-year copyright line. Contact details and fake legal destinations were not added.
+The first footer version added the deep-green surface, ivory wave, original logo on a light tile, homepage anchor links, visual-only social icons, disabled newsletter controls, transparent furniture cutout, factual highlights, and current-year copyright. See Phase 3O for the current refinements and verification.
 
-**Verification:** ESLint and production build passed. The 1536×1024 transparent WebP was composited over the footer green for visual review; the complete rug edge is visible in the replacement cutout. Source review confirmed the artwork is aligned within the viewport, the ivory wave and green background remain continuous, the social icon row is visual-only pending verified URLs, and the update signup remains disabled. The logo source remains the original JPEG and footer links target existing homepage anchors. A full rendered browser screenshot, tablet/mobile rendering, link activation, keyboard focus, console, and horizontal-overflow checks remain pending because the browser preview was unavailable.
+### Phase 3O — Approved footer visual refinement
+
+**Status: IMPLEMENTED — ESLint and production build passed; partial browser visual review complete**
+
+**Implemented:** Rebuilt the footer's desktop grid as five aligned columns and restored all approved Shop, Company, and Help labels. Existing section anchors remain links; unavailable destinations are plain noninteractive text without “Coming later” labels. Added a restrained layered forest-green background, retained the shallow SVG wave and original logo asset on a compact light tile, repositioned the transparent lounge artwork in a separate lower-right layer, kept the four confirmed highlights and current-year copyright, and made the Get Updates area a clearly marked disabled preview. Social icons remain decorative because approved account URLs are unavailable.
+
+**Verification:** ESLint and `npm.cmd run build` passed. A local Chrome screenshot at the available 1280×720 desktop window was reviewed before the last grid adjustment; a second screenshot of the updated footer was reviewed in responsive 1024px emulation. It showed the restored columns, highlights, copyright, and repositioned transparent artwork. Exact 1440px, 768px, and 375px screenshots, browser-console review, and keyboard/link activation checks were not completed. The visual-only social icons, original JPEG logo backing, unimplemented destinations, and inactive newsletter signup remain limitations.
+
+### Phase 3P — Footer composition and image correction
+
+**Status: IMPLEMENTED — ESLint and production build passed; local browser layout reviewed at the available desktop window**
+
+**Implemented:** Replaced the oversized footer cutout with a new transparent illustration featuring a cream chair, sage-green cushion, low wooden table with slender angled legs, rug, plant, and pendant lamp (`public/images/footer-lounge-cutout-v2.png`). Corrected the uneven column proportions and placed the artwork lower-right so the chair/table do not sit behind the newsletter or highlight copy. Kept the newsletter input and arrow disabled, removed visible preview labels, and retained its inactive state in accessible text. Tablet breakpoints place the artwork in a dedicated row; mobile hides the decoration.
+
+**Verification:** `npm.cmd run lint` and `npm.cmd run build` passed after the final CSS changes. The transparent PNG alpha channel was checked. A local browser screenshot at the available 1280×720 window and 90% browser zoom was reviewed during the visual adjustments; it showed the illustration below the updates form and separate from the left highlight row. Exact 1440px, 768px, and 375px screenshots, a final screenshot after the last column-width adjustment, browser-console review, and keyboard/link activation checks were not completed. The current local logo is still the original JPEG on its light tile; official social URLs, legal/contact destinations, and a newsletter service remain unconfigured.
 
 ## Phase 4 — Establish data, identity, and authorization foundations
 
