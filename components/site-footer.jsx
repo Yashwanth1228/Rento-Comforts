@@ -3,8 +3,8 @@ import {
   FiMapPin,
   FiPackage,
   FiRepeat,
-  FiArrowUpRight,
 } from "react-icons/fi";
+import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube } from "react-icons/fa6";
 
 const navigationGroups = [
   {
@@ -28,11 +28,6 @@ const navigationGroups = [
     title: "Help",
     links: [{ label: "FAQs", href: "#faq-heading" }],
     pending: "Contact Support · Delivery Information",
-  },
-  {
-    title: "Legal",
-    links: [],
-    pending: "Terms · Privacy · Rental · Refund policies",
   },
 ];
 
@@ -63,6 +58,12 @@ export function SiteFooter() {
               />
             </a>
             <p>Furniture and home appliances for rent or purchase, with a shopping experience designed for Bengaluru.</p>
+            <div className="site-footer__social" aria-hidden="true">
+              {[FaInstagram, FaFacebookF, FaYoutube, FaLinkedinIn].map((Icon, index) => (
+                <span className="site-footer__social-icon" key={index}><Icon /></span>
+              ))}
+            </div>
+            <span className="sr-only">Official social media account links are not configured.</span>
           </div>
 
           <div className="site-footer__navigation">
@@ -75,15 +76,24 @@ export function SiteFooter() {
             ))}
           </div>
 
+          <section className="site-footer__updates" aria-labelledby="site-footer-updates-title">
+            <h2 id="site-footer-updates-title">Get Updates</h2>
+            <p>Subscribe to receive updates on new products, offers and more.</p>
+            <div className="site-footer__updates-form" aria-describedby="site-footer-updates-note">
+              <input type="email" placeholder="Enter your email address" aria-label="Email address" disabled />
+              <button type="button" aria-label="Email updates coming soon" disabled>→</button>
+            </div>
+            <span id="site-footer-updates-note" className="sr-only">Email sign-up is not available yet.</span>
+          </section>
+
           <div className="site-footer__decoration" aria-hidden="true">
             <Image
-              src="/images/footer-lounge-composition.webp"
+              src="/images/footer-lounge-cutout.webp"
               alt=""
               fill
-              sizes="(max-width: 900px) 36vw, 34vw"
+              sizes="(max-width: 900px) 36vw, (max-width: 1550px) 58vw, 900px"
               className="site-footer__decoration-image"
             />
-            <span>Illustrative interior</span>
           </div>
         </div>
 
@@ -100,7 +110,6 @@ export function SiteFooter() {
 
         <div className="site-footer__base">
           <span>© {new Date().getFullYear()} Rento Comforts</span>
-          <a href="#top">Back to top <FiArrowUpRight aria-hidden="true" /></a>
         </div>
       </div>
     </footer>

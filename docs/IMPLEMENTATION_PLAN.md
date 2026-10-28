@@ -128,11 +128,11 @@ This plan is intentionally incremental for a single developer. A phase is comple
 
 ### Phase 3N — Approved dark-green footer
 
-**Status: IMPLEMENTED — lint/build passed; browser visual and interaction checks pending**
+**Status: IMPLEMENTED — lint/build passed; desktop cutout rendering inspected; tablet/mobile and link/keyboard checks pending**
 
-**Implemented:** Replaced the compact footer placeholder with the approved deep-forest layout, ivory SVG wave, original logo presented unchanged on a light tile, four navigation groups using only available homepage anchors, pending labels for unimplemented About/Support/Delivery/Legal destinations, a unique optimized footer illustration, four confirmed business highlights, and the current-year copyright line. No newsletter form, contact details, social links, or fake legal destinations were added.
+**Implemented:** Replaced the compact footer placeholder with the approved deep-forest layout, ivory SVG wave, original logo presented unchanged on a light tile, Shop/Company/Help navigation using available homepage anchors, decorative social icons pending verified account URLs, a Get Updates column with a disabled email field pending an approved signup workflow, a transparent furniture cutout placed over the continuous green background, four confirmed business highlights, and the current-year copyright line. Contact details and fake legal destinations were not added.
 
-**Verification:** ESLint and production build passed. Source review confirmed the logo source remains the original JPEG and all footer links target existing page anchors. The new generated artwork is a separate 1200×800 WebP and is identified as illustrative in project documentation. Desktop/tablet/mobile browser rendering, link activation, keyboard focus, console, and horizontal-overflow checks remain pending because the browser surface was unavailable in this implementation session.
+**Verification:** ESLint and production build passed. The 1536×1024 transparent WebP was composited over the footer green for visual review; the complete rug edge is visible in the replacement cutout. Source review confirmed the artwork is aligned within the viewport, the ivory wave and green background remain continuous, the social icon row is visual-only pending verified URLs, and the update signup remains disabled. The logo source remains the original JPEG and footer links target existing homepage anchors. A full rendered browser screenshot, tablet/mobile rendering, link activation, keyboard focus, console, and horizontal-overflow checks remain pending because the browser preview was unavailable.
 
 ## Phase 4 — Establish data, identity, and authorization foundations
 
