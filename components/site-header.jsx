@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   FiArrowRight, FiChevronDown, FiHeart, FiMapPin, FiMenu,
@@ -14,8 +15,8 @@ import { megaMenuNavigation } from "@/data/mega-menu-navigation";
 
 // Primary Links: Strictly "Rent" and "Buy"
 const primaryLinks = [
-  { label: "Rent", href: "#rentals" },
-  { label: "Buy", href: "#buy" },
+  { label: "Rent", href: "/products?mode=rent" },
+  { label: "Buy", href: "/products?mode=buy" },
 ];
 
 const menuTabs = [
@@ -91,6 +92,7 @@ function CategoryMenu({ id, compact = false, onSelect, expandedGroup = "", onTog
 }
 
 export function SiteHeader() {
+  const router = useRouter();
   const { items: cartItems } = useCart();
   const [activeMenu, setActiveMenu] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -304,11 +306,13 @@ export function SiteHeader() {
               role="search"
               onSubmit={(event) => {
                 event.preventDefault();
-                setSearchOpen(Boolean(query.trim()));
+                const params = new URLSearchParams();
+                if (query.trim()) params.set("q", query.trim());
+                router.push(`/products${params.size ? `?${params.toString()}` : ""}`);
               }}
             >
               <FiSearch className="w-3.5 h-3.5 text-charcoal/50 ml-3 shrink-0" aria-hidden="true" />
-              <label className="sr-only" htmlFor="site-search">Search category examples</label>
+              <label className="sr-only" htmlFor="site-search">Search products</label>
               <input
                 id="site-search"
                 type="search"
@@ -340,16 +344,16 @@ export function SiteHeader() {
                     <ul>
                       {matches.map((name) => (
                         <li key={name}>
-                          <a href={`#cat-${name.toLowerCase().replaceAll(" ", "-")}`} onClick={() => setSearchOpen(false)}>
+                          <a href={`/products?q=${encodeURIComponent(name)}`} onClick={() => setSearchOpen(false)}>
                             {name}<FiArrowUpRight aria-hidden="true" />
                           </a>
                         </li>
                       ))}
                     </ul>
-                    <span>These are illustrative category examples. Product search is not connected yet.</span>
+                    <span>Search will show matching catalogue items when available.</span>
                   </>
                 ) : (
-                  <p className="search-suggestions__empty">No matching category examples. Product search is not connected yet.</p>
+                  <p className="search-suggestions__empty">No category suggestion. Press Enter to search the catalogue.</p>
                 )}
               </div>
             )}

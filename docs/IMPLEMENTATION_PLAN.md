@@ -178,11 +178,15 @@ The first footer version added the deep-green surface, ivory wave, original logo
 
 ## Phase 5 — Build catalogue and inventory visibility
 
-**Status: NOT STARTED**
+**Status: IN PROGRESS — catalogue listing UI implemented; verified inventory and backend remain unimplemented**
 
 **Prerequisites:** Product data requirements, image/content ownership, approved design direction, and inventory policy.
 
 **Acceptance criteria:** Admin can manage initial product information and images; customers can browse, search, filter, and inspect details; rent/buy availability is explicit; out-of-stock sales are blocked securely; INR is used consistently.
+
+**Implemented so far:** Added `/products` with Rent/Buy modes, category-family and represented product-type filters, rental/purchase-specific INR price range filtering, search, supported sorting, result counts, clear and empty states, responsive product grid, and a native mobile filter dialog. It reuses the existing shared `ProductCard` and in-memory cart. Header Rent/Buy links and search submission lead to the catalogue. Existing illustrative fixtures are loaded only in development and are labeled as previews; production has no product records and shows the verified-catalogue empty state. Filter state is encoded in the URL and restored on browser Back/Forward.
+
+**Verification:** ESLint and production build passed after the catalogue implementation. Browser-level layout checks at 1440px, 1280px, 768px, and 375px, interactive filter/search/cart checks, and browser-console review are still pending. No real product records, product detail route, brand or size/capacity attributes, verified availability, database, admin catalogue, stock validation, or checkout were added. Rental/purchase prices and product imagery shown in development are sample data only.
 
 ## Phase 6 — Implement customer order and rental request workflows
 
