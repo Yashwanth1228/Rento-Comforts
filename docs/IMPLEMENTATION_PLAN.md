@@ -158,6 +158,16 @@ The first footer version added the deep-green surface, ivory wave, original logo
 
 **Verification:** `npm.cmd run lint` and `npm.cmd run build` passed after the final CSS changes. The transparent PNG alpha channel was checked. A local browser screenshot at the available 1280×720 window and 90% browser zoom was reviewed during the visual adjustments; it showed the illustration below the updates form and separate from the left highlight row. Exact 1440px, 768px, and 375px screenshots, a final screenshot after the last column-width adjustment, browser-console review, and keyboard/link activation checks were not completed. The current local logo is still the original JPEG on its light tile; official social URLs, legal/contact destinations, and a newsletter service remain unconfigured.
 
+### Phase 3Q — Complete approved mega-menu navigation taxonomy
+
+**Status: IMPLEMENTED — lint/build and taxonomy source checks passed; live browser interaction/viewport QA pending**
+
+**Implemented:** Added the complete approved Furniture (8 groups), Appliances (8 groups), Combos (6 groups), and Packers & Movers (6 groups) taxonomies to `data/mega-menu-navigation.js`. Group and item IDs are stable, destinations are optional, and every subcategory is marked planned because no matching catalogue or service route exists. Desktop menus keep the existing presentation, use four category columns plus the editorial promo panel for Furniture/Appliances and three plus promo for Combos/Packers, and scroll within a viewport-height limit. Mobile uses the same data with expandable category and subgroup controls. Promotional CTAs only link Furniture/Appliances to the existing category-discovery section; no bundle or moving-service booking action is exposed.
+
+**Verification:** ESLint and production build passed. Source checks confirmed the requested menu and group counts and checked that all subcategory IDs are stable and marked planned. Browser testing of each open menu, keyboard/outside-close interaction, and exact 1440px/1280px/768px/375px layouts remains outstanding.
+
+**Limitations:** The existing homepage category anchors are illustrative, not catalogue destinations; all menu subcategories remain noninteractive. No product, bundle, or moving-service availability is implied.
+
 ## Phase 4 — Establish data, identity, and authorization foundations
 
 **Status: NOT STARTED**

@@ -39,6 +39,20 @@ const slides = [
     actions: [{ label: "Explore Appliances", href: "#appliances", primary: true }],
     imagePosition: "center bottom",
   },
+  {
+    eyebrow: "Furniture · Considered living",
+    title: "Make Room for Comfort.",
+    description: "Explore thoughtfully chosen furniture for a more comfortable home.",
+    image: "/images/hero-living-room-slide-4.jpg",
+    alt: "Warm living room with a sage-green sofa, wooden coffee table and a lounge chair",
+    note: "Illustrative living room concept · not a product listing",
+    actions: [
+      { label: "Explore Rentals", href: "#rentals", primary: true },
+      { label: "Shop to Buy", href: "#buy", primary: false },
+    ],
+    imagePosition: "right center",
+    photoLayout: true,
+  },
 ];
 
 export function HeroCarousel() {
@@ -63,10 +77,10 @@ export function HeroCarousel() {
 
   return (
     <section className="hero-carousel page-container" aria-label="Homepage highlights" aria-roledescription="carousel">
-      <div className="hero-carousel__viewport" tabIndex={0} onKeyDown={handleKeyDown}>
+      <div className={`hero-carousel__viewport${activeSlide.photoLayout ? " hero-carousel__viewport--image-only" : ""}`} tabIndex={0} onKeyDown={handleKeyDown}>
         <AnimatePresence initial={false} mode="wait">
           <motion.article
-            className="hero-slide"
+            className={`hero-slide${activeSlide.photoLayout ? " hero-slide--photo" : ""}`}
             key={activeSlide.image}
             role="group"
             aria-roledescription="slide"
@@ -85,7 +99,7 @@ export function HeroCarousel() {
               className="hero-slide__image"
               style={{ objectPosition: activeSlide.imagePosition }}
             />
-            <div className="hero-slide__field" aria-hidden="true" />
+            {!activeSlide.photoLayout && <div className="hero-slide__field" aria-hidden="true" />}
             <div className="hero-slide__content">
               <p className="hero-slide__eyebrow"><span />{activeSlide.eyebrow}</p>
               <h1 id="hero-heading">{activeSlide.title}</h1>
@@ -102,7 +116,7 @@ export function HeroCarousel() {
                 ))}
               </div>
             </div>
-            <p className="hero-slide__image-note">{activeSlide.note}</p>
+            {!activeSlide.photoLayout && <p className="hero-slide__image-note">{activeSlide.note}</p>}
           </motion.article>
         </AnimatePresence>
 

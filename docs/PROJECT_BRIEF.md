@@ -32,6 +32,10 @@ Daily/weekly rental plans; quarterly/annual plans; rent-to-own; EMI; coupons; ra
 
 These are ideas only. Do not implement or represent them as committed scope without an explicit business decision.
 
+### CONFIRMED — navigation planning taxonomy
+
+The complete Furniture, Appliances, Combos, and Packers & Movers category hierarchy is approved for navigation planning and review. This approval confirms the taxonomy labels only; it does not confirm product inventory, saleable bundles, service availability, pricing, or booking workflows. Until meaningful destinations and business availability are verified, the mega-menu subcategories remain planned, noninteractive labels. The shared taxonomy lives in [`data/mega-menu-navigation.js`](../data/mega-menu-navigation.js).
+
 ## Launch priorities
 
 1. Establish a reliable catalogue and accurate product availability.

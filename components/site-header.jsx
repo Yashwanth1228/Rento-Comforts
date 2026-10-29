@@ -4,12 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
-  FiArrowRight, FiChevronDown, FiGrid, FiHeart, FiMapPin, FiMenu,
-  FiSearch, FiShoppingCart, FiTruck, FiTv, FiUser, FiX,
-  FiBox, FiHome, FiBriefcase, FiWind, FiDroplet, FiLayers, FiArrowUpRight,
+  FiArrowRight, FiChevronDown, FiHeart, FiMapPin, FiMenu,
+  FiSearch, FiShoppingCart, FiTruck, FiUser, FiX,
+  FiHome, FiArrowUpRight,
   FiShield,
 } from "react-icons/fi";
 import { useCart } from "@/components/cart-provider";
+import { megaMenuNavigation } from "@/data/mega-menu-navigation";
 
 // Primary Links: Strictly "Rent" and "Buy"
 const primaryLinks = [
@@ -18,62 +19,74 @@ const primaryLinks = [
 ];
 
 const menuTabs = [
-  { id: "furniture", label: "Furniture", icon: FiHome },
-  { id: "appliances", label: "Appliances", icon: FiGrid },
-  { id: "combos", label: "Combos", icon: FiBox },
-  { id: "packers", label: "Packers & Movers", icon: FiTruck },
-];
-
-const menuContent = {
-  furniture: {
-    groups: [
-      { heading: "Living Room", icon: FiHome, links: [{ label: "Sofas", href: "#cat-sofas" }] },
-      { heading: "Bedroom", icon: FiLayers, links: [{ label: "Beds", href: "#cat-beds" }, { label: "Wardrobes", href: "#cat-wardrobes" }] },
-      { heading: "Dining & Work", icon: FiBriefcase, links: [{ label: "Dining Tables", href: "#cat-dining-tables" }, { label: "Study Tables", href: "#cat-study-tables" }] },
-    ],
-    promo: true,
-  },
-  appliances: {
-    groups: [
-      { heading: "Cooling", icon: FiWind, links: [{ label: "Refrigerators", href: "#cat-refrigerators" }, { label: "Air Conditioners", href: "#cat-air-conditioners" }] },
-      { heading: "Laundry", icon: FiDroplet, links: [{ label: "Washing Machines", href: "#cat-washing-machines" }] },
-      { heading: "Entertainment & Kitchen", icon: FiTv, links: [{ label: "Televisions", href: "#cat-televisions" }, { label: "Microwaves", href: "#cat-microwaves" }] },
-    ],
-    promo: false,
-  },
-  combos: { groups: [], pending: "Product bundles and their catalogue destinations are not configured yet." },
-  packers: { groups: [], pending: "Service details and booking destinations are not configured yet." },
-};
+  { id: "furniture", image: "/images/category-sofas-cutout.webp", imageAlt: "" },
+  { id: "appliances", image: "/images/hero-appliances-cutout.webp", imageAlt: "" },
+  { id: "combos", image: "/images/category-combos.webp", imageAlt: "" },
+  { id: "packers", image: "/images/category-movers-truck.webp", imageAlt: "" },
+].map((tab) => ({ ...tab, label: megaMenuNavigation[tab.id].label }));
 
 const allCategoryLabels = ["Sofas", "Beds", "Wardrobes", "Dining Tables", "Study Tables", "Refrigerators", "Washing Machines", "Televisions", "Air Conditioners", "Microwaves"];
 
-function CategoryMenu({ id, compact = false, onSelect }) {
-  const content = menuContent[id];
+function MenuItem({ item, onSelect }) {
+  if (item.status === "active" && item.href) {
+    return <a href={item.href} onClick={onSelect}>{item.label}<FiArrowUpRight aria-hidden="true" /></a>;
+  }
+  return <span className="mega-menu__planned-item" title="Planned category; no live destination is configured">{item.label}</span>;
+}
+
+function CategoryMenu({ id, compact = false, onSelect, expandedGroup = "", onToggleGroup }) {
+  const content = megaMenuNavigation[id];
   if (!content) return null;
-  if (content.pending) return <p className="mega-menu__pending">{content.pending}</p>;
+  const columns = content.columns;
   return (
-    <div className={compact ? "mobile-category__links" : "mega-menu__groups"}>
-      {content.groups.map((group) => {
-        const GroupIcon = group.icon;
-        return (
-          <section className="mega-menu__group" key={group.heading}>
-            <h3><GroupIcon aria-hidden="true" />{group.heading}</h3>
-            <ul>{group.links.map((item) => <li key={item.label}><a href={item.href} onClick={onSelect}>{item.label}<FiArrowUpRight aria-hidden="true" /></a></li>)}</ul>
-          </section>
-        );
-      })}
-      {!compact && content.promo && (
-        <aside className="mega-menu__promo">
-          <Image src="/images/rento-living-room.webp" alt="Illustrative warm living room with sofa and coffee table" fill sizes="(max-width: 1250px) 35vw, 24vw" />
-          <div className="mega-menu__promo-copy">
-            <span>PREMIUM LIVING</span>
-            <h3>Furniture for Every Chapter of Life</h3>
-            <p>Explore furniture for rent or purchase in Bengaluru.</p>
-            <a href="#categories" onClick={onSelect}>Explore Furniture <FiArrowRight aria-hidden="true" /></a>
-          </div>
-        </aside>
+    <>
+      {compact ? (
+        <div className="mobile-category__links">
+          <p className="mobile-category__status">{content.statusNote}</p>
+          {columns.flat().map((category) => {
+            const groupKey = `${id}-${category.id}`;
+            const isExpanded = expandedGroup === groupKey;
+            const listId = `mobile-category-list-${groupKey}`;
+            return (
+              <section className="mobile-category__group" key={category.id}>
+                <button id={`mobile-category-heading-${groupKey}`} className="mobile-category__group-toggle" type="button" aria-expanded={isExpanded} aria-controls={listId} onClick={() => onToggleGroup(groupKey)}>
+                  <Image src={category.image} alt="" aria-hidden="true" width={48} height={36} sizes="28px" className={category.imageClassName} />
+                  <span>{category.heading}</span>
+                  <FiChevronDown aria-hidden="true" />
+                </button>
+                {isExpanded && <ul id={listId} aria-labelledby={`mobile-category-heading-${groupKey}`}>
+                  {category.items.map((item) => <li key={item.id}><MenuItem item={item} onSelect={onSelect} /></li>)}
+                </ul>}
+              </section>
+            );
+          })}
+        </div>
+      ) : (
+        <div className={`mega-menu__groups mega-menu__groups--${columns.length}-columns`}>
+          {columns.map((column, columnIndex) => (
+            <div className="mega-menu__column" key={`${id}-column-${columnIndex + 1}`}>
+              {column.map((category) => {
+                return (
+                  <section className="mega-menu__group" key={category.id}>
+                    <h3><Image src={category.image} alt="" aria-hidden="true" width={48} height={36} sizes="32px" className={category.imageClassName} />{category.heading}</h3>
+                    <ul>{category.items.map((item) => <li key={item.id}><MenuItem item={item} onSelect={onSelect} /></li>)}</ul>
+                  </section>
+                );
+              })}
+            </div>
+          ))}
+          <aside className="mega-menu__promo">
+            <Image src={content.promo.image} alt={content.promo.imageAlt} fill sizes="(max-width: 1250px) 32vw, 22vw" />
+            <div className="mega-menu__promo-copy">
+              <span>{content.promo.eyebrow}</span>
+              <h3>{content.promo.heading}</h3>
+              <p>{content.promo.description}</p>
+              {content.promo.href && content.promo.cta && <a href={content.promo.href} onClick={onSelect}>{content.promo.cta} <FiArrowRight aria-hidden="true" /></a>}
+            </div>
+          </aside>
+        </div>
       )}
-    </div>
+    </>
   );
 }
 
@@ -82,6 +95,7 @@ export function SiteHeader() {
   const [activeMenu, setActiveMenu] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileCategory, setMobileCategory] = useState("");
+  const [mobileGroup, setMobileGroup] = useState("");
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [pinOpen, setPinOpen] = useState(false);
@@ -154,6 +168,7 @@ export function SiteHeader() {
   function closeNavigation() {
     setMobileOpen(false);
     setMobileCategory("");
+    setMobileGroup("");
     setActiveMenu("");
   }
 
@@ -441,18 +456,17 @@ export function SiteHeader() {
       <div className="category-navigation" onMouseEnter={() => window.clearTimeout(closeTimer.current)} onMouseLeave={scheduleClose}>
         <div className="w-full flex items-center gap-6 px-4 sm:px-6 lg:px-8 category-navigation__inner">
           {menuTabs.map((tab) => {
-            const Icon = tab.icon;
             const expanded = activeMenu === tab.id;
-            return <button key={tab.id} type="button" ref={(node) => { categoryButtonRefs.current[tab.id] = node; }} className={`category-navigation__tab${expanded ? " is-active" : ""}`} aria-expanded={isMobile ? mobileCategory === tab.id : expanded} aria-haspopup="true" aria-controls={isMobile ? "mobile-navigation" : "category-mega-menu"} onMouseEnter={() => !isMobile && openMenu(tab.id)} onFocus={() => !isMobile && openMenu(tab.id)} onClick={() => { if (isMobile) { setMobileOpen(true); setMobileCategory(mobileCategory === tab.id ? "" : tab.id); } else { openMenu(expanded ? "" : tab.id); } }}>
-              <Icon aria-hidden="true" /><span>{tab.label}</span><FiChevronDown aria-hidden="true" className="category-navigation__chevron" />
+            return <button key={tab.id} type="button" ref={(node) => { categoryButtonRefs.current[tab.id] = node; }} className={`category-navigation__tab${expanded ? " is-active" : ""}`} aria-expanded={isMobile ? mobileCategory === tab.id : expanded} aria-haspopup="true" aria-controls={isMobile ? "mobile-navigation" : "category-mega-menu"} onMouseEnter={() => !isMobile && openMenu(tab.id)} onFocus={() => !isMobile && openMenu(tab.id)} onClick={() => { if (isMobile) { setMobileOpen(true); setMobileCategory(mobileCategory === tab.id ? "" : tab.id); setMobileGroup(""); } else { openMenu(expanded ? "" : tab.id); } }}>
+              <Image src={tab.image} alt={tab.imageAlt} aria-hidden="true" width={64} height={48} sizes="40px" className="category-navigation__image" /><span>{tab.label}</span><FiChevronDown aria-hidden="true" className="category-navigation__chevron" />
             </button>;
           })}
         </div>
         {!isMobile && activeMenu && <div id="category-mega-menu" className="mega-menu page-container" onMouseEnter={() => window.clearTimeout(closeTimer.current)} onMouseLeave={scheduleClose}>
           <div className="mega-menu__content">
-            <div className="mega-menu__heading"><span>{menuTabs.find((tab) => tab.id === activeMenu)?.label}</span><p>Explore category examples</p></div>
+            <div className="mega-menu__heading"><span>{menuTabs.find((tab) => tab.id === activeMenu)?.label}</span><p>Approved planned taxonomy for review</p></div>
             <CategoryMenu id={activeMenu} onSelect={closeNavigation} />
-            <p className="mega-menu__disclaimer">Category artwork and labels are illustrative; catalogue availability is not connected.</p>
+            <p className="mega-menu__disclaimer">These categories are planned. Product listings, bundle availability and moving-service operations are not configured.</p>
           </div>
         </div>}
       </div>
@@ -465,11 +479,10 @@ export function SiteHeader() {
         <div className="mobile-nav__categories">
           <p>Shop by category</p>
           {menuTabs.map((tab) => {
-            const Icon = tab.icon;
             const expanded = mobileCategory === tab.id;
             return <section className="mobile-category" key={tab.id}>
-              <button type="button" aria-expanded={expanded} onClick={() => setMobileCategory(expanded ? "" : tab.id)}><Icon aria-hidden="true" />{tab.label}<FiChevronDown aria-hidden="true" /></button>
-              {expanded && <CategoryMenu id={tab.id} compact onSelect={closeNavigation} />}
+              <button type="button" aria-expanded={expanded} onClick={() => { setMobileCategory(expanded ? "" : tab.id); setMobileGroup(""); }}><Image src={tab.image} alt={tab.imageAlt} aria-hidden="true" width={64} height={48} sizes="32px" className="mobile-category__image" />{tab.label}<FiChevronDown aria-hidden="true" /></button>
+              {expanded && <CategoryMenu id={tab.id} compact expandedGroup={mobileGroup} onToggleGroup={(groupKey) => setMobileGroup((current) => current === groupKey ? "" : groupKey)} onSelect={closeNavigation} />}
             </section>;
           })}
         </div>
