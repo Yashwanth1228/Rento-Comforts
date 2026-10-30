@@ -1449,17 +1449,16 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 @media (min-width: 1200px) {
   .catalogue-product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
-@media (hover: hover) {
-  .rental-product-card--catalogue:hover,
-  .rental-product-card--catalogue:has(:focus-visible) { z-index: 1; transform: translateY(-2px); border-radius: 14px; }
-  .rental-product-card--catalogue .rental-product-card__actions--catalogue { opacity: 0; transform: translateY(4px); pointer-events: none; transition: opacity .18s ease,transform .18s ease; }
-  .rental-product-card--catalogue:hover .rental-product-card__actions--catalogue,
-  .rental-product-card--catalogue:focus-within .rental-product-card__actions--catalogue { opacity: 1; transform: none; pointer-events: auto; }
-  .rental-product-card--catalogue:hover .rental-product-card__details--catalogue,
-  .rental-product-card--catalogue:has(:focus-visible) .rental-product-card__details--catalogue { min-height: 72px; padding-bottom: 6px; }
-  .rental-product-card--catalogue:hover .rental-product-card__actions--catalogue,
-  .rental-product-card--catalogue:has(:focus-visible) .rental-product-card__actions--catalogue { height: 50px; min-height: 50px; max-height: 56px; padding: 0 8px 8px; }
-}
+.rental-product-card--catalogue,
+.rental-product-card--catalogue:hover,
+.rental-product-card--catalogue:focus-within { transform: none; transition: none; }
+.rental-product-card--catalogue .rental-product-card__actions--catalogue,
+.rental-product-card--catalogue:hover .rental-product-card__actions--catalogue,
+.rental-product-card--catalogue:focus-within .rental-product-card__actions--catalogue { height: 50px; min-height: 50px; max-height: 56px; padding: 0 8px 8px; opacity: 1; transform: none; pointer-events: auto; transition: none; }
+.rental-product-card--catalogue .rental-product-card__actions--catalogue button,
+.rental-product-card--catalogue .catalogue-product-favorite { transition: none; }
+.rental-product-card--catalogue .catalogue-product-favorite:hover { background: #fff; }
+.catalogue-product-rating { white-space: nowrap; }
 @media (hover: none) {
   .rental-product-card--catalogue .rental-product-card__actions--catalogue { height: auto; min-height: 0; max-height: none; flex-basis: auto; opacity: 1; transform: none; pointer-events: auto; }
 }

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/components/cart-provider";
-import { FiEye, FiShoppingCart } from "react-icons/fi";
+import { FiEye, FiHeart, FiShoppingCart, FiStar } from "react-icons/fi";
 
 function formatINRFromPaise(amountPaise) {
   if (!Number.isSafeInteger(amountPaise) || amountPaise < 0) {
@@ -37,6 +37,7 @@ export function ProductCard({ product, variant = "default" }) {
   const displayName = variant === "catalogue" ? product.name.replace(/\s+— Preview$/, "") : product.name;
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [cartMessage, setCartMessage] = useState("");
+  const [isFavorite, setIsFavorite] = useState(false);
   const dialogRef = useRef(null);
   const { items: cartItems, addItem } = useCart();
   const monthlyRent = isPurchase
@@ -55,6 +56,13 @@ export function ProductCard({ product, variant = "default" }) {
     : product.monthlyRentalPricePaise;
   const hasValidPrice =
     Number.isSafeInteger(itemPricePaise) && itemPricePaise > 0;
+  const rating = Number.isFinite(product.rating) && product.rating >= 0 && product.rating <= 5 ? product.rating : null;
+  const reviewCount = Number.isSafeInteger(product.reviewCount) && product.reviewCount >= 0 ? product.reviewCount : null;
+  const hasDescription = typeof product.description === "string" && product.description.trim().length > 0;
+
+  function toggleFavorite() {
+    setIsFavorite((current) => !current);
+  }
 
   function handleAddToCart() {
     const added = addItem(product);
@@ -81,7 +89,7 @@ export function ProductCard({ product, variant = "default" }) {
 
   return (
     <>
-      <article className={`rental-product-card group relative self-start rounded-2xl border border-[#e2e2dc] bg-white p-3 shadow-sm transition-[transform,box-shadow] duration-300 motion-reduce:transition-none hover:shadow-lg${variant === "catalogue" ? " rental-product-card--catalogue" : ""}`}>
+      <article className={`rental-product-card ${variant === "catalogue" ? "rental-product-card--catalogue group relative self-start rounded-2xl border border-[#e2e2dc] bg-white p-0 shadow-sm" : "group relative self-start rounded-2xl border border-[#e2e2dc] bg-white p-3 shadow-sm transition-[transform,box-shadow] duration-300 motion-reduce:transition-none hover:shadow-lg"}`}>
         <div className={`relative overflow-hidden bg-[#F8F7F2] ${variant === "catalogue" ? "aspect-[1.62] rounded-t-[13px]" : "aspect-[4/3] rounded-xl"}`}>
           <Image
             src={product.imageUrl}
@@ -90,6 +98,11 @@ export function ProductCard({ product, variant = "default" }) {
             sizes="(max-width: 640px) 44vw, (max-width: 1000px) 45vw, 22vw"
             className="object-contain p-4"
           />
+          {variant === "catalogue" && (
+            <button type="button" onClick={toggleFavorite} aria-label={isFavorite ? `Remove ${displayName} from favorites` : `Add ${displayName} to favorites`} aria-pressed={isFavorite} title={isFavorite ? "Remove from favorites" : "Add to favorites"} className="catalogue-product-favorite absolute right-2.5 top-2.5 z-[1] inline-flex size-8 items-center justify-center rounded-full bg-white/95 text-[#252925] shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]">
+              <FiHeart aria-hidden="true" className={isFavorite ? "fill-[#124734] text-[#124734]" : ""} />
+            </button>
+          )}
 
         </div>
 
@@ -97,15 +110,24 @@ export function ProductCard({ product, variant = "default" }) {
           <h3 className={`truncate font-semibold leading-6 text-[#252925] ${variant === "catalogue" ? "text-[13px] sm:text-sm" : "text-sm sm:text-base"}`}>
             {displayName}
           </h3>
-          {variant === "catalogue" && product.description && <p className="mt-0.5 truncate text-[11px] leading-4 text-[#747a75]">{product.description}</p>}
+          {variant === "catalogue" && hasDescription && <p className="mt-0.5 truncate text-[11px] leading-4 text-[#747a75]">{product.description}</p>}
 
           {(isPurchase ? purchasePrice : monthlyRent) !== null && (
-            <p className={`mt-1 font-semibold leading-5 text-[#124734] ${variant === "catalogue" ? "text-[14px]" : "text-sm sm:text-base"}`}>
-              {isPurchase ? purchasePrice : monthlyRent}
-              {!isPurchase && (
-                <span className="ml-1 text-xs font-normal text-[#606860]">/mo</span>
+            <div className="mt-1 flex min-w-0 items-baseline justify-between gap-1">
+              <p className={`min-w-0 font-semibold leading-5 text-[#124734] ${variant === "catalogue" ? "text-[14px]" : "text-sm sm:text-base"}`}>
+                {isPurchase ? purchasePrice : monthlyRent}
+                {!isPurchase && (
+                  <span className="ml-1 text-xs font-normal text-[#606860]">/mo</span>
+                )}
+              </p>
+              {variant === "catalogue" && rating !== null && (
+                <p className="catalogue-product-rating inline-flex shrink-0 items-center gap-1 text-[11px] leading-4 text-[#4f5650]" aria-label={`Rating ${rating.toFixed(1)} out of 5${reviewCount === null ? "" : `, ${reviewCount} reviews`}`}>
+                  <FiStar aria-hidden="true" className="fill-[#d59a32] text-[#d59a32]" />
+                  <span>{rating.toFixed(1)}</span>
+                  {reviewCount !== null && <span className="text-[#858b85]">({reviewCount})</span>}
+                </p>
               )}
-            </p>
+            </div>
           )}
         </div>
 
