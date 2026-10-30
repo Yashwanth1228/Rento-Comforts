@@ -3,6 +3,14 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/components/cart-provider";
+import { FiEye, FiShoppingCart } from "react-icons/fi";
+
+const catalogueArtwork = {
+  sofas: { src: "/images/category-dining-tables.webp", alt: "Illustrative living room with a sofa" },
+  beds: { src: "/images/category-beds.webp", alt: "Illustrative bedroom with a bed" },
+  refrigerators: { src: "/images/category-refrigerators.webp", alt: "Illustrative kitchen with a refrigerator" },
+  "washing machines": { src: "/images/category-washing-machines.webp", alt: "Illustrative laundry area with a washing machine" },
+};
 
 function formatINRFromPaise(amountPaise) {
   if (!Number.isSafeInteger(amountPaise) || amountPaise < 0) {
@@ -30,9 +38,13 @@ function DetailRow({ label, children }) {
 }
 
 /** Displays a concise rental or purchase card and an accessible details preview. */
-export function ProductCard({ product }) {
+export function ProductCard({ product, variant = "default" }) {
   const mode = product.mode === "buy" ? "buy" : "rent";
   const isPurchase = mode === "buy";
+  const catalogueImage = catalogueArtwork[product.category?.toLowerCase()];
+  const imageUrl = variant === "catalogue" && catalogueImage ? catalogueImage.src : product.imageUrl;
+  const imageAlt = variant === "catalogue" && catalogueImage ? catalogueImage.alt : product.imageAlt;
+  const displayName = variant === "catalogue" ? product.name.replace(/\s+— Preview$/, "") : product.name;
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [cartMessage, setCartMessage] = useState("");
   const dialogRef = useRef(null);
@@ -79,25 +91,26 @@ export function ProductCard({ product }) {
 
   return (
     <>
-      <article className="rental-product-card group relative self-start rounded-2xl border border-[#e2e2dc] bg-white p-3 shadow-sm transition-[transform,box-shadow] duration-300 motion-reduce:transition-none hover:shadow-lg">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-[#F8F7F2]">
+      <article className={`rental-product-card group relative self-start rounded-2xl border border-[#e2e2dc] bg-white p-3 shadow-sm transition-[transform,box-shadow] duration-300 motion-reduce:transition-none hover:shadow-lg${variant === "catalogue" ? " rental-product-card--catalogue" : ""}`}>
+        <div className={`relative overflow-hidden bg-[#F8F7F2] ${variant === "catalogue" ? "aspect-[1.62] rounded-t-[13px]" : "aspect-[4/3] rounded-xl"}`}>
           <Image
-            src={product.imageUrl}
-            alt={product.imageAlt}
+            src={imageUrl}
+            alt={imageAlt}
             fill
             sizes="(max-width: 640px) 44vw, (max-width: 1000px) 45vw, 22vw"
-            className="object-contain p-4"
+            className={variant === "catalogue" ? "object-cover" : "object-contain p-4"}
           />
 
         </div>
 
-        <div className="rental-product-card__details px-1 pb-0 pt-2 sm:min-h-[4.5rem] sm:pb-2 sm:pt-3">
-          <h3 className="truncate text-sm font-semibold leading-6 text-[#252925] sm:text-base">
-            {product.name}
+        <div className={`rental-product-card__details px-1 pb-0 pt-2 sm:min-h-[4.5rem] sm:pb-2 sm:pt-3 ${variant === "catalogue" ? "rental-product-card__details--catalogue" : ""}`}>
+          <h3 className={`truncate font-semibold leading-6 text-[#252925] ${variant === "catalogue" ? "text-[13px] sm:text-sm" : "text-sm sm:text-base"}`}>
+            {displayName}
           </h3>
+          {variant === "catalogue" && product.description && <p className="mt-0.5 truncate text-[11px] leading-4 text-[#747a75]">{product.description}</p>}
 
           {(isPurchase ? purchasePrice : monthlyRent) !== null && (
-            <p className="mt-1 text-sm font-semibold leading-5 text-[#124734] sm:text-base">
+            <p className={`mt-1 font-semibold leading-5 text-[#124734] ${variant === "catalogue" ? "text-[14px]" : "text-sm sm:text-base"}`}>
               {isPurchase ? purchasePrice : monthlyRent}
               {!isPurchase && (
                 <span className="ml-1 text-xs font-normal text-[#606860]">/mo</span>
@@ -106,22 +119,24 @@ export function ProductCard({ product }) {
           )}
         </div>
 
-        <div className="rental-product-card__actions grid grid-cols-1 items-center gap-2 overflow-hidden px-1 transition-[max-height,opacity,transform,padding-bottom,border-color] duration-200 motion-reduce:transition-none sm:grid-cols-2">
+        <div className={`rental-product-card__actions grid grid-cols-1 items-center gap-2 overflow-hidden px-1 transition-[max-height,opacity,transform,padding-bottom,border-color] duration-200 motion-reduce:transition-none sm:grid-cols-2${variant === "catalogue" ? " rental-product-card__actions--catalogue" : ""}`}>
           <button
             type="button"
             onClick={() => setIsQuickViewOpen(true)}
             className="inline-flex min-h-10 items-center justify-center rounded-full border border-[#b8c9bc] bg-white px-3 text-sm font-semibold text-[#124734] transition-colors hover:bg-[#E9F1E9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]"
           >
+            {variant === "catalogue" && <FiEye aria-hidden="true" className="mr-1.5" />}
             Quick View
           </button>
           <button
             type="button"
             onClick={handleAddToCart}
             disabled={isInCart}
-            aria-label={isInCart ? `${product.name} is already in the cart` : `Add ${product.name} to cart`}
+            aria-label={isInCart ? `${displayName} is already in the cart` : `Add ${displayName} to cart`}
             aria-disabled={isInCart}
             className="inline-flex min-h-10 items-center justify-center rounded-full bg-[#017F36] px-3 text-sm font-semibold text-white transition-colors hover:bg-[#124734] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] disabled:cursor-not-allowed disabled:opacity-60"
           >
+            {variant === "catalogue" && <FiShoppingCart aria-hidden="true" className="mr-1.5" />}
             Add to Cart
           </button>
         </div>
@@ -163,8 +178,8 @@ export function ProductCard({ product }) {
         <div className="grid gap-5 p-5 sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] sm:p-6">
           <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-[#F8F7F2]">
             <Image
-              src={product.imageUrl}
-              alt={product.imageAlt}
+              src={imageUrl}
+              alt={imageAlt}
               fill
               sizes="(max-width: 640px) 84vw, 260px"
               className="object-contain p-4"

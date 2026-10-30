@@ -47,56 +47,74 @@ function createSearchParams(filters) {
   return params;
 }
 
-function FilterOptions({ products, filters, onChange, onClear, onApply }) {
+function FilterOptions({ products, filters, onChange, onClear, onApply, idPrefix }) {
   const representedCategories = [...new Map(products.map((product) => {
     const id = slugify(product.category);
-    return [id, categoryDisplayNames[id] || product.category];
+    return [id, { label: categoryDisplayNames[id] || product.category, family: familyFor(product) }];
   })).entries()];
-  const subcategories = representedCategories.filter(([, label]) => filters.category === "all" || familyFor({ category: label }) === filters.category);
+  const subcategories = representedCategories.filter(([, value]) => filters.category === "all" || value.family === filters.category);
+  const prices = products.filter((product) => product.mode === filters.mode).map((product) => filters.mode === "buy" ? product.purchasePricePaise : product.monthlyRentalPricePaise).filter((value) => Number.isSafeInteger(value) && value > 0).map((value) => value / 100);
+  const priceFloor = prices.length ? Math.floor(Math.min(...prices)) : 0;
+  const priceCeiling = prices.length ? Math.ceil(Math.max(...prices)) : 0;
+  const selectedMinimum = filters.minPrice ? Number(filters.minPrice) : priceFloor;
+  const selectedMaximum = filters.maxPrice ? Number(filters.maxPrice) : priceCeiling;
+  const setMinimum = (value) => onChange({ ...filters, minPrice: String(value), maxPrice: selectedMaximum < value ? String(value) : filters.maxPrice });
+  const setMaximum = (value) => onChange({ ...filters, maxPrice: String(value), minPrice: selectedMinimum > value ? String(value) : filters.minPrice });
 
   return (
-    <div className="space-y-6">
-      <section aria-labelledby="catalogue-category-heading">
-        <h3 id="catalogue-category-heading" className="mb-3 text-sm font-semibold text-[#252925]">Category</h3>
-        <div className="space-y-1">
+    <div className="catalogue-filter-options">
+      <section className="catalogue-filter-section" aria-labelledby={`${idPrefix}-category-heading`}>
+        <h3 id={`${idPrefix}-category-heading`} className="catalogue-filter-section__title">Category</h3>
+        <div className="catalogue-filter-categories grid gap-1.5">
           {categoryFamilies.map((category) => (
-            <button key={category.id} type="button" aria-pressed={filters.category === category.id} onClick={() => onChange({ ...filters, category: category.id, subcategory: "" })} className={`flex min-h-10 w-full items-center justify-between rounded-lg px-3 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] ${filters.category === category.id ? "bg-[#E9F1E9] font-semibold text-[#124734]" : "text-[#46534a] hover:bg-[#f4f3ee]"}`}>
-              {category.label}{filters.category === category.id && <span aria-hidden="true" className="text-[#017F36]">•</span>}
+            <button key={category.id} type="button" aria-pressed={filters.category === category.id} onClick={() => onChange({ ...filters, category: category.id, subcategory: "" })} className={`catalogue-filter-category flex w-full${filters.category === category.id ? " is-active" : ""}`}>
+              <span className={`catalogue-filter-category__check${filters.category === category.id ? " is-active" : ""}`} aria-hidden="true">{filters.category === category.id ? "✓" : ""}</span>
+              <span>{category.label}</span>
             </button>
           ))}
         </div>
       </section>
 
       {subcategories.length > 0 && (
-        <section aria-labelledby="catalogue-subcategory-heading">
-          <h3 id="catalogue-subcategory-heading" className="mb-3 text-sm font-semibold text-[#252925]">Product type</h3>
-          <div className="space-y-2">
-            {subcategories.map(([id, label]) => (
-              <label key={id} className="flex min-h-8 cursor-pointer items-center gap-2.5 text-sm text-[#46534a]">
-                <input type="checkbox" checked={filters.subcategory === id} onChange={() => onChange({ ...filters, subcategory: filters.subcategory === id ? "" : id })} className="size-4 accent-[#017F36]" />
-                <span>{label}</span>
+        <details className="catalogue-filter-section catalogue-filter-details" open>
+          <summary id={`${idPrefix}-subcategory-heading`} className="catalogue-filter-section__title">Product Type<FiChevronDown aria-hidden="true" /></summary>
+          <div className="mt-3 grid gap-y-1.5" aria-labelledby={`${idPrefix}-subcategory-heading`}>
+            {subcategories.map(([id, value]) => (
+              <label key={id} className="catalogue-filter-type flex">
+                <input type="checkbox" checked={filters.subcategory === id} onChange={() => onChange({ ...filters, subcategory: filters.subcategory === id ? "" : id })} />
+                <span>{value.label}</span>
               </label>
             ))}
           </div>
-        </section>
+        </details>
       )}
 
-      <section aria-labelledby="catalogue-price-heading">
-        <h3 id="catalogue-price-heading" className="mb-3 text-sm font-semibold text-[#252925]">Price range (₹)</h3>
-        <div className="grid grid-cols-2 gap-2">
-          <label className="text-xs text-[#606860]">Minimum
-            <input type="number" min="0" inputMode="numeric" value={filters.minPrice} onChange={(event) => onChange({ ...filters, minPrice: event.target.value })} placeholder="₹0" className="mt-1 min-h-10 w-full rounded-lg border border-[#d8d8d0] bg-white px-2 text-sm text-[#252925] outline-none focus:border-[#017F36] focus:ring-2 focus:ring-[#017F36]/15" />
-          </label>
-          <label className="text-xs text-[#606860]">Maximum
-            <input type="number" min="0" inputMode="numeric" value={filters.maxPrice} onChange={(event) => onChange({ ...filters, maxPrice: event.target.value })} placeholder="No limit" className="mt-1 min-h-10 w-full rounded-lg border border-[#d8d8d0] bg-white px-2 text-sm text-[#252925] outline-none focus:border-[#017F36] focus:ring-2 focus:ring-[#017F36]/15" />
-          </label>
-        </div>
-      </section>
+      <details className="catalogue-filter-section catalogue-filter-details" open>
+        <summary id={`${idPrefix}-price-heading`} className="catalogue-filter-section__title">Price Range (₹{filters.mode === "rent" ? " / month" : " / one-time"})<FiChevronDown aria-hidden="true" /></summary>
+        {prices.length ? <div className="mt-4">
+          <div className="catalogue-range-sliders" aria-label="Adjust price range">
+            <label className="sr-only" htmlFor={`${idPrefix}-minimum-range`}>Minimum price</label>
+            <input id={`${idPrefix}-minimum-range`} type="range" min={priceFloor} max={priceCeiling} value={Math.min(selectedMinimum, priceCeiling)} onChange={(event) => setMinimum(Number(event.target.value))} />
+            <label className="sr-only" htmlFor={`${idPrefix}-maximum-range`}>Maximum price</label>
+            <input id={`${idPrefix}-maximum-range`} type="range" min={priceFloor} max={priceCeiling} value={Math.max(selectedMaximum, priceFloor)} onChange={(event) => setMaximum(Number(event.target.value))} />
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <label className="catalogue-price-input">From
+              <input type="number" min="0" inputMode="numeric" value={filters.minPrice} onChange={(event) => onChange({ ...filters, minPrice: event.target.value })} placeholder={`₹${priceFloor.toLocaleString("en-IN")}`} />
+            </label>
+            <label className="catalogue-price-input">To
+              <input type="number" min="0" inputMode="numeric" value={filters.maxPrice} onChange={(event) => onChange({ ...filters, maxPrice: event.target.value })} placeholder={`₹${priceCeiling.toLocaleString("en-IN")}`} />
+            </label>
+          </div>
+        </div> : <p className="mt-2 text-xs leading-5 text-[#70766f]">Price filtering will appear when catalogue pricing is available.</p>}
+      </details>
 
-      <div className="flex flex-wrap items-center gap-3 border-t border-[#e4e2da] pt-4">
-        <button type="button" onClick={onClear} className="min-h-10 rounded-full px-3 text-sm font-semibold text-[#124734] underline underline-offset-4 hover:text-[#017F36] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]">Clear filters</button>
-        {onApply && <button type="button" onClick={onApply} className="min-h-10 flex-1 rounded-full bg-[#017F36] px-4 text-sm font-semibold text-white hover:bg-[#124734] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]">Apply filters</button>}
-      </div>
+      {onApply && (
+        <div className="flex items-center gap-3 border-t border-[#e4e2da] pt-4">
+          <button type="button" onClick={onClear} className="min-h-10 rounded-full px-3 text-sm font-semibold text-[#124734] underline underline-offset-4 hover:text-[#017F36] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]">Clear All</button>
+          <button type="button" onClick={onApply} className="min-h-10 flex-1 rounded-full bg-[#017F36] px-4 text-sm font-semibold text-white hover:bg-[#124734] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]">Apply Filters</button>
+        </div>
+      )}
     </div>
   );
 }
@@ -155,47 +173,51 @@ export function ProductCatalogue({ products = [], initialParams = {}, isDevelopm
 
   return (
     <main className="min-h-[60vh] bg-[#F8F7F2] pb-16">
-      <div className="mx-auto w-[min(100%-32px,1380px)] pt-7 sm:w-[min(100%-48px,1380px)] sm:pt-10">
-        <nav aria-label="Breadcrumb" className="mb-5 text-sm text-[#606860]">
+      <section className="catalogue-intro">
+        <div className="mx-auto w-[min(100%-40px,1464px)] pt-3 sm:w-[min(100%-72px,1464px)]">
+        <nav aria-label="Breadcrumb" className="mb-3 text-xs text-[#606860] sm:text-[13px]">
           <ol className="flex items-center gap-2"><li><Link href="/" className="hover:text-[#017F36]">Home</Link></li><li aria-hidden="true">/</li><li className="font-medium text-[#124734]" aria-current="page">Products</li></ol>
         </nav>
 
-        <header className="mb-7 flex flex-col justify-between gap-5 border-b border-[#e4e2da] pb-7 md:flex-row md:items-end">
-          <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[.16em] text-[#017F36]">Furniture &amp; home appliances</p>
-            <h1 className="font-editorial text-4xl font-medium leading-tight text-[#124734] sm:text-5xl">Explore Our Collection</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#606860] sm:text-base">Browse furniture and home appliance listings for rental or purchase.</p>
+        <header className="catalogue-intro__content relative mb-0 flex min-h-[112px] flex-col justify-between gap-3 py-3 md:flex-row md:items-center md:py-4">
+          <div className="relative z-10">
+            <h1 className="font-editorial text-[34px] font-medium leading-[1.08] tracking-[-.025em] text-[#092f28] sm:text-[44px]">Explore Our Collection</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-5 text-[#606860] sm:text-[15px]">Find furniture and home appliances for your home. Available for rent or purchase in Bengaluru.</p>
           </div>
-          <div className="inline-flex w-fit rounded-full border border-[#cfd8ce] bg-white p-1" role="tablist" aria-label="Choose rental or purchase listings">
+          <div className="relative z-10 inline-flex w-fit shrink-0 rounded-full border border-[#e6e2d9] bg-white/75 p-1 shadow-sm md:mr-[24%]" role="tablist" aria-label="Choose rental or purchase listings">
             {[{ id: "rent", label: "Rent" }, { id: "buy", label: "Buy" }].map((mode) => (
-              <button key={mode.id} type="button" role="tab" aria-selected={filters.mode === mode.id} onClick={() => updateFilters({ ...filters, mode: mode.id, minPrice: "", maxPrice: "" })} className={`min-h-10 min-w-24 rounded-full px-5 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] ${filters.mode === mode.id ? "bg-[#124734] text-white" : "text-[#46534a] hover:bg-[#E9F1E9]"}`}>{mode.label}</button>
+              <button key={mode.id} type="button" role="tab" aria-selected={filters.mode === mode.id} onClick={() => updateFilters({ ...filters, mode: mode.id, minPrice: "", maxPrice: "" })} className={`min-h-9 min-w-[88px] rounded-full px-5 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] ${filters.mode === mode.id ? "bg-[#004c3a] text-white" : "text-[#252925] hover:bg-[#E9F1E9]"}`}>{mode.label}</button>
             ))}
           </div>
         </header>
+        </div>
+      </section>
 
+      <div className="mx-auto w-[min(100%-40px,1464px)] sm:w-[min(100%-72px,1464px)]">
         {isDevelopmentPreview && products.some((product) => product.previewOnly) && (
-          <aside role="note" className="mb-6 rounded-xl border border-[#cbd9cc] bg-[#E9F1E9] p-4 text-sm leading-6 text-[#124734]">
-            <strong className="block">Development preview only</strong>
-            <span>Illustrative product names, images and sample prices are for local interface review. They are not verified inventory, approved commercial prices, or availability information.</span>
+          <aside role="note" className="mb-2 flex min-h-7 items-center gap-2 text-[10px] leading-4 text-[#66756b]">
+            <span className="grid size-4 shrink-0 place-items-center rounded-full bg-[#e4eee4] text-[9px] font-bold text-[#124734]" aria-hidden="true">i</span>
+            <span><strong className="font-semibold text-[#345746]">Development preview only.</strong> Sample items and prices are not verified inventory or commercial pricing.</span>
           </aside>
         )}
 
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
-          <aside className="hidden w-[245px] shrink-0 rounded-2xl border border-[#e3e1d9] bg-white p-5 lg:block" aria-label="Product filters">
-            <div className="mb-5 flex items-center gap-2 text-[#124734]"><FiFilter aria-hidden="true" /><h2 className="text-base font-semibold">Filters</h2></div>
-            <FilterOptions products={products} filters={filters} onChange={(next) => updateFilters(next, true)} onClear={clearFilters} />
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-7">
+          <aside className="hidden w-[292px] shrink-0 rounded-xl border border-[#e7e5df] bg-white p-4 shadow-[0_2px_8px_rgba(37,41,37,.035)] lg:block" aria-label="Product filters">
+            <div className="mb-3 flex items-center justify-between border-b border-[#eceae3] pb-3 text-[#124734]"><div className="flex items-center gap-2"><FiFilter aria-hidden="true" /><h2 className="text-[15px] font-semibold">Filters</h2></div><button type="button" onClick={clearFilters} className="text-xs font-semibold text-[#017F36] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]">Clear All</button></div>
+            <FilterOptions products={products} filters={filters} onChange={(next) => updateFilters(next, true)} onClear={clearFilters} idPrefix="desktop" />
           </aside>
 
           <section className="min-w-0 flex-1" aria-label={`${filters.mode === "rent" ? "Rental" : "Purchase"} products`}>
-            <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-[#e3e1d9] bg-white p-3 sm:flex-row sm:items-center sm:p-4">
-              <form className="flex min-h-11 flex-1 items-center gap-2 rounded-full border border-[#deddd5] bg-[#F8F7F2] px-4" role="search" onSubmit={(event) => { event.preventDefault(); updateFilters(filters, true); }}>
+            <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+              <p className="mr-auto text-sm font-medium text-[#252925]" aria-live="polite"><strong className="font-semibold">{visibleProducts.length}</strong> {visibleProducts.length === 1 ? "product" : "products"} {filters.mode === "rent" ? "to rent" : "to buy"}</p>
+              <form className="flex min-h-9 w-full items-center gap-2 rounded-full border border-[#deddd5] bg-white px-3 shadow-[0_1px_3px_rgba(37,41,37,.025)] sm:w-[min(32vw,300px)]" role="search" onSubmit={(event) => { event.preventDefault(); updateFilters(filters, true); }}>
                 <FiSearch aria-hidden="true" className="shrink-0 text-[#124734]" />
                 <label className="sr-only" htmlFor="catalogue-search">Search products</label>
                 <input id="catalogue-search" type="search" value={filters.query} onChange={(event) => updateFilters({ ...filters, query: event.target.value }, true)} placeholder="Search furniture and appliances" className="min-w-0 flex-1 bg-transparent text-sm text-[#252925] outline-none placeholder:text-[#858a84]" />
                 {filters.query && <button type="button" aria-label="Clear search" onClick={() => updateFilters({ ...filters, query: "" }, true)} className="rounded-full p-1 text-[#606860] hover:bg-[#e9e8e0]"><FiX aria-hidden="true" /></button>}
               </form>
               <button type="button" onClick={() => setMobileFiltersOpen(true)} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#cfd8ce] px-4 text-sm font-semibold text-[#124734] lg:hidden"><FiFilter aria-hidden="true" />Filters{hasActiveFilters && <span className="grid size-5 place-items-center rounded-full bg-[#017F36] text-xs text-white">•</span>}</button>
-              <label className="flex min-h-11 items-center gap-2 rounded-full border border-[#deddd5] bg-white px-4 text-sm text-[#46534a]">
+              <label className="flex min-h-9 items-center gap-2 rounded-full border border-[#d8d8d2] bg-white px-3 text-sm text-[#46534a]">
                 <span className="whitespace-nowrap">Sort by</span><span className="sr-only">Sort products</span>
                 <select aria-label="Sort products" value={filters.sort} onChange={(event) => updateFilters({ ...filters, sort: event.target.value })} className="min-w-0 flex-1 bg-transparent font-semibold text-[#124734] outline-none">
                   <option value="recommended">Recommended</option><option value="price-asc">Price: Low to High</option><option value="price-desc">Price: High to Low</option><option value="name-asc">Name: A to Z</option>
@@ -203,14 +225,11 @@ export function ProductCatalogue({ products = [], initialParams = {}, isDevelopm
               </label>
             </div>
 
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <p className="text-sm text-[#606860]" aria-live="polite"><strong className="font-semibold text-[#252925]">{visibleProducts.length}</strong> {visibleProducts.length === 1 ? "product" : "products"} {filters.mode === "rent" ? "to rent" : "to buy"}</p>
-              {hasActiveFilters && <button type="button" onClick={clearFilters} className="text-sm font-semibold text-[#124734] underline underline-offset-4 hover:text-[#017F36]">Clear filters</button>}
-            </div>
+            {hasActiveFilters && <div className="mb-2 flex justify-end"><button type="button" onClick={clearFilters} className="text-xs font-semibold text-[#124734] underline underline-offset-4 hover:text-[#017F36]">Clear filters</button></div>}
 
             {visibleProducts.length ? (
-              <div className="grid grid-cols-2 items-start gap-x-3 gap-y-5 sm:gap-x-5 sm:gap-y-7 xl:grid-cols-4" aria-live="polite">
-                {visibleProducts.map((product) => <ProductCard key={`${filters.mode}:${product.id}`} product={product} />)}
+              <div className="catalogue-product-grid grid grid-cols-2 items-start gap-3 sm:gap-5 lg:grid-cols-3 2xl:grid-cols-4" aria-live="polite">
+                {visibleProducts.map((product) => <ProductCard key={`${filters.mode}:${product.id}`} product={product} variant="catalogue" />)}
               </div>
             ) : (
               <div className="rounded-2xl border border-dashed border-[#cbd2c9] bg-white px-6 py-14 text-center">
@@ -229,7 +248,7 @@ export function ProductCatalogue({ products = [], initialParams = {}, isDevelopm
       <dialog ref={dialogRef} onClose={() => setMobileFiltersOpen(false)} onClick={(event) => { if (event.target === dialogRef.current) setMobileFiltersOpen(false); }} aria-labelledby="mobile-filter-title" className="m-0 ml-auto h-dvh max-h-dvh w-[min(90vw,390px)] max-w-none overflow-y-auto border-0 bg-[#F8F7F2] p-0 text-[#252925] shadow-2xl backdrop:bg-[#252925]/45">
         <div className="flex min-h-full flex-col p-5">
           <header className="mb-6 flex items-center justify-between border-b border-[#deddd5] pb-4"><div><p className="eyebrow">Refine your search</p><h2 id="mobile-filter-title" className="mt-1 font-editorial text-2xl font-medium text-[#124734]">Filters</h2></div><button type="button" onClick={() => setMobileFiltersOpen(false)} aria-label="Close filters" className="grid size-11 place-items-center rounded-full border border-[#d9d8cf] bg-white text-[#124734]"><FiX aria-hidden="true" /></button></header>
-          <div className="flex-1"><FilterOptions products={products} filters={filters} onChange={(next) => updateFilters(next, true)} onClear={clearFilters} onApply={() => setMobileFiltersOpen(false)} /></div>
+          <div className="flex-1"><FilterOptions products={products} filters={filters} onChange={(next) => updateFilters(next, true)} onClear={clearFilters} onApply={() => setMobileFiltersOpen(false)} idPrefix="mobile" /></div>
         </div>
       </dialog>
     </main>
