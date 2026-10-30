@@ -1416,52 +1416,63 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .catalogue-intro::before { position: absolute; inset: 0 0 0 auto; width: min(26%, 400px); content: ""; background: url("/images/rento-living-room.webp") right 56% / cover no-repeat; -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.3) 14%, #000 38%); mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.3) 14%, #000 38%); }
 .catalogue-intro::after { position: absolute; inset: 0 0 0 50%; content: ""; pointer-events: none; background: linear-gradient(90deg, #f8f7f2 0%, rgba(248,247,242,.76) 20%, rgba(248,247,242,0) 76%); }
 .catalogue-intro__content { z-index: 1; }
-.catalogue-filter-options { display: grid; gap: 13px; }
-.catalogue-filter-section { padding-bottom: 12px; border-bottom: 1px solid #eceae3; }
+.catalogue-filter-options { display: grid; gap: 10px; }
+.catalogue-filter-section { padding-bottom: 10px; border-bottom: 1px solid #eceae3; }
 .catalogue-filter-section:last-child { border-bottom: 0; padding-bottom: 0; }
 .catalogue-filter-section__title { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #252925; font-size: .82rem; font-weight: 650; line-height: 1.35; }
 .catalogue-filter-details > summary { cursor: pointer; list-style: none; }
 .catalogue-filter-details > summary::-webkit-details-marker { display: none; }
 .catalogue-filter-details > summary svg { width: 15px; height: 15px; color: #617068; transition: transform .15s ease; }
 .catalogue-filter-details:not([open]) > summary svg { transform: rotate(-90deg); }
-.catalogue-filter-category { width: 100%; min-height: 34px; display: flex; align-items: center; gap: 9px; padding: 4px 7px; border-radius: 8px; color: #59615b; text-align: left; font-size: .79rem; transition: background-color .15s ease,color .15s ease; }
+.catalogue-filter-category { width: 100%; min-height: 30px; display: flex; align-items: center; gap: 8px; padding: 3px 6px; border-radius: 8px; color: #59615b; text-align: left; font-size: .78rem; transition: background-color .15s ease,color .15s ease; }
 .catalogue-filter-category:hover { background: #f5f7f3; color: #124734; }
 .catalogue-filter-category.is-active { background: #edf3ec; color: #124734; font-weight: 600; }
 .catalogue-filter-category__check { width: 16px; height: 16px; flex: 0 0 16px; display: grid; place-items: center; border: 1px solid #c4ccc4; border-radius: 4px; background: #fff; color: #fff; font-size: 11px; }
 .catalogue-filter-category__check.is-active { border-color: #124734; background: #124734; }
-.catalogue-filter-type { min-height: 30px; display: flex; align-items: center; gap: 9px; color: #626a63; font-size: .78rem; cursor: pointer; }
-.catalogue-filter-type input { width: 16px; height: 16px; accent-color: #124734; }
+.catalogue-filter-type { min-height: 26px; display: flex; align-items: center; gap: 8px; color: #626a63; font-size: .76rem; cursor: pointer; }
+.catalogue-filter-type input { width: 14px; height: 14px; accent-color: #124734; }
 .catalogue-price-input { min-width: 0; display: grid; gap: 5px; color: #737b74; font-size: .67rem; }
-.catalogue-price-input input { width: 100%; height: 36px; min-width: 0; border: 1px solid #dedfd8; border-radius: 8px; padding: 0 9px; background: #fff; color: #252925; font-size: .76rem; }
+.catalogue-price-input input { width: 100%; height: 34px; min-width: 0; border: 1px solid #dedfd8; border-radius: 8px; padding: 0 8px; background: #fff; color: #252925; font-size: .75rem; }
 .catalogue-price-input input:focus-visible { outline: 2px solid #017f36; outline-offset: 1px; }
 .catalogue-range-sliders { position: relative; height: 24px; }
 .catalogue-range-sliders input { position: absolute; inset: 0; width: 100%; height: 24px; margin: 0; appearance: none; background: transparent; pointer-events: none; }
-.catalogue-range-sliders input::-webkit-slider-runnable-track { height: 4px; border-radius: 999px; background: #dce5dc; }
-.catalogue-range-sliders input::-moz-range-track { height: 4px; border-radius: 999px; background: #dce5dc; }
+.catalogue-range-sliders input::-webkit-slider-runnable-track { height: 4px; border-radius: 999px; background: #124734; }
+.catalogue-range-sliders input::-moz-range-track { height: 4px; border-radius: 999px; background: #124734; }
 .catalogue-range-sliders input::-webkit-slider-thumb { width: 15px; height: 15px; margin-top: -5.5px; appearance: none; border: 2px solid #fff; border-radius: 50%; background: #124734; box-shadow: 0 0 0 1px #124734; pointer-events: auto; cursor: ew-resize; }
 .catalogue-range-sliders input::-moz-range-thumb { width: 12px; height: 12px; border: 2px solid #fff; border-radius: 50%; background: #124734; box-shadow: 0 0 0 1px #124734; pointer-events: auto; cursor: ew-resize; }
-.rental-product-card--catalogue { display: flex; flex-direction: column; overflow: hidden; padding: 0; border-radius: 14px; box-shadow: 0 2px 8px rgba(37,41,37,.045); }
-.rental-product-card--catalogue > div:first-child { border-radius: 0; }
-.rental-product-card--catalogue .rental-product-card__details--catalogue { min-height: 82px; padding: 10px 12px 8px; }
-.rental-product-card--catalogue .rental-product-card__actions--catalogue { position: relative; inset: auto; height: auto; flex: 0 0 auto; max-height: none; padding: 0 10px 10px; opacity: 1; transform: none; pointer-events: auto; }
-.rental-product-card--catalogue .rental-product-card__actions--catalogue button { min-height: 38px; border-radius: 11px; padding-inline: 8px; font-size: .72rem; }
+.rental-product-card--catalogue { display: flex; min-width: 0; flex-direction: column; overflow: hidden; padding: 0; border-radius: 14px; box-shadow: 0 2px 8px rgba(37,41,37,.045); }
+.rental-product-card--catalogue > div:first-child { border-radius: 0; background: #f2eee5; }
+.rental-product-card--catalogue .rental-product-card__details--catalogue { min-width: 0; min-height: 72px; padding: 8px 10px 6px; }
+.rental-product-card--catalogue .rental-product-card__actions--catalogue { position: relative; inset: auto; height: 50px; min-height: 50px; flex: 0 0 50px; max-height: 56px; padding: 0 8px 8px; opacity: 1; transform: none; pointer-events: auto; }
+.rental-product-card--catalogue .rental-product-card__actions--catalogue button { min-width: 0; min-height: 36px; border-radius: 10px; padding-inline: 6px; font-size: .68rem; white-space: nowrap; }
 .rental-product-card--catalogue .rental-product-card__actions--catalogue button:last-child { background: #004c3a; }
-@media (min-width: 1400px) and (max-width: 1535px) {
+@media (min-width: 1200px) {
   .catalogue-product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 @media (hover: hover) {
   .rental-product-card--catalogue:hover,
   .rental-product-card--catalogue:has(:focus-visible) { z-index: 1; transform: translateY(-2px); border-radius: 14px; }
+  .rental-product-card--catalogue .rental-product-card__actions--catalogue { opacity: 0; transform: translateY(4px); pointer-events: none; transition: opacity .18s ease,transform .18s ease; }
+  .rental-product-card--catalogue:hover .rental-product-card__actions--catalogue,
+  .rental-product-card--catalogue:focus-within .rental-product-card__actions--catalogue { opacity: 1; transform: none; pointer-events: auto; }
+  .rental-product-card--catalogue:hover .rental-product-card__details--catalogue,
+  .rental-product-card--catalogue:has(:focus-visible) .rental-product-card__details--catalogue { min-height: 72px; padding-bottom: 6px; }
+  .rental-product-card--catalogue:hover .rental-product-card__actions--catalogue,
+  .rental-product-card--catalogue:has(:focus-visible) .rental-product-card__actions--catalogue { height: 50px; min-height: 50px; max-height: 56px; padding: 0 8px 8px; }
+}
+@media (hover: none) {
+  .rental-product-card--catalogue .rental-product-card__actions--catalogue { height: auto; min-height: 0; max-height: none; flex-basis: auto; opacity: 1; transform: none; pointer-events: auto; }
 }
 @media (max-width: 639px) {
   .catalogue-intro { min-height: 0; }
   .catalogue-intro::before { width: 42%; opacity: .25; }
   .catalogue-intro::after { inset-inline-start: 35%; }
   .rental-product-card--catalogue { border-radius: 12px; }
-  .rental-product-card--catalogue .rental-product-card__details--catalogue { min-height: 74px; padding: 8px 9px 7px; }
-  .rental-product-card--catalogue .rental-product-card__actions--catalogue { grid-template-columns: 1fr; gap: 6px; }
-  .rental-product-card--catalogue .rental-product-card__actions button { min-height: 36px; padding-inline: 8px; font-size: .72rem; }
+  .rental-product-card--catalogue .rental-product-card__details--catalogue { min-height: 70px; padding: 8px 9px 7px; }
+  .rental-product-card--catalogue .rental-product-card__actions--catalogue { height: auto; min-height: 0; max-height: none; flex-basis: auto; grid-template-columns: 1fr; gap: 6px; }
+  .rental-product-card--catalogue .rental-product-card__actions button { min-height: 34px; padding-inline: 8px; font-size: .68rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   .catalogue-filter-details > summary svg { transition: none; }
+  .rental-product-card--catalogue .rental-product-card__actions--catalogue { transition: none; }
 }

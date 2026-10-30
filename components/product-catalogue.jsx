@@ -58,8 +58,26 @@ function FilterOptions({ products, filters, onChange, onClear, onApply, idPrefix
   const priceCeiling = prices.length ? Math.ceil(Math.max(...prices)) : 0;
   const selectedMinimum = filters.minPrice ? Number(filters.minPrice) : priceFloor;
   const selectedMaximum = filters.maxPrice ? Number(filters.maxPrice) : priceCeiling;
-  const setMinimum = (value) => onChange({ ...filters, minPrice: String(value), maxPrice: selectedMaximum < value ? String(value) : filters.maxPrice });
-  const setMaximum = (value) => onChange({ ...filters, maxPrice: String(value), minPrice: selectedMinimum > value ? String(value) : filters.minPrice });
+  const clampPrice = (value) => Math.min(priceCeiling, Math.max(priceFloor, value));
+  const setMinimum = (value) => {
+    const minimum = clampPrice(value);
+    onChange({ ...filters, minPrice: String(minimum), maxPrice: selectedMaximum < minimum ? String(minimum) : filters.maxPrice });
+  };
+  const setMaximum = (value) => {
+    const maximum = clampPrice(value);
+    onChange({ ...filters, maxPrice: String(maximum), minPrice: selectedMinimum > maximum ? String(maximum) : filters.minPrice });
+  };
+  const normalizePriceInput = (bound) => {
+    const raw = bound === "minimum" ? filters.minPrice : filters.maxPrice;
+    if (!raw) return;
+    const parsed = Number(raw);
+    if (!Number.isFinite(parsed)) {
+      onChange({ ...filters, [bound === "minimum" ? "minPrice" : "maxPrice"]: "" });
+      return;
+    }
+    if (bound === "minimum") setMinimum(parsed);
+    else setMaximum(parsed);
+  };
 
   return (
     <div className="catalogue-filter-options">
@@ -100,10 +118,10 @@ function FilterOptions({ products, filters, onChange, onClear, onApply, idPrefix
           </div>
           <div className="mt-3 grid grid-cols-2 gap-2">
             <label className="catalogue-price-input">From
-              <input type="number" min="0" inputMode="numeric" value={filters.minPrice} onChange={(event) => onChange({ ...filters, minPrice: event.target.value })} placeholder={`₹${priceFloor.toLocaleString("en-IN")}`} />
+              <input type="number" min={priceFloor} max={priceCeiling} inputMode="numeric" value={filters.minPrice} onBlur={() => normalizePriceInput("minimum")} onChange={(event) => onChange({ ...filters, minPrice: event.target.value })} placeholder={`₹${priceFloor.toLocaleString("en-IN")}`} />
             </label>
             <label className="catalogue-price-input">To
-              <input type="number" min="0" inputMode="numeric" value={filters.maxPrice} onChange={(event) => onChange({ ...filters, maxPrice: event.target.value })} placeholder={`₹${priceCeiling.toLocaleString("en-IN")}`} />
+              <input type="number" min={priceFloor} max={priceCeiling} inputMode="numeric" value={filters.maxPrice} onBlur={() => normalizePriceInput("maximum")} onChange={(event) => onChange({ ...filters, maxPrice: event.target.value })} placeholder={`₹${priceCeiling.toLocaleString("en-IN")}`} />
             </label>
           </div>
         </div> : <p className="mt-2 text-xs leading-5 text-[#70766f]">Price filtering will appear when catalogue pricing is available.</p>}
@@ -201,8 +219,8 @@ export function ProductCatalogue({ products = [], initialParams = {}, isDevelopm
           </aside>
         )}
 
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-7">
-          <aside className="hidden w-[292px] shrink-0 rounded-xl border border-[#e7e5df] bg-white p-4 shadow-[0_2px_8px_rgba(37,41,37,.035)] lg:block" aria-label="Product filters">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-5">
+          <aside className="hidden w-[260px] min-w-0 shrink-0 rounded-xl border border-[#e7e5df] bg-white p-3.5 shadow-[0_2px_8px_rgba(37,41,37,.035)] lg:block" aria-label="Product filters">
             <div className="mb-3 flex items-center justify-between border-b border-[#eceae3] pb-3 text-[#124734]"><div className="flex items-center gap-2"><FiFilter aria-hidden="true" /><h2 className="text-[15px] font-semibold">Filters</h2></div><button type="button" onClick={clearFilters} className="text-xs font-semibold text-[#017F36] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]">Clear All</button></div>
             <FilterOptions products={products} filters={filters} onChange={(next) => updateFilters(next, true)} onClear={clearFilters} idPrefix="desktop" />
           </aside>
@@ -210,7 +228,7 @@ export function ProductCatalogue({ products = [], initialParams = {}, isDevelopm
           <section className="min-w-0 flex-1" aria-label={`${filters.mode === "rent" ? "Rental" : "Purchase"} products`}>
             <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
               <p className="mr-auto text-sm font-medium text-[#252925]" aria-live="polite"><strong className="font-semibold">{visibleProducts.length}</strong> {visibleProducts.length === 1 ? "product" : "products"} {filters.mode === "rent" ? "to rent" : "to buy"}</p>
-              <form className="flex min-h-9 w-full items-center gap-2 rounded-full border border-[#deddd5] bg-white px-3 shadow-[0_1px_3px_rgba(37,41,37,.025)] sm:w-[min(32vw,300px)]" role="search" onSubmit={(event) => { event.preventDefault(); updateFilters(filters, true); }}>
+              <form className="flex min-h-9 w-full min-w-0 items-center gap-2 rounded-full border border-[#deddd5] bg-white px-3 shadow-[0_1px_3px_rgba(37,41,37,.025)] sm:w-[min(22vw,240px)]" role="search" onSubmit={(event) => { event.preventDefault(); updateFilters(filters, true); }}>
                 <FiSearch aria-hidden="true" className="shrink-0 text-[#124734]" />
                 <label className="sr-only" htmlFor="catalogue-search">Search products</label>
                 <input id="catalogue-search" type="search" value={filters.query} onChange={(event) => updateFilters({ ...filters, query: event.target.value }, true)} placeholder="Search furniture and appliances" className="min-w-0 flex-1 bg-transparent text-sm text-[#252925] outline-none placeholder:text-[#858a84]" />
@@ -228,7 +246,7 @@ export function ProductCatalogue({ products = [], initialParams = {}, isDevelopm
             {hasActiveFilters && <div className="mb-2 flex justify-end"><button type="button" onClick={clearFilters} className="text-xs font-semibold text-[#124734] underline underline-offset-4 hover:text-[#017F36]">Clear filters</button></div>}
 
             {visibleProducts.length ? (
-              <div className="catalogue-product-grid grid grid-cols-2 items-start gap-3 sm:gap-5 lg:grid-cols-3 2xl:grid-cols-4" aria-live="polite">
+              <div className="catalogue-product-grid grid min-w-0 grid-cols-2 items-start gap-3 sm:gap-4 lg:grid-cols-3" aria-live="polite">
                 {visibleProducts.map((product) => <ProductCard key={`${filters.mode}:${product.id}`} product={product} variant="catalogue" />)}
               </div>
             ) : (
