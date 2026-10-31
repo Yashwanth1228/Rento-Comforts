@@ -1478,6 +1478,20 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .rental-product-card--catalogue .catalogue-product-favorite { transition: none; }
 .rental-product-card--catalogue .catalogue-product-favorite:hover { background: #fff; }
 .catalogue-product-rating { white-space: nowrap; }
+
+/* Catalogue-only filter collapse: reclaim the sidebar width for product cards. */
+@media (min-width: 1024px) {
+  /* Explicit filter states keep the card count predictable when the sidebar toggles. */
+  .catalogue-product-grid--filters-shown { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+  .catalogue-product-grid--filters-hidden { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+}
+
+/* Keep the complete three-layer site navigation together while scrolling. */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
 @media (hover: none) {
   .rental-product-card--catalogue .rental-product-card__actions--catalogue { height: auto; min-height: 0; max-height: none; flex-basis: auto; opacity: 1; transform: none; pointer-events: auto; }
 }

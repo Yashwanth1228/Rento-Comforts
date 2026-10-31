@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FiChevronDown, FiFilter, FiSearch, FiX } from "react-icons/fi";
+import { FiChevronDown, FiChevronLeft, FiChevronRight, FiFilter, FiSearch, FiX } from "react-icons/fi";
 import { ProductCard } from "@/components/rental-product-card";
 
 const categoryFamilies = [
@@ -140,6 +140,7 @@ function FilterOptions({ products, filters, onChange, onClear, onApply, idPrefix
 export function ProductCatalogue({ products = [], initialParams = {}, isDevelopmentPreview = false }) {
   const [filters, setFilters] = useState(() => readInitialFilters(initialParams));
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [desktopFiltersVisible, setDesktopFiltersVisible] = useState(true);
   const dialogRef = useRef(null);
   const visibleProducts = useMemo(() => {
     const modeProducts = products.filter((product) => product.mode === filters.mode);
@@ -220,13 +221,16 @@ export function ProductCatalogue({ products = [], initialParams = {}, isDevelopm
         )}
 
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6">
-          <aside className="hidden w-[292px] min-w-0 shrink-0 rounded-xl border border-[#e7e5df] bg-white p-3.5 shadow-[0_2px_8px_rgba(37,41,37,.035)] lg:block" aria-label="Product filters">
+          <aside id="catalogue-filter-sidebar" className={`${desktopFiltersVisible ? "hidden lg:block" : "hidden"} w-[272px] min-w-0 shrink-0 rounded-xl border border-[#e7e5df] bg-white p-3.5 shadow-[0_2px_8px_rgba(37,41,37,.035)]`} aria-label="Product filters">
             <div className="mb-3 flex items-center justify-between border-b border-[#eceae3] pb-3 text-[#124734]"><div className="flex items-center gap-2"><FiFilter aria-hidden="true" /><h2 className="text-[15px] font-semibold">Filters</h2></div><button type="button" onClick={clearFilters} className="text-xs font-semibold text-[#017F36] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]">Clear All</button></div>
             <FilterOptions products={products} filters={filters} onChange={(next) => updateFilters(next, true)} onClear={clearFilters} idPrefix="desktop" />
           </aside>
 
           <section className="min-w-0 flex-1" aria-label={`${filters.mode === "rent" ? "Rental" : "Purchase"} products`}>
             <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+              <button type="button" onClick={() => setDesktopFiltersVisible((visible) => !visible)} aria-expanded={desktopFiltersVisible} aria-controls={desktopFiltersVisible ? "catalogue-filter-sidebar" : undefined} className="hidden min-h-9 shrink-0 items-center gap-1.5 rounded-md px-2 text-sm font-medium text-[#124734] hover:bg-[#E9F1E9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] lg:inline-flex">
+                {desktopFiltersVisible ? <><span>Hide filters</span><FiChevronLeft aria-hidden="true" /></> : <><span>Show filters</span><FiChevronRight aria-hidden="true" /></>}
+              </button>
               <p className="mr-auto text-sm font-medium text-[#252925]" aria-live="polite"><strong className="font-semibold">{visibleProducts.length}</strong> {visibleProducts.length === 1 ? "product" : "products"} {filters.mode === "rent" ? "to rent" : "to buy"}</p>
               <form className="flex min-h-9 w-full min-w-0 items-center gap-2 rounded-full border border-[#deddd5] bg-white px-3 shadow-[0_1px_3px_rgba(37,41,37,.025)] sm:w-[min(22vw,240px)]" role="search" onSubmit={(event) => { event.preventDefault(); updateFilters(filters, true); }}>
                 <FiSearch aria-hidden="true" className="shrink-0 text-[#124734]" />
@@ -246,7 +250,7 @@ export function ProductCatalogue({ products = [], initialParams = {}, isDevelopm
             {hasActiveFilters && <div className="mb-2 flex justify-end"><button type="button" onClick={clearFilters} className="text-xs font-semibold text-[#124734] underline underline-offset-4 hover:text-[#017F36]">Clear filters</button></div>}
 
             {visibleProducts.length ? (
-              <div className="catalogue-product-grid grid min-w-0 grid-cols-2 items-start gap-3 sm:gap-5 lg:grid-cols-3" aria-live="polite">
+              <div className={`catalogue-product-grid grid min-w-0 grid-cols-2 items-start gap-3 sm:gap-5 lg:grid-cols-3 ${desktopFiltersVisible ? "catalogue-product-grid--filters-shown" : "catalogue-product-grid--filters-hidden"}`} aria-live="polite">
                 {visibleProducts.map((product) => <ProductCard key={`${filters.mode}:${product.id}`} product={product} variant="catalogue" />)}
               </div>
             ) : (
