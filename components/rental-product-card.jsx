@@ -96,12 +96,19 @@ export function ProductCard({ product, variant = "default" }) {
             alt={product.imageAlt}
             fill
             sizes="(max-width: 640px) 44vw, (max-width: 1000px) 45vw, 22vw"
-            className="object-contain p-4"
+            className={variant === "catalogue" ? "object-cover p-0" : "object-contain p-4"}
           />
           {variant === "catalogue" && (
+            <>
+              {product.previewBadge && product.previewOnly && (
+                <span className="catalogue-product-badge absolute left-2.5 top-2.5 z-[1] rounded-full bg-[#17845c] px-3 py-1 text-[11px] font-semibold leading-4 text-white">
+                  {product.previewBadge}
+                </span>
+              )}
             <button type="button" onClick={toggleFavorite} aria-label={isFavorite ? `Remove ${displayName} from favorites` : `Add ${displayName} to favorites`} aria-pressed={isFavorite} title={isFavorite ? "Remove from favorites" : "Add to favorites"} className="catalogue-product-favorite absolute right-2.5 top-2.5 z-[1] inline-flex size-8 items-center justify-center rounded-full bg-white/95 text-[#252925] shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]">
               <FiHeart aria-hidden="true" className={isFavorite ? "fill-[#124734] text-[#124734]" : ""} />
             </button>
+            </>
           )}
 
         </div>
@@ -122,7 +129,7 @@ export function ProductCard({ product, variant = "default" }) {
               </p>
               {variant === "catalogue" && rating !== null && (
                 <p className="catalogue-product-rating inline-flex shrink-0 items-center gap-1 text-[11px] leading-4 text-[#4f5650]" aria-label={`Rating ${rating.toFixed(1)} out of 5${reviewCount === null ? "" : `, ${reviewCount} reviews`}`}>
-                  <FiStar aria-hidden="true" className="fill-[#d59a32] text-[#d59a32]" />
+                  <FiStar aria-hidden="true" className="size-3.5 fill-[#d59a32] text-[#d59a32]" />
                   <span>{rating.toFixed(1)}</span>
                   {reviewCount !== null && <span className="text-[#858b85]">({reviewCount})</span>}
                 </p>
@@ -137,7 +144,7 @@ export function ProductCard({ product, variant = "default" }) {
             onClick={() => setIsQuickViewOpen(true)}
             className="inline-flex min-h-10 items-center justify-center rounded-full border border-[#b8c9bc] bg-white px-3 text-sm font-semibold text-[#124734] transition-colors hover:bg-[#E9F1E9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]"
           >
-            {variant === "catalogue" && <FiEye aria-hidden="true" className="mr-1.5" />}
+            {variant === "catalogue" && <FiEye aria-hidden="true" className="mr-2 size-4 shrink-0" />}
             Quick View
           </button>
           <button
@@ -148,7 +155,7 @@ export function ProductCard({ product, variant = "default" }) {
             aria-disabled={isInCart}
             className="inline-flex min-h-10 items-center justify-center rounded-full bg-[#017F36] px-3 text-sm font-semibold text-white transition-colors hover:bg-[#124734] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {variant === "catalogue" && <FiShoppingCart aria-hidden="true" className="mr-1.5" />}
+            {variant === "catalogue" && <FiShoppingCart aria-hidden="true" className="mr-2 size-4 shrink-0" />}
             Add to Cart
           </button>
         </div>

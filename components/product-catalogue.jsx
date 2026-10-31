@@ -215,12 +215,12 @@ export function ProductCatalogue({ products = [], initialParams = {}, isDevelopm
         {isDevelopmentPreview && products.some((product) => product.previewOnly) && (
           <aside role="note" className="mb-2 flex min-h-7 items-center gap-2 text-[10px] leading-4 text-[#66756b]">
             <span className="grid size-4 shrink-0 place-items-center rounded-full bg-[#e4eee4] text-[9px] font-bold text-[#124734]" aria-hidden="true">i</span>
-            <span><strong className="font-semibold text-[#345746]">Development preview only.</strong> Sample items and prices are not verified inventory or commercial pricing.</span>
+            <span><strong className="font-semibold text-[#345746]">Development preview only.</strong> Sample product details, ratings, imagery and prices are illustrative, not verified inventory or commercial information.</span>
           </aside>
         )}
 
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-5">
-          <aside className="hidden w-[260px] min-w-0 shrink-0 rounded-xl border border-[#e7e5df] bg-white p-3.5 shadow-[0_2px_8px_rgba(37,41,37,.035)] lg:block" aria-label="Product filters">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6">
+          <aside className="hidden w-[292px] min-w-0 shrink-0 rounded-xl border border-[#e7e5df] bg-white p-3.5 shadow-[0_2px_8px_rgba(37,41,37,.035)] lg:block" aria-label="Product filters">
             <div className="mb-3 flex items-center justify-between border-b border-[#eceae3] pb-3 text-[#124734]"><div className="flex items-center gap-2"><FiFilter aria-hidden="true" /><h2 className="text-[15px] font-semibold">Filters</h2></div><button type="button" onClick={clearFilters} className="text-xs font-semibold text-[#017F36] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]">Clear All</button></div>
             <FilterOptions products={products} filters={filters} onChange={(next) => updateFilters(next, true)} onClear={clearFilters} idPrefix="desktop" />
           </aside>
@@ -246,7 +246,7 @@ export function ProductCatalogue({ products = [], initialParams = {}, isDevelopm
             {hasActiveFilters && <div className="mb-2 flex justify-end"><button type="button" onClick={clearFilters} className="text-xs font-semibold text-[#124734] underline underline-offset-4 hover:text-[#017F36]">Clear filters</button></div>}
 
             {visibleProducts.length ? (
-              <div className="catalogue-product-grid grid min-w-0 grid-cols-2 items-start gap-3 sm:gap-4 lg:grid-cols-3" aria-live="polite">
+              <div className="catalogue-product-grid grid min-w-0 grid-cols-2 items-start gap-3 sm:gap-5 lg:grid-cols-3" aria-live="polite">
                 {visibleProducts.map((product) => <ProductCard key={`${filters.mode}:${product.id}`} product={product} variant="catalogue" />)}
               </div>
             ) : (
