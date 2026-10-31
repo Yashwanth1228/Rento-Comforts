@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FiChevronDown, FiChevronLeft, FiChevronRight, FiFilter, FiSearch, FiX } from "react-icons/fi";
+import { FiChevronDown, FiChevronLeft, FiChevronRight, FiFilter, FiX } from "react-icons/fi";
 import { ProductCard } from "@/components/rental-product-card";
 
 const categoryFamilies = [
@@ -141,7 +141,9 @@ export function ProductCatalogue({ products = [], initialParams = {}, isDevelopm
   const [filters, setFilters] = useState(() => readInitialFilters(initialParams));
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [desktopFiltersVisible, setDesktopFiltersVisible] = useState(true);
+  const [siteHeaderHeight, setSiteHeaderHeight] = useState(0);
   const dialogRef = useRef(null);
+  const subcategoryListRef = useRef(null);
   const visibleProducts = useMemo(() => {
     const modeProducts = products.filter((product) => product.mode === filters.mode);
     const matched = modeProducts.filter((product) => {
@@ -188,7 +190,28 @@ export function ProductCatalogue({ products = [], initialParams = {}, isDevelopm
     return () => window.removeEventListener("popstate", restoreFromUrl);
   }, []);
 
+  useEffect(() => {
+    const header = document.querySelector(".site-header");
+    if (!header) return;
+    const updateHeaderHeight = () => setSiteHeaderHeight(header.getBoundingClientRect().height);
+    updateHeaderHeight();
+    window.addEventListener("resize", updateHeaderHeight);
+    const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(updateHeaderHeight) : null;
+    observer?.observe(header);
+    return () => {
+      window.removeEventListener("resize", updateHeaderHeight);
+      observer?.disconnect();
+    };
+  }, []);
+
   const hasActiveFilters = filters.category !== "all" || filters.subcategory || filters.query || filters.minPrice || filters.maxPrice;
+  const subcategoryOptions = [...new Map(products
+    .filter((product) => product.mode === filters.mode)
+    .filter((product) => filters.category === "all" || familyFor(product) === filters.category)
+    .map((product) => {
+      const id = slugify(product.category);
+      return [id, { id, label: categoryDisplayNames[id] || product.category }];
+    }))];
 
   return (
     <main className="min-h-[60vh] bg-[#F8F7F2] pb-16">
@@ -220,6 +243,34 @@ export function ProductCatalogue({ products = [], initialParams = {}, isDevelopm
           </aside>
         )}
 
+        <div style={{ top: `${siteHeaderHeight}px` }} className="sticky z-40 mb-3 grid min-w-0 grid-cols-1 items-center gap-3 border-b border-[#e7e5df] bg-[#F8F7F2] py-1 lg:grid-cols-[272px_minmax(0,1fr)] lg:gap-6" aria-label="Catalogue controls">
+          <div className="flex min-w-0 items-center">
+            <button type="button" onClick={() => setDesktopFiltersVisible((visible) => !visible)} aria-expanded={desktopFiltersVisible} aria-controls={desktopFiltersVisible ? "catalogue-filter-sidebar" : undefined} className="hidden min-h-10 shrink-0 items-center gap-1.5 rounded-md px-0 text-lg font-extrabold text-[#124734] hover:bg-[#E9F1E9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] lg:inline-flex">
+              {desktopFiltersVisible ? <><span>Hide filters</span><FiChevronRight aria-hidden="true" /></> : <><span>Show filters</span><FiChevronLeft aria-hidden="true" /></>}
+            </button>
+            <button type="button" onClick={() => setMobileFiltersOpen(true)} className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-full border border-[#cfd8ce] px-4 text-sm font-semibold text-[#124734] lg:hidden"><FiFilter aria-hidden="true" />Filters{hasActiveFilters && <span className="grid size-5 place-items-center rounded-full bg-[#017F36] text-xs text-white">•</span>}</button>
+          </div>
+          <div className="flex min-w-0 items-center gap-2 lg:col-start-2 lg:row-start-1" aria-label="Product subcategories">
+            <button type="button" aria-label="Show previous subcategories" aria-controls="product-subcategory-list" onClick={() => {
+              const list = subcategoryListRef.current;
+              if (!list) return;
+              const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+              list.scrollBy({ left: -Math.max(200, list.clientWidth * 0.75), behavior: reduceMotion ? "instant" : "smooth" });
+            }} className="grid size-11 shrink-0 place-items-center rounded-full border border-[#dce2df] bg-white text-[#124734] hover:bg-[#E9F1E9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]"><FiChevronLeft aria-hidden="true" /></button>
+            <div ref={subcategoryListRef} id="product-subcategory-list" className="catalogue-subcategory-scroll flex min-w-0 flex-1 items-center gap-3 overflow-hidden py-1">
+              {subcategoryOptions.map(([id, option]) => (
+                <button key={id} type="button" aria-pressed={filters.subcategory === id} onClick={() => updateFilters({ ...filters, subcategory: filters.subcategory === id ? "" : id }, true)} className={`min-h-12 shrink-0 rounded-xl px-5 text-base font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] ${filters.subcategory === id ? "bg-[#dff3f8] font-semibold text-[#007d9a]" : "bg-[#e7ebec] text-[#252925] hover:bg-[#dce4e5]"}`}>{option.label}</button>
+              ))}
+            </div>
+            <button type="button" aria-label="Show more subcategories" aria-controls="product-subcategory-list" onClick={() => {
+              const list = subcategoryListRef.current;
+              if (!list) return;
+              const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+              list.scrollBy({ left: Math.max(200, list.clientWidth * 0.75), behavior: reduceMotion ? "instant" : "smooth" });
+            }} className="grid size-11 shrink-0 place-items-center rounded-full border border-[#dce2df] bg-white text-[#124734] hover:bg-[#E9F1E9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]"><FiChevronRight aria-hidden="true" /></button>
+          </div>
+        </div>
+
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6">
           <aside id="catalogue-filter-sidebar" className={`${desktopFiltersVisible ? "hidden lg:block" : "hidden"} w-[272px] min-w-0 shrink-0 rounded-xl border border-[#e7e5df] bg-white p-3.5 shadow-[0_2px_8px_rgba(37,41,37,.035)]`} aria-label="Product filters">
             <div className="mb-3 flex items-center justify-between border-b border-[#eceae3] pb-3 text-[#124734]"><div className="flex items-center gap-2"><FiFilter aria-hidden="true" /><h2 className="text-[15px] font-semibold">Filters</h2></div><button type="button" onClick={clearFilters} className="text-xs font-semibold text-[#017F36] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]">Clear All</button></div>
@@ -227,25 +278,6 @@ export function ProductCatalogue({ products = [], initialParams = {}, isDevelopm
           </aside>
 
           <section className="min-w-0 flex-1" aria-label={`${filters.mode === "rent" ? "Rental" : "Purchase"} products`}>
-            <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-              <button type="button" onClick={() => setDesktopFiltersVisible((visible) => !visible)} aria-expanded={desktopFiltersVisible} aria-controls={desktopFiltersVisible ? "catalogue-filter-sidebar" : undefined} className="hidden min-h-9 shrink-0 items-center gap-1.5 rounded-md px-2 text-sm font-medium text-[#124734] hover:bg-[#E9F1E9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] lg:inline-flex">
-                {desktopFiltersVisible ? <><span>Hide filters</span><FiChevronLeft aria-hidden="true" /></> : <><span>Show filters</span><FiChevronRight aria-hidden="true" /></>}
-              </button>
-              <p className="mr-auto text-sm font-medium text-[#252925]" aria-live="polite"><strong className="font-semibold">{visibleProducts.length}</strong> {visibleProducts.length === 1 ? "product" : "products"} {filters.mode === "rent" ? "to rent" : "to buy"}</p>
-              <form className="flex min-h-9 w-full min-w-0 items-center gap-2 rounded-full border border-[#deddd5] bg-white px-3 shadow-[0_1px_3px_rgba(37,41,37,.025)] sm:w-[min(22vw,240px)]" role="search" onSubmit={(event) => { event.preventDefault(); updateFilters(filters, true); }}>
-                <FiSearch aria-hidden="true" className="shrink-0 text-[#124734]" />
-                <label className="sr-only" htmlFor="catalogue-search">Search products</label>
-                <input id="catalogue-search" type="search" value={filters.query} onChange={(event) => updateFilters({ ...filters, query: event.target.value }, true)} placeholder="Search furniture and appliances" className="min-w-0 flex-1 bg-transparent text-sm text-[#252925] outline-none placeholder:text-[#858a84]" />
-                {filters.query && <button type="button" aria-label="Clear search" onClick={() => updateFilters({ ...filters, query: "" }, true)} className="rounded-full p-1 text-[#606860] hover:bg-[#e9e8e0]"><FiX aria-hidden="true" /></button>}
-              </form>
-              <button type="button" onClick={() => setMobileFiltersOpen(true)} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#cfd8ce] px-4 text-sm font-semibold text-[#124734] lg:hidden"><FiFilter aria-hidden="true" />Filters{hasActiveFilters && <span className="grid size-5 place-items-center rounded-full bg-[#017F36] text-xs text-white">•</span>}</button>
-              <label className="flex min-h-9 items-center gap-2 rounded-full border border-[#d8d8d2] bg-white px-3 text-sm text-[#46534a]">
-                <span className="whitespace-nowrap">Sort by</span><span className="sr-only">Sort products</span>
-                <select aria-label="Sort products" value={filters.sort} onChange={(event) => updateFilters({ ...filters, sort: event.target.value })} className="min-w-0 flex-1 bg-transparent font-semibold text-[#124734] outline-none">
-                  <option value="recommended">Recommended</option><option value="price-asc">Price: Low to High</option><option value="price-desc">Price: High to Low</option><option value="name-asc">Name: A to Z</option>
-                </select><FiChevronDown aria-hidden="true" className="pointer-events-none -ml-6" />
-              </label>
-            </div>
 
             {hasActiveFilters && <div className="mb-2 flex justify-end"><button type="button" onClick={clearFilters} className="text-xs font-semibold text-[#124734] underline underline-offset-4 hover:text-[#017F36]">Clear filters</button></div>}
 
