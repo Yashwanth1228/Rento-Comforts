@@ -2,17 +2,12 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FiChevronLeft, FiChevronRight, FiImage, FiMinus, FiPlus, FiStar, FiX } from "react-icons/fi";
+import { FiCalendar, FiChevronDown, FiChevronLeft, FiChevronRight, FiClock, FiCreditCard, FiHeadphones, FiHelpCircle, FiImage, FiInfo, FiMessageCircle, FiRefreshCw, FiShoppingBag, FiStar, FiTool, FiTruck, FiX } from "react-icons/fi";
 
 const validReview = (review) => {
   const allowedReview = review?.demo === true || (review?.verified === true && review?.published === true);
   return allowedReview && Number.isFinite(review.rating) && review.rating >= 1 && review.rating <= 5 && typeof review.text === "string" && review.text.trim().length > 0;
 };
-
-const validFaq = (faq) =>
-  (faq?.approved === true || faq?.demo === true) &&
-  typeof faq.question === "string" && faq.question.trim().length > 0 &&
-  typeof faq.answer === "string" && faq.answer.trim().length > 0;
 
 const dateLabel = (value) => {
   if (!value) return "";
@@ -25,7 +20,7 @@ function ReviewStars({ rating, interactive = false, value, onChange }) {
   return <span className="inline-flex items-center gap-0.5 text-[#d59a32]" aria-label={`${rating} out of 5 stars`}>{[1, 2, 3, 4, 5].map((star) => <FiStar key={star} aria-hidden="true" className={`size-3.5 ${star <= Math.round(rating) ? "fill-current" : "fill-transparent"}`} />)}</span>;
 }
 
-export function ProductDetailFeedback({ reviews, faqs, developmentFeedback }) {
+export function ProductDetailReviews({ reviews, developmentFeedback }) {
   const [localReviews, setLocalReviews] = useState([]);
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("newest");
@@ -35,10 +30,6 @@ export function ProductDetailFeedback({ reviews, faqs, developmentFeedback }) {
   const isDevelopmentPreview = Boolean(developmentFeedback);
   const baseReviews = isDevelopmentPreview ? developmentFeedback.reviews : reviews;
   const reviewItems = useMemo(() => [...(Array.isArray(baseReviews) ? baseReviews.filter(validReview) : []), ...localReviews], [baseReviews, localReviews]);
-  const faqItems = useMemo(() => {
-    const configured = Array.isArray(faqs) ? faqs.filter(validFaq) : [];
-    return isDevelopmentPreview ? [...configured, ...(developmentFeedback.faqs || []).filter(validFaq)] : configured;
-  }, [faqs, developmentFeedback, isDevelopmentPreview]);
   const average = reviewItems.length ? reviewItems.reduce((total, review) => total + review.rating, 0) / reviewItems.length : null;
   const photos = useMemo(() => reviewItems.flatMap((review) => (Array.isArray(review.photos) ? review.photos : []).map((photo) => ({ ...photo, reviewId: review.id, reviewerName: review.reviewerName, reviewTitle: review.title || "Customer review", demo: review.demo === true }))), [reviewItems]);
   const visibleReviews = useMemo(() => {
@@ -63,9 +54,9 @@ export function ProductDetailFeedback({ reviews, faqs, developmentFeedback }) {
     return () => window.removeEventListener("keydown", handleKey);
   }, [photoIndex, photos.length]);
 
-  return <section className="mt-5 grid min-w-0 items-start gap-4 lg:grid-cols-2" aria-label="Customer reviews and product FAQs">
+  return <section className="mt-5 min-w-0" aria-labelledby="customer-reviews-heading">
     <article className="min-w-0 rounded-2xl border border-[#e7e4dc] bg-white p-4 shadow-[0_2px_10px_rgba(37,41,37,0.045)] sm:p-5">
-      <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="font-editorial text-xl font-semibold text-[#124734] sm:text-2xl">Customer Reviews</h2>{average !== null && <div className="flex items-center gap-2"><strong className="text-sm text-[#252925]">{average.toFixed(1)}</strong><ReviewStars rating={average} /><span className="text-xs text-[#69736b]">({reviewItems.length})</span></div>}</div>
+      <div className="flex flex-wrap items-center justify-between gap-2"><h2 id="customer-reviews-heading" className="font-editorial text-xl font-semibold text-[#124734] sm:text-2xl">Customer Reviews</h2>{average !== null && <div className="flex items-center gap-2"><strong className="text-sm text-[#252925]">{average.toFixed(1)}</strong><ReviewStars rating={average} /><span className="text-xs text-[#69736b]">({reviewItems.length})</span></div>}</div>
       {isDevelopmentPreview && <p className="mt-2 rounded-lg bg-[#edf5ec] px-3 py-2 text-xs font-semibold text-[#124734]">Demo reviews — development preview only</p>}
       {reviewItems.length === 0 ? <div className="mt-4 rounded-xl bg-[#f8f7f2] px-4 py-5 text-center"><p className="text-sm font-semibold text-[#252925]">No customer reviews yet</p><p className="mt-1 text-xs leading-5 text-[#69736b]">Reviews and product photos from customers will appear here once available.</p></div> : <>
         <div className="mt-3 grid gap-3 sm:grid-cols-[minmax(120px,.7fr)_minmax(0,1.3fr)]">
@@ -78,11 +69,50 @@ export function ProductDetailFeedback({ reviews, faqs, developmentFeedback }) {
       </>}
       {isDevelopmentPreview && <div className="mt-4 border-t border-[#eeece7] pt-3"><button type="button" onClick={() => setFormOpen((open) => !open)} aria-expanded={formOpen} className="rounded-lg border border-[#9ab6a3] bg-white px-3 py-2 text-sm font-semibold text-[#124734] hover:bg-[#f2f7f1] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]">{formOpen ? "Close Review Preview" : "Try Review Form"}</button><p className="mt-1 text-[11px] text-[#69736b]">Local preview only — no review is sent to a server.</p><div hidden={!formOpen}><DemoReviewForm onAdd={(review) => setLocalReviews((current) => [review, ...current])} photoUrlsRef={photoUrls} /></div></div>}
     </article>
-
-    <article className="min-w-0 rounded-2xl border border-[#e7e4dc] bg-white p-4 shadow-[0_2px_10px_rgba(37,41,37,0.045)] sm:p-5"><div className="flex items-center justify-between gap-2"><h2 className="font-editorial text-xl font-semibold text-[#124734] sm:text-2xl">Frequently Asked Questions</h2>{isDevelopmentPreview && <span className="shrink-0 rounded-full bg-[#edf5ec] px-2.5 py-1 text-[10px] font-semibold text-[#124734]">DEMO</span>}</div>{faqItems.length === 0 ? <div className="mt-4 rounded-xl bg-[#f8f7f2] px-4 py-5 text-center"><p className="text-sm font-semibold text-[#252925]">Product-specific FAQs will appear here once confirmed.</p></div> : <FaqAccordion faqs={faqItems} />}{isDevelopmentPreview && <p className="mt-3 text-[11px] leading-4 text-[#69736b]">Illustrative answers for development preview only. Policy-dependent terms are pending confirmation.</p>}</article>
-
     {photoIndex >= 0 && photos[photoIndex] && <PhotoViewer photo={photos[photoIndex]} index={photoIndex} count={photos.length} onClose={() => setPhotoIndex(-1)} onChange={setPhotoIndex} />}
   </section>;
+}
+
+export function ProductDetailFaq({ faqs, developmentFeedback }) {
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const isDevelopmentPreview = Boolean(developmentFeedback);
+  const configuredFaqs = Array.isArray(faqs) ? faqs.filter((faq) => faq?.approved === true && typeof faq.question === "string" && faq.question.trim() && typeof faq.answer === "string" && faq.answer.trim()) : [];
+  const demoFaqs = isDevelopmentPreview ? (developmentFeedback.faqs || []).filter((faq) => faq?.demo === true && typeof faq.question === "string" && faq.question.trim() && typeof faq.answer === "string" && faq.answer.trim()) : [];
+  const faqItems = [...configuredFaqs, ...demoFaqs];
+  const categories = [...new Set(faqItems.map((faq) => faq.category).filter((category) => typeof category === "string" && category.trim()))];
+  const visibleFaqs = selectedCategory === "all" ? faqItems : faqItems.filter((faq) => faq.category === selectedCategory);
+
+  return <section className="mt-8 min-w-0" aria-labelledby="product-faq-heading">
+    <div className="grid min-w-0 gap-7 lg:grid-cols-[minmax(0,0.32fr)_minmax(0,0.68fr)] lg:gap-10">
+      <div className="flex min-w-0 flex-col">
+        <div className="flex items-center gap-3 text-sm font-bold tracking-[0.08em] text-[#124734]"><span>FAQ</span><span className="h-[2px] w-16 bg-[#b9cbb9]" aria-hidden="true" /></div>
+        <h2 id="product-faq-heading" className="mt-5 max-w-[530px] font-sans text-4xl font-bold leading-[1.08] text-[#124734] sm:text-[3.25rem]">Frequently Asked Questions</h2>
+        <p className="mt-5 max-w-md border-l-[3px] border-[#124734] pl-4 text-base leading-[1.55] text-[#414a44] sm:text-lg">Quick answers to common questions about renting or buying furniture, appliances and home essentials on Rento Comforts.</p>
+        <div className="mt-5 flex min-h-[320px] flex-1 flex-col items-center justify-center rounded-t-2xl border border-dashed border-[#c9cec3] bg-[linear-gradient(145deg,#f1f3e8,#f8f7f2_58%,#ece9df)] p-7 text-center sm:min-h-[390px] lg:rounded-b-none lg:border-b-0" role="img" aria-label="Interior photography placeholder; a combined furniture and appliance photograph is not available">
+          <span className="grid size-14 place-items-center rounded-full bg-white/80 text-[#124734] shadow-sm"><FiImage aria-hidden="true" className="size-6" /></span>
+          <p className="mt-4 max-w-xs text-sm font-semibold text-[#124734]">Interior photograph pending</p>
+          <p className="mt-1 max-w-xs text-xs leading-5 text-[#69736b]">A suitable authorized photo showing furniture and appliances together is not available yet.</p>
+        </div>
+      </div>
+
+      <div className="min-w-0">
+        {isDevelopmentPreview && <p className="mb-3 inline-flex rounded-full bg-[#edf5ec] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#124734]">Development FAQ preview</p>}
+        {faqItems.length > 0 && categories.length > 0 && <FaqCategoryFilters categories={categories} faqs={faqItems} selectedCategory={selectedCategory} onSelect={setSelectedCategory} />}
+        {faqItems.length === 0 ? <div className="rounded-2xl border border-[#e7e4dc] bg-white px-5 py-8 text-center shadow-[0_2px_10px_rgba(37,41,37,0.045)]"><p className="text-sm font-semibold text-[#252925]">Product-specific FAQs will appear here once confirmed.</p></div> : <FaqAccordion faqs={visibleFaqs} />}
+      </div>
+    </div>
+    <aside className="mt-0 grid gap-4 rounded-b-2xl rounded-t-none bg-[#063f31] p-5 text-white shadow-[0_8px_24px_rgba(18,71,52,0.12)] sm:grid-cols-2 sm:items-center sm:gap-5 sm:px-7 sm:py-5 lg:grid-cols-[1fr_1fr_1fr_1.55fr]" aria-label="FAQ information and support">
+      <div className="flex min-h-12 items-center gap-3"><FiInfo aria-hidden="true" className="size-6 shrink-0 text-[#dbe9d9]" /><p className="text-xs leading-5 text-white/90"><strong className="block text-sm text-white">Product details</strong>Review configured information on this page.</p></div>
+      <div className="flex min-h-12 items-center gap-3 border-white/20 sm:border-l sm:pl-5"><FiHelpCircle aria-hidden="true" className="size-6 shrink-0 text-[#dbe9d9]" /><p className="text-xs leading-5 text-white/90"><strong className="block text-sm text-white">Policy terms</strong>{isDevelopmentPreview ? "Demo answers are illustrative, not confirmed policy." : "Policy information appears when confirmed."}</p></div>
+      <div className="flex min-h-12 items-center gap-3 border-white/20 sm:border-l sm:pl-5"><FiCalendar aria-hidden="true" className="size-6 shrink-0 text-[#dbe9d9]" /><p className="text-xs leading-5 text-white/90"><strong className="block text-sm text-white">Availability</strong>{isDevelopmentPreview ? "This preview does not confirm availability." : "Only confirmed availability is represented."}</p></div>
+      <div className="flex min-h-[68px] items-center gap-3 rounded-full bg-[#f8f7f2] px-4 py-3 text-[#124734] sm:col-span-2 sm:px-5 lg:col-span-1"><FiHeadphones aria-hidden="true" className="ml-1 size-7 shrink-0" /><p className="text-xs leading-5 text-[#46534a]"><strong className="block text-sm text-[#252925]">Still have a question?</strong>Customer support contact is not configured yet.</p></div>
+    </aside>
+  </section>;
+}
+
+function FaqCategoryFilters({ categories, faqs, selectedCategory, onSelect }) {
+  const categoryCounts = categories.map((category) => ({ category, count: faqs.filter((faq) => faq.category === category).length }));
+  return <div className="mb-4 flex gap-2 overflow-x-auto pb-1" aria-label="Filter FAQs by category"><button type="button" aria-pressed={selectedCategory === "all"} onClick={() => onSelect("all")} className={`shrink-0 rounded-full border px-4 py-2 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] sm:text-sm ${selectedCategory === "all" ? "border-[#063f31] bg-[#063f31] text-white" : "border-[#d8d9d4] bg-white text-[#252925] hover:bg-[#f3f6f0]"}`}><FiHelpCircle aria-hidden="true" className="mr-2 inline size-4" />All Questions ({faqs.length})</button>{categoryCounts.map(({ category, count }) => <button key={category} type="button" aria-pressed={selectedCategory === category} onClick={() => onSelect(category)} className={`shrink-0 rounded-full border px-4 py-2 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] sm:text-sm ${selectedCategory === category ? "border-[#063f31] bg-[#063f31] text-white" : "border-[#d8d9d4] bg-white text-[#252925] hover:bg-[#f3f6f0]"}`}><FiShoppingBag aria-hidden="true" className="mr-2 inline size-4" />{category} ({count})</button>)}</div>;
 }
 
 function DemoReviewForm({ onAdd, photoUrlsRef }) {
@@ -141,5 +171,17 @@ function PhotoViewer({ photo, index, count, onClose, onChange }) {
 
 function FaqAccordion({ faqs }) {
   const [openIndex, setOpenIndex] = useState(-1);
-  return <div className="mt-3 divide-y divide-[#e9e7e1] border-y border-[#e9e7e1]">{faqs.map((faq, index) => { const isOpen = openIndex === index; const answerId = `product-faq-answer-${faq.id || index}`; return <div key={faq.id || faq.question} className="py-0.5"><h3><button type="button" aria-expanded={isOpen} aria-controls={answerId} onClick={() => setOpenIndex(isOpen ? -1 : index)} className="flex min-h-11 w-full items-center justify-between gap-3 py-2 text-left text-sm font-medium text-[#252925] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#017F36]"><span>{faq.question}</span>{isOpen ? <FiMinus aria-hidden="true" className="size-4 shrink-0 text-[#124734]" /> : <FiPlus aria-hidden="true" className="size-4 shrink-0 text-[#124734]" />}</button></h3><div id={answerId} aria-hidden={!isOpen} className={`overflow-hidden pr-7 text-sm leading-5 text-[#59635c] transition-[max-height,opacity] duration-300 motion-reduce:transition-none ${isOpen ? "max-h-40 pb-3 opacity-100" : "max-h-0 opacity-0"}`}>{faq.answer}</div></div>; })}</div>;
+  return <div className="space-y-2" aria-label="Product questions">{faqs.map((faq, index) => { const isOpen = openIndex === index; const answerId = `product-faq-answer-${faq.id || index}`; const Icon = faqIcon(faq.question); return <article key={faq.id || faq.question} className={`overflow-hidden rounded-2xl border transition-colors duration-200 motion-reduce:transition-none ${isOpen ? "border-[#cbdcc9] bg-[#edf4e9]" : "border-[#e3e3dd] bg-white hover:border-[#cbd7c8]"}`}><h3><button type="button" aria-expanded={isOpen} aria-controls={answerId} onClick={() => setOpenIndex(isOpen ? -1 : index)} className="flex min-h-[72px] w-full items-center gap-3 px-3 py-2.5 text-left focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#017F36] sm:gap-4 sm:px-5"><span className={`grid size-12 shrink-0 place-items-center rounded-2xl ${isOpen ? "bg-white text-[#124734]" : "bg-[#f2f5e8] text-[#124734]"}`}><Icon aria-hidden="true" className="size-6" /></span><span className="min-w-0 flex-1 text-base font-bold leading-5 text-[#252925] sm:text-lg">{faq.question}</span><FiChevronDown aria-hidden="true" className={`mr-1 size-5 shrink-0 text-[#124734] transition-transform duration-200 motion-reduce:transition-none ${isOpen ? "rotate-180" : ""}`} /></button></h3><div id={answerId} aria-hidden={!isOpen} className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 motion-reduce:transition-none ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}><div className="min-h-0"><p className="border-t border-[#dce7d9] px-4 pb-4 pt-3 pl-[68px] text-sm leading-6 text-[#4f5b52] sm:pl-[84px]">{faq.answer}{faq.demo && <span className="ml-1 font-medium text-[#124734]">(Illustrative development answer; terms are unconfirmed.)</span>}</p></div></div></article>; })}</div>;
+}
+
+function faqIcon(question = "") {
+  const text = question.toLowerCase();
+  if (text.includes("date")) return FiCalendar;
+  if (text.includes("duration")) return FiClock;
+  if (text.includes("deposit")) return FiCreditCard;
+  if (text.includes("delivery") || text.includes("setup") || text.includes("return")) return FiTruck;
+  if (text.includes("maintenance")) return FiTool;
+  if (text.includes("extend")) return FiRefreshCw;
+  if (text.includes("buy") || text.includes("purchase")) return FiShoppingBag;
+  return FiHelpCircle;
 }

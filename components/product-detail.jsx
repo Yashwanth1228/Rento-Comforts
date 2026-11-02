@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useCart } from "@/components/cart-provider";
 import { ProductCard } from "@/components/rental-product-card";
-import { ProductDetailFeedback } from "@/components/product-detail-feedback";
+import { ProductDetailFaq, ProductDetailReviews } from "@/components/product-detail-feedback";
 import { FiCalendar, FiChevronLeft, FiChevronRight, FiClock, FiHeart, FiHome, FiInfo, FiMaximize2, FiShare2, FiShoppingCart, FiX } from "react-icons/fi";
 
 const money = (paise) => Number.isSafeInteger(paise) && paise > 0
@@ -155,9 +155,11 @@ export function ProductDetail({ product, products = [], initialMode = "rent", de
           </div>
         </section>
 
-        <ProductDetailFeedback reviews={current?.reviews} faqs={current?.approvedFaqs} developmentFeedback={developmentFeedback} />
+        <ProductDetailReviews reviews={current?.reviews} developmentFeedback={developmentFeedback} />
 
         {related.length > 0 && <section className="mt-5" aria-labelledby="related-products-title"><div className="mb-3 flex items-center justify-between"><h2 id="related-products-title" className="font-editorial text-2xl font-semibold text-[#103d2d]">You May Also Like</h2><Link href={`/products?mode=${mode}`} className="inline-flex items-center gap-2 text-sm font-semibold text-[#124734] hover:text-[#017F36]">View All <FiChevronRight /></Link></div><div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{related.map((candidate) => <ProductCard key={candidate.slug} product={{ ...candidate.offerings[mode], mode }} variant="catalogue" requireRentalSelection showPreviewBadge={false} showRating={!candidate.offerings[mode].previewOnly} />)}</div></section>}
+
+        <ProductDetailFaq faqs={current?.approvedFaqs} developmentFeedback={developmentFeedback} />
       </div>
 
       {zoomOpen && selectedImage && <div role="dialog" aria-modal="true" aria-label="Product image" className="fixed inset-0 z-[200] grid place-items-center bg-black/80 p-4" onClick={() => setZoomOpen(false)}><button type="button" onClick={() => setZoomOpen(false)} className="absolute right-5 top-5 grid size-10 place-items-center rounded-full bg-white text-[#252925]" aria-label="Close image viewer"><FiX aria-hidden="true" /></button><div className="relative h-[82vh] w-[min(92vw,1100px)]" onClick={(event) => event.stopPropagation()}><Image src={selectedImage.src} alt={selectedImage.alt || current.name} fill sizes="90vw" className="object-contain" /></div></div>}
