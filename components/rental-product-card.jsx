@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/components/cart-provider";
-import { FiEye, FiHeart, FiShoppingCart, FiStar } from "react-icons/fi";
+import { FiEye, FiHeart, FiShoppingCart, FiStar, FiX } from "react-icons/fi";
+import { productSlug } from "@/lib/product-slug";
 
 function formatINRFromPaise(amountPaise) {
   if (!Number.isSafeInteger(amountPaise) || amountPaise < 0) {
@@ -31,10 +33,10 @@ function DetailRow({ label, children }) {
 }
 
 /** Displays a concise rental or purchase card and an accessible details preview. */
-export function ProductCard({ product, variant = "default" }) {
+export function ProductCard({ product, variant = "default", requireRentalSelection = false, showPreviewBadge = true, showRating = true }) {
   const mode = product.mode === "buy" ? "buy" : "rent";
   const isPurchase = mode === "buy";
-  const displayName = variant === "catalogue" ? product.name.replace(/\s+— Preview$/, "") : product.name;
+  const displayName = variant === "catalogue" ? product.name.replace(/\s+\S+\s+Preview$/i, "") : product.name;
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [cartMessage, setCartMessage] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
@@ -56,15 +58,24 @@ export function ProductCard({ product, variant = "default" }) {
     : product.monthlyRentalPricePaise;
   const hasValidPrice =
     Number.isSafeInteger(itemPricePaise) && itemPricePaise > 0;
+  const hasConfiguredRentalDuration = Array.isArray(product.rentalDurationOptionsMonths) && product.rentalDurationOptionsMonths.some((months) => Number.isInteger(months) && months > 0);
+  const rentalSelectionRequired = requireRentalSelection && !isPurchase;
+  const addToCartDisabled = isInCart || rentalSelectionRequired;
   const rating = Number.isFinite(product.rating) && product.rating >= 0 && product.rating <= 5 ? product.rating : null;
   const reviewCount = Number.isSafeInteger(product.reviewCount) && product.reviewCount >= 0 ? product.reviewCount : null;
   const hasDescription = typeof product.description === "string" && product.description.trim().length > 0;
+  const detailHref = `/products/${productSlug(displayName)}?mode=${mode}`;
 
   function toggleFavorite() {
     setIsFavorite((current) => !current);
   }
 
   function handleAddToCart() {
+    if (rentalSelectionRequired) {
+      setCartMessage(hasConfiguredRentalDuration ? "Choose the rental date and duration on the product page before adding this item." : "Rental duration options are not configured for this preview item.");
+      return;
+    }
+
     const added = addItem(product);
     setCartMessage(
       added
@@ -91,16 +102,10 @@ export function ProductCard({ product, variant = "default" }) {
     <>
       <article className={`rental-product-card ${variant === "catalogue" ? "rental-product-card--catalogue group relative self-start rounded-2xl border border-[#e2e2dc] bg-white p-0 shadow-sm" : "group relative self-start rounded-2xl border border-[#e2e2dc] bg-white p-3 shadow-sm transition-[transform,box-shadow] duration-300 motion-reduce:transition-none hover:shadow-lg"}`}>
         <div className={`relative overflow-hidden bg-[#F8F7F2] ${variant === "catalogue" ? "aspect-[1.62] rounded-t-[13px]" : "aspect-[4/3] rounded-xl"}`}>
-          <Image
-            src={product.imageUrl}
-            alt={product.imageAlt}
-            fill
-            sizes="(max-width: 640px) 44vw, (max-width: 1000px) 45vw, 22vw"
-            className={variant === "catalogue" ? "object-cover p-0" : "object-contain p-4"}
-          />
+          {variant === "catalogue" ? <Link href={detailHref} aria-label={`View details for ${displayName}`} className="absolute inset-0 focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[#017F36]"><Image src={product.imageUrl} alt={product.imageAlt} fill sizes="(max-width: 640px) 44vw, (max-width: 1000px) 45vw, 22vw" className="object-cover p-0" /></Link> : <Image src={product.imageUrl} alt={product.imageAlt} fill sizes="(max-width: 640px) 44vw, (max-width: 1000px) 45vw, 22vw" className="object-contain p-4" />}
           {variant === "catalogue" && (
             <>
-              {product.previewBadge && product.previewOnly && (
+              {showPreviewBadge && product.previewBadge && product.previewOnly && (
                 <span className="catalogue-product-badge absolute left-2.5 top-2.5 z-[1] rounded-full bg-[#17845c] px-3 py-1 text-[11px] font-semibold leading-4 text-white">
                   {product.previewBadge}
                 </span>
@@ -115,7 +120,7 @@ export function ProductCard({ product, variant = "default" }) {
 
         <div className={`rental-product-card__details px-1 pb-0 pt-2 sm:min-h-[4.5rem] sm:pb-2 sm:pt-3 ${variant === "catalogue" ? "rental-product-card__details--catalogue" : ""}`}>
           <h3 className={`truncate font-semibold leading-6 text-[#252925] ${variant === "catalogue" ? "text-[13px] sm:text-sm" : "text-sm sm:text-base"}`}>
-            {displayName}
+            {variant === "catalogue" ? <Link href={detailHref} className="rounded-sm hover:text-[#124734] focus-visible:outline-2 focus-visible:outline-[#017F36]">{displayName}</Link> : displayName}
           </h3>
           {variant === "catalogue" && hasDescription && <p className="mt-0.5 truncate text-[11px] leading-4 text-[#747a75]">{product.description}</p>}
 
@@ -127,7 +132,7 @@ export function ProductCard({ product, variant = "default" }) {
                   <span className="ml-1 text-xs font-normal text-[#606860]">/mo</span>
                 )}
               </p>
-              {variant === "catalogue" && rating !== null && (
+              {variant === "catalogue" && showRating && rating !== null && (
                 <p className="catalogue-product-rating inline-flex shrink-0 items-center gap-1 text-[11px] leading-4 text-[#4f5650]" aria-label={`Rating ${rating.toFixed(1)} out of 5${reviewCount === null ? "" : `, ${reviewCount} reviews`}`}>
                   <FiStar aria-hidden="true" className="size-3.5 fill-[#d59a32] text-[#d59a32]" />
                   <span>{rating.toFixed(1)}</span>
@@ -150,9 +155,9 @@ export function ProductCard({ product, variant = "default" }) {
           <button
             type="button"
             onClick={handleAddToCart}
-            disabled={isInCart}
-            aria-label={isInCart ? `${displayName} is already in the cart` : `Add ${displayName} to cart`}
-            aria-disabled={isInCart}
+            disabled={addToCartDisabled}
+            aria-label={isInCart ? `${displayName} is already in the cart` : rentalSelectionRequired ? `${displayName} requires rental options on its detail page before it can be added` : `Add ${displayName} to cart`}
+            aria-disabled={addToCartDisabled}
             className="inline-flex min-h-10 items-center justify-center rounded-full bg-[#017F36] px-3 text-sm font-semibold text-white transition-colors hover:bg-[#124734] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {variant === "catalogue" && <FiShoppingCart aria-hidden="true" className="mr-2 size-4 shrink-0" />}
@@ -181,7 +186,7 @@ export function ProductCard({ product, variant = "default" }) {
               id={`quick-view-title-${product.id}`}
               className="font-editorial text-2xl font-medium text-[#124734] sm:text-3xl"
             >
-              {product.name}
+              {displayName}
             </h2>
           </div>
           <button
@@ -190,7 +195,7 @@ export function ProductCard({ product, variant = "default" }) {
             aria-label="Close quick view"
             className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-[#e2e2dc] text-2xl leading-none text-[#124734] transition-colors hover:bg-[#E9F1E9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]"
           >
-            <span aria-hidden="true">×</span>
+            <FiX aria-hidden="true" />
           </button>
         </div>
 

@@ -32,9 +32,9 @@ function toCartItem(product) {
       mode === "rent" ? product.minimumRentalMonths : null,
     availabilityMessage:
       mode === "rent" ? product.availabilityMessage : null,
-    rentalPlan: mode === "rent" ? null : undefined,
-    rentalDates: mode === "rent" ? null : undefined,
-    configurationPending: mode === "rent",
+    rentalPlan: mode === "rent" ? product.rentalPlan || null : undefined,
+    rentalDates: mode === "rent" ? product.rentalDates || null : undefined,
+    configurationPending: mode === "rent" && (!product.rentalPlan || !product.rentalDates),
   };
 }
 
