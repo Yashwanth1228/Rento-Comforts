@@ -6,7 +6,7 @@ import { useMemo } from "react";
 import { useCart } from "@/components/cart-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { FiArrowRight, FiCalendar, FiCreditCard, FiMinus, FiPlus, FiRefreshCw, FiShoppingCart, FiTool, FiTrash2, FiTruck } from "react-icons/fi";
+import { FiArrowRight, FiCalendar, FiCreditCard, FiHeadphones, FiLock, FiMinus, FiPlus, FiRefreshCw, FiShoppingCart, FiTool, FiTrash2, FiTruck } from "react-icons/fi";
 
 function formatINRFromPaise(amountPaise) {
   if (!Number.isSafeInteger(amountPaise) || amountPaise < 0) return null;
@@ -49,31 +49,32 @@ export default function CartPage() {
   return (
     <>
       <SiteHeader />
-      <main className={`${items.length === 0 ? "min-h-[calc(100svh-204px)] px-4 py-3 sm:px-7 sm:py-3 lg:min-h-[calc(100svh-152px)] lg:px-10" : "min-h-[62vh] px-4 py-8 sm:px-7 sm:py-12 lg:px-10"} bg-[#fbfaf7]`}>
-        <div className="mx-auto max-w-[1440px]">
+      <main className={`${items.length === 0 ? "min-h-[calc(100svh-204px)] px-4 py-3 sm:px-7 sm:py-3 lg:min-h-[calc(100svh-152px)] lg:px-10" : "min-h-[62vh] px-4 py-5 sm:px-7 sm:py-6 lg:px-10"} bg-[#fbfaf7]`}>
+        <div className="mx-auto max-w-[1536px]">
           {items.length === 0 ? (
             <EmptyCart />
           ) : (
             <>
-              <div className="mb-6">
+              <div className="mb-4">
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#124734]">Your selections</p>
-                <h1 className="mt-2 font-editorial text-4xl font-medium text-[#124734] sm:text-5xl">Your Cart</h1>
+                <h1 className="mt-1 font-editorial text-4xl font-medium text-[#124734] sm:text-5xl">Your Cart</h1>
               </div>
-              {hasPreviewItems && <PreviewNotice />}
-              <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_370px] xl:gap-8">
-                <section aria-label="Cart items" className="min-w-0">
-                  <ul className="space-y-4">
+              <div className="cart-populated-layout">
+                <section aria-label="Cart items" className="cart-populated-items">
+                  {hasPreviewItems && <PreviewNotice />}
+                  <ul className="mt-4 space-y-4">
                     {items.map((item) => (
                       <CartItem key={item.cartKey} item={item} onRemove={removeItem} onQuantityChange={updateQuantity} />
                     ))}
                   </ul>
-                  <div className="mt-5 grid gap-3 rounded-2xl bg-[#e9f1e9] px-4 py-4 text-sm text-[#124734] sm:grid-cols-3 sm:px-5">
-                    <div className="flex items-center gap-2"><FiShoppingCart className="size-5 shrink-0" /><span>Rent and purchase totals are separate</span></div>
-                    <div className="flex items-center gap-2"><FiTruck className="size-5 shrink-0" /><span>Delivery charges are not configured</span></div>
-                    <div className="flex items-center gap-2"><FiRefreshCw className="size-5 shrink-0" /><span>Cart does not reserve inventory</span></div>
+                  <div className="mt-4 grid gap-3 rounded-2xl bg-[#e9f1e9] px-4 py-4 text-sm text-[#124734] sm:grid-cols-2 sm:px-5 xl:grid-cols-4 xl:gap-0 xl:py-3">
+                    <div className="flex items-center gap-2 xl:border-r xl:border-[#cbd9cb] xl:px-3"><FiLock className="size-5 shrink-0" /><span>Checkout unavailable</span></div>
+                    <div className="flex items-center gap-2 xl:border-r xl:border-[#cbd9cb] xl:px-3"><FiTruck className="size-5 shrink-0" /><span>Delivery charges pending</span></div>
+                    <div className="flex items-center gap-2 xl:border-r xl:border-[#cbd9cb] xl:px-3"><FiCalendar className="size-5 shrink-0" /><span>Rental details shown</span></div>
+                    <div className="flex items-center gap-2 xl:px-3"><FiHeadphones className="size-5 shrink-0" /><span>No order placed</span></div>
                   </div>
                 </section>
-                <CartSummary summary={summary} />
+                <div className="cart-populated-aside"><CartSummary summary={summary} /></div>
               </div>
             </>
           )}
@@ -128,35 +129,37 @@ function CartItem({ item, onRemove, onQuantityChange }) {
   const durationMonths = item.rentalPlan?.durationMonths;
 
   return (
-    <li className="grid min-w-0 gap-4 rounded-2xl border border-[#e6e4de] bg-white p-4 shadow-[0_3px_14px_rgba(37,41,37,0.055)] sm:grid-cols-[180px_minmax(0,1fr)] sm:p-5 xl:grid-cols-[200px_minmax(0,1fr)_140px]">
-      <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-[#f8f7f2]">
-        <Image src={item.imageUrl} alt={item.imageAlt || item.name} fill sizes="(max-width: 640px) 90vw, 200px" className="object-contain p-2" />
+    <li className="cart-populated-item">
+      <div className="cart-populated-item__image">
+        <Image src={item.imageUrl} alt={item.imageAlt || item.name} fill sizes="(max-width: 640px) 90vw, 240px" className="object-cover" />
       </div>
-      <div className="min-w-0">
+      <div className="cart-populated-item__details">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="text-lg font-bold leading-6 text-[#252925]">{item.name.replace(/\s+—\s+Preview$/i, "")}</h2>
           {item.previewOnly && <span className="rounded-full bg-[#edf5ec] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-[#124734]">Preview</span>}
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] ${isPurchase ? "border border-[#c4d6c5] text-[#326b42]" : "bg-[#e7f3e6] text-[#017F36]"}`}>{isPurchase ? "Purchase item" : "Rental item"}</span>
-          {item.category && <span className="text-sm text-[#69736b]">{item.category}</span>}
         </div>
+        {item.category && <p className="mt-1 text-sm text-[#69736b]">{item.category}</p>}
         {price ? <p className="mt-2 text-xl font-bold text-[#124734]">{price}<span className="ml-1 text-sm font-normal text-[#59635c]">{isPurchase ? "one-time" : "/month"}</span></p> : <p className="mt-2 text-sm font-semibold text-[#69736b]">Price not configured</p>}
-        {isPurchase ? <p className="mt-1 text-xs text-[#69736b]">One-time purchase price; delivery and other charges are not configured.</p> : (
-          <div className="mt-3 grid gap-x-4 gap-y-2 text-xs text-[#59635c] sm:grid-cols-2">
-            <p className="flex items-center gap-2"><FiCreditCard className="size-4 shrink-0 text-[#124734]" /><span>Security deposit: {deposit || "To be confirmed"}</span></p>
-            <p className="flex items-center gap-2"><FiCalendar className="size-4 shrink-0 text-[#124734]" /><span>Start date: {startDate || "Not selected"}</span></p>
-            <p className="flex items-center gap-2"><FiRefreshCw className="size-4 shrink-0 text-[#124734]" /><span>Duration: {Number.isInteger(durationMonths) ? `${durationMonths} ${durationMonths === 1 ? "month" : "months"}` : "Not configured"}</span></p>
-            {Number.isInteger(item.minimumRentalMonths) && <p>Minimum rental: {item.minimumRentalMonths} {item.minimumRentalMonths === 1 ? "month" : "months"}</p>}
-          </div>
+        {isPurchase ? <p className="mt-1 text-sm text-[#69736b]">One-time purchase price</p> : (
+          <>
+            <p className="mt-1 flex items-center gap-2 text-sm text-[#59635c]"><FiCreditCard className="size-4 shrink-0 text-[#124734]" /><span>Security deposit: {deposit || "To be confirmed"}</span></p>
+            <div className="mt-2 grid max-w-[510px] gap-2 sm:grid-cols-2">
+              <div className="flex min-h-9 items-center gap-2 rounded-xl border border-[#dedfd9] bg-white px-3 py-2 text-xs text-[#252925]"><FiCalendar className="size-4 shrink-0 text-[#124734]" /><span>Start date: {startDate || "Not selected"}</span></div>
+              <div className="flex min-h-9 items-center gap-2 rounded-xl border border-[#dedfd9] bg-white px-3 py-2 text-xs text-[#252925]"><FiRefreshCw className="size-4 shrink-0 text-[#124734]" /><span>Duration: {Number.isInteger(durationMonths) ? `${durationMonths} ${durationMonths === 1 ? "month" : "months"}` : "Not configured"}</span></div>
+            </div>
+            {Number.isInteger(item.minimumRentalMonths) && <p className="mt-2 text-xs text-[#69736b]">Minimum rental: {item.minimumRentalMonths} {item.minimumRentalMonths === 1 ? "month" : "months"}</p>}
+          </>
         )}
       </div>
-      <div className="flex items-center justify-between gap-3 border-t border-[#eeece7] pt-3 sm:col-span-2 sm:justify-end xl:col-span-1 xl:flex-col xl:items-end xl:justify-between xl:border-0 xl:pt-0">
+      <div className="cart-populated-item__actions">
         {isPurchase ? <div className="inline-flex h-10 items-center rounded-full border border-[#d9ded8] bg-white" aria-label={`Quantity ${quantity}`}>
           <button type="button" onClick={() => onQuantityChange(item.cartKey, Math.max(1, quantity - 1))} disabled={quantity <= 1} aria-label={`Decrease quantity of ${item.name}`} className="grid size-10 place-items-center rounded-l-full text-[#124734] transition-colors hover:bg-[#edf5ec] disabled:cursor-not-allowed disabled:opacity-40"><FiMinus aria-hidden="true" /></button>
           <span className="min-w-8 text-center text-sm font-semibold tabular-nums text-[#252925]">{quantity}</span>
           <button type="button" onClick={() => onQuantityChange(item.cartKey, quantity + 1)} disabled={!Number.isSafeInteger(quantity + 1)} aria-label={`Increase quantity of ${item.name}`} className="grid size-10 place-items-center rounded-r-full text-[#124734] transition-colors hover:bg-[#edf5ec] disabled:cursor-not-allowed disabled:opacity-40"><FiPlus aria-hidden="true" /></button>
-        </div> : <span className="text-xs text-[#69736b]">Rental quantity changes are not configured</span>}
+        </div> : <span className="inline-flex h-10 items-center rounded-full border border-[#d9ded8] px-4 text-sm text-[#252925]">1 rental</span>}
         <button type="button" onClick={() => onRemove(item.cartKey)} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-[#a9c4ad] px-4 text-sm font-semibold text-[#124734] transition-colors hover:bg-[#edf5ec] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]"><FiTrash2 aria-hidden="true" className="size-4" />Remove</button>
       </div>
     </li>
@@ -166,27 +169,27 @@ function CartItem({ item, onRemove, onQuantityChange }) {
 function CartSummary({ summary }) {
   const { rentals, purchases, monthlyRentPaise, purchaseSubtotalPaise, depositTotalPaise, hasMissingDeposit } = summary;
   return (
-    <aside className="h-fit rounded-2xl border border-[#e6e4de] bg-white p-5 shadow-[0_4px_18px_rgba(37,41,37,0.065)] lg:sticky lg:top-6 lg:p-6">
+    <aside className="cart-populated-summary h-fit rounded-2xl border border-[#e6e4de] bg-white p-5 shadow-[0_4px_18px_rgba(37,41,37,0.065)] lg:sticky lg:top-6 lg:p-6">
       <div className="flex items-center justify-between gap-3"><h2 className="text-xl font-bold text-[#124734]">Cart Summary</h2><span className="rounded-full bg-[#e9f1e9] px-3 py-1 text-xs font-semibold text-[#124734]">{rentals.length + purchases.length} {rentals.length + purchases.length === 1 ? "item" : "items"}</span></div>
-      <dl className="mt-5 space-y-3 text-sm">
-        {rentals.length > 0 && <SummaryRow label="Monthly rental charges" value={formatINRFromPaise(monthlyRentPaise)} suffix="/month" />}
+      <dl className="mt-4 space-y-0 text-sm">
+        {rentals.length > 0 && <SummaryRow label="Monthly rent total" value={formatINRFromPaise(monthlyRentPaise)} suffix="/month" />}
         {purchases.length > 0 && <SummaryRow label="Purchase subtotal" value={formatINRFromPaise(purchaseSubtotalPaise)} />}
-        {rentals.length > 0 && <SummaryRow label="Configured security deposits" value={formatINRFromPaise(depositTotalPaise)} note={hasMissingDeposit ? "Some deposits pending" : null} />}
-        {rentals.length > 0 && <SummaryRow label="Delivery / setup charges" value="To be confirmed" />}
+        {rentals.length > 0 && <SummaryRow label="Security deposit" value={formatINRFromPaise(depositTotalPaise)} note={hasMissingDeposit ? "Some deposits pending confirmation" : null} />}
+        <SummaryRow label="Delivery & setup" value="To be confirmed" />
+        <SummaryRow label="Discount" value="Not configured" />
       </dl>
-      <div className="mt-5 rounded-xl bg-[#e9f1e9] p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#46534a]">Final amount</p>
-        <p className="mt-1 text-lg font-bold text-[#124734]">Pending confirmation</p>
-        <p className="mt-2 border-t border-[#cad9ca] pt-2 text-sm font-semibold text-[#124734]">Recurring monthly rent <span className="float-right">{formatINRFromPaise(monthlyRentPaise) || "—"}{rentals.length > 0 ? "/mo" : ""}</span></p>
+      <div className="mt-3 rounded-xl bg-[#e9f1e9] p-4">
+        <div className="flex items-center justify-between gap-3"><span className="font-bold text-[#124734]">Final amount</span><span className="text-right text-lg font-bold text-[#124734]">Pending confirmation</span></div>
+        {rentals.length > 0 && <p className="mt-2 border-t border-[#cad9ca] pt-2 text-sm font-semibold text-[#124734]">Recurring monthly rent <span className="float-right">{formatINRFromPaise(monthlyRentPaise) || "—"}/mo</span></p>}
       </div>
       <p className="mt-3 text-xs leading-5 text-[#69736b]">Rental duration, delivery/setup charges and applicable payment terms are not fully configured. This cart does not reserve stock.</p>
-      <button type="button" disabled aria-disabled="true" title="Checkout is unavailable until pricing and inventory validation are configured" className="mt-5 inline-flex min-h-[50px] w-full cursor-not-allowed items-center justify-center gap-2 rounded-full bg-[#9aafa0] px-5 text-sm font-bold text-white">Checkout unavailable <FiArrowRight aria-hidden="true" /></button>
-      <p className="mt-2 text-center text-[11px] leading-4 text-[#69736b]">Checkout will be available after pricing and inventory validation are implemented.</p>
+      <button type="button" disabled aria-disabled="true" title="Checkout is unavailable until pricing and inventory validation are configured" className="mt-4 inline-flex min-h-[50px] w-full cursor-not-allowed items-center justify-center gap-2 rounded-full bg-[#9aafa0] px-5 text-sm font-bold text-white">Checkout unavailable <FiArrowRight aria-hidden="true" /></button>
+      <p className="mt-2 text-center text-[11px] leading-4 text-[#69736b]">Checkout needs configured pricing and inventory validation.</p>
       <Link href="/products" className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#a9c4ad] px-4 text-sm font-semibold text-[#124734] transition-colors hover:bg-[#edf5ec] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]">Continue Shopping</Link>
     </aside>
   );
 }
 
 function SummaryRow({ label, value, suffix = "", note }) {
-  return <div className="flex items-start justify-between gap-4 border-b border-[#efeee9] pb-3 last:border-0"><dt className="text-[#59635c]">{label}{note && <span className="mt-1 block text-[10px] text-[#69736b]">{note}</span>}</dt><dd className="shrink-0 text-right font-semibold text-[#252925]">{value || "To be confirmed"}{suffix && value ? <span className="ml-1 text-xs font-normal">{suffix}</span> : null}</dd></div>;
+  return <div className="flex items-start justify-between gap-4 border-b border-[#efeee9] py-2.5 last:border-0"><dt className="text-[#59635c]">{label}{note && <span className="mt-1 block text-[10px] text-[#69736b]">{note}</span>}</dt><dd className="shrink-0 text-right font-semibold text-[#252925]">{value || "To be confirmed"}{suffix && value ? <span className="ml-1 text-xs font-normal">{suffix}</span> : null}</dd></div>;
 }
