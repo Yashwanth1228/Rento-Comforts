@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FiCalendar, FiChevronDown, FiChevronLeft, FiChevronRight, FiClock, FiCreditCard, FiHeadphones, FiHelpCircle, FiImage, FiInfo, FiMessageCircle, FiRefreshCw, FiShoppingBag, FiStar, FiTool, FiTruck, FiX } from "react-icons/fi";
+import { FiArrowRight, FiCalendar, FiChevronDown, FiChevronLeft, FiChevronRight, FiClock, FiCreditCard, FiGrid, FiHeadphones, FiHelpCircle, FiImage, FiInfo, FiMessageCircle, FiRefreshCw, FiShoppingBag, FiStar, FiTool, FiTruck, FiX } from "react-icons/fi";
 
 const validReview = (review) => {
   const allowedReview = review?.demo === true || (review?.verified === true && review?.published === true);
@@ -82,37 +82,37 @@ export function ProductDetailFaq({ faqs, developmentFeedback }) {
   const categories = [...new Set(faqItems.map((faq) => faq.category).filter((category) => typeof category === "string" && category.trim()))];
   const visibleFaqs = selectedCategory === "all" ? faqItems : faqItems.filter((faq) => faq.category === selectedCategory);
 
-  return <section className="mt-8 min-w-0" aria-labelledby="product-faq-heading">
-    <div className="grid min-w-0 gap-7 lg:grid-cols-[minmax(0,0.32fr)_minmax(0,0.68fr)] lg:gap-10">
+  return <section className="relative left-1/2 mt-10 w-screen -translate-x-1/2 overflow-hidden bg-[#fbf8f2] px-4 pb-5 pt-10 sm:px-7 sm:pt-12 lg:px-[3.7vw] lg:pb-8" aria-labelledby="product-faq-heading">
+    <div className="mx-auto grid min-w-0 max-w-[1660px] gap-8 lg:grid-cols-[minmax(0,0.31fr)_minmax(0,0.69fr)] lg:gap-9">
       <div className="flex min-w-0 flex-col">
-        <div className="flex items-center gap-3 text-sm font-bold tracking-[0.08em] text-[#124734]"><span>FAQ</span><span className="h-[2px] w-16 bg-[#b9cbb9]" aria-hidden="true" /></div>
-        <h2 id="product-faq-heading" className="mt-5 max-w-[530px] font-sans text-4xl font-bold leading-[1.08] text-[#124734] sm:text-[3.25rem]">Frequently Asked Questions</h2>
-        <p className="mt-5 max-w-md border-l-[3px] border-[#124734] pl-4 text-base leading-[1.55] text-[#414a44] sm:text-lg">Quick answers to common questions about renting or buying furniture, appliances and home essentials on Rento Comforts.</p>
-        <div className="mt-5 flex min-h-[320px] flex-1 flex-col items-center justify-center rounded-t-2xl border border-dashed border-[#c9cec3] bg-[linear-gradient(145deg,#f1f3e8,#f8f7f2_58%,#ece9df)] p-7 text-center sm:min-h-[390px] lg:rounded-b-none lg:border-b-0" role="img" aria-label="Interior photography placeholder; a combined furniture and appliance photograph is not available">
-          <span className="grid size-14 place-items-center rounded-full bg-white/80 text-[#124734] shadow-sm"><FiImage aria-hidden="true" className="size-6" /></span>
-          <p className="mt-4 max-w-xs text-sm font-semibold text-[#124734]">Interior photograph pending</p>
-          <p className="mt-1 max-w-xs text-xs leading-5 text-[#69736b]">A suitable authorized photo showing furniture and appliances together is not available yet.</p>
+        <div className="flex items-center gap-4 text-[15px] font-extrabold tracking-[0.04em] text-[#124734]"><span>FAQ</span><span className="h-[2px] w-[68px] bg-[#b9cbb9]" aria-hidden="true" /></div>
+        <h2 id="product-faq-heading" className="mt-7 max-w-[500px] font-sans text-[2.65rem] font-extrabold leading-[1.06] tracking-[-0.035em] text-[#124734] sm:text-[3.35rem]">Frequently Asked Questions</h2>
+        <p className="mt-6 max-w-[470px] border-l-[4px] border-[#124734] pl-5 text-[17px] leading-[1.55] text-[#414a44] sm:text-[19px]">Quick answers to common questions about renting or buying furniture, appliances and home essentials on Rento Comforts.</p>
+        {isDevelopmentPreview && <span className="mt-4 w-fit rounded-full bg-[#e9f1e9] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-[#124734]">Illustrative FAQ preview</span>}
+        <div className="relative mt-6 min-h-[340px] flex-1 overflow-hidden rounded-t-2xl bg-[#e9e5d9] sm:min-h-[390px] lg:rounded-b-none">
+          <Image src="/images/home-appliances.webp" alt="Illustrative home interior with refrigerator, washing machine and furnishings" fill sizes="(max-width: 1024px) 100vw, 32vw" className="object-cover object-center" />
+          <span className="absolute bottom-3 left-3 rounded-full bg-[#fbf8f2]/90 px-3 py-1 text-[10px] font-medium text-[#46534a]">Illustrative interior</span>
         </div>
       </div>
 
-      <div className="min-w-0">
-        {isDevelopmentPreview && <p className="mb-3 inline-flex rounded-full bg-[#edf5ec] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#124734]">Development FAQ preview</p>}
+      <div className="min-w-0 lg:pt-4">
         {faqItems.length > 0 && categories.length > 0 && <FaqCategoryFilters categories={categories} faqs={faqItems} selectedCategory={selectedCategory} onSelect={setSelectedCategory} />}
         {faqItems.length === 0 ? <div className="rounded-2xl border border-[#e7e4dc] bg-white px-5 py-8 text-center shadow-[0_2px_10px_rgba(37,41,37,0.045)]"><p className="text-sm font-semibold text-[#252925]">Product-specific FAQs will appear here once confirmed.</p></div> : <FaqAccordion faqs={visibleFaqs} />}
       </div>
     </div>
-    <aside className="mt-0 grid gap-4 rounded-b-2xl rounded-t-none bg-[#063f31] p-5 text-white shadow-[0_8px_24px_rgba(18,71,52,0.12)] sm:grid-cols-2 sm:items-center sm:gap-5 sm:px-7 sm:py-5 lg:grid-cols-[1fr_1fr_1fr_1.55fr]" aria-label="FAQ information and support">
-      <div className="flex min-h-12 items-center gap-3"><FiInfo aria-hidden="true" className="size-6 shrink-0 text-[#dbe9d9]" /><p className="text-xs leading-5 text-white/90"><strong className="block text-sm text-white">Product details</strong>Review configured information on this page.</p></div>
-      <div className="flex min-h-12 items-center gap-3 border-white/20 sm:border-l sm:pl-5"><FiHelpCircle aria-hidden="true" className="size-6 shrink-0 text-[#dbe9d9]" /><p className="text-xs leading-5 text-white/90"><strong className="block text-sm text-white">Policy terms</strong>{isDevelopmentPreview ? "Demo answers are illustrative, not confirmed policy." : "Policy information appears when confirmed."}</p></div>
-      <div className="flex min-h-12 items-center gap-3 border-white/20 sm:border-l sm:pl-5"><FiCalendar aria-hidden="true" className="size-6 shrink-0 text-[#dbe9d9]" /><p className="text-xs leading-5 text-white/90"><strong className="block text-sm text-white">Availability</strong>{isDevelopmentPreview ? "This preview does not confirm availability." : "Only confirmed availability is represented."}</p></div>
-      <div className="flex min-h-[68px] items-center gap-3 rounded-full bg-[#f8f7f2] px-4 py-3 text-[#124734] sm:col-span-2 sm:px-5 lg:col-span-1"><FiHeadphones aria-hidden="true" className="ml-1 size-7 shrink-0" /><p className="text-xs leading-5 text-[#46534a]"><strong className="block text-sm text-[#252925]">Still have a question?</strong>Customer support contact is not configured yet.</p></div>
+    <aside className="mx-auto mt-0 grid max-w-[1740px] gap-3 rounded-2xl bg-[#063f31] p-4 text-white shadow-[0_8px_24px_rgba(18,71,52,0.12)] sm:grid-cols-2 sm:items-center sm:gap-0 sm:px-6 sm:py-5 lg:grid-cols-[1fr_1fr_1fr_1fr_1.7fr] lg:px-8" aria-label="FAQ information and support">
+      <div className="flex min-h-[58px] items-center gap-3 sm:px-3"><FiCalendar aria-hidden="true" className="size-7 shrink-0 text-[#e0eee0] sm:size-8" /><p className="text-[13px] leading-[1.4] text-white"><strong className="block text-sm font-semibold">Rental details</strong>See configured terms above</p></div>
+      <div className="flex min-h-[58px] items-center gap-3 border-white/25 sm:border-l sm:px-4"><FiTruck aria-hidden="true" className="size-7 shrink-0 text-[#e0eee0] sm:size-8" /><p className="text-[13px] leading-[1.4] text-white"><strong className="block text-sm font-semibold">Delivery information</strong>Shown when confirmed</p></div>
+      <div className="flex min-h-[58px] items-center gap-3 border-white/25 sm:border-l sm:px-4"><FiTool aria-hidden="true" className="size-7 shrink-0 text-[#e0eee0] sm:size-8" /><p className="text-[13px] leading-[1.4] text-white"><strong className="block text-sm font-semibold">Product support</strong>Policy details are being confirmed</p></div>
+      <div className="flex min-h-[58px] items-center gap-3 border-white/25 sm:border-l sm:px-4"><FiShoppingBag aria-hidden="true" className="size-7 shrink-0 text-[#e0eee0] sm:size-8" /><p className="text-[13px] leading-[1.4] text-white"><strong className="block text-sm font-semibold">Rent or purchase</strong>Options vary by product</p></div>
+      <div className="flex min-h-[70px] items-center gap-3 rounded-full bg-[#fbf8f2] px-4 py-3 text-[#124734] sm:col-span-2 sm:mx-2 sm:px-5 lg:col-span-1"><FiHeadphones aria-hidden="true" className="ml-1 size-8 shrink-0" /><p className="text-xs leading-[1.4] text-[#46534a]"><strong className="block text-[15px] text-[#252925]">Still have a question?</strong>Customer support contact is not configured yet.</p><FiArrowRight aria-hidden="true" className="ml-auto size-6 shrink-0" /></div>
     </aside>
   </section>;
 }
 
 function FaqCategoryFilters({ categories, faqs, selectedCategory, onSelect }) {
   const categoryCounts = categories.map((category) => ({ category, count: faqs.filter((faq) => faq.category === category).length }));
-  return <div className="mb-4 flex gap-2 overflow-x-auto pb-1" aria-label="Filter FAQs by category"><button type="button" aria-pressed={selectedCategory === "all"} onClick={() => onSelect("all")} className={`shrink-0 rounded-full border px-4 py-2 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] sm:text-sm ${selectedCategory === "all" ? "border-[#063f31] bg-[#063f31] text-white" : "border-[#d8d9d4] bg-white text-[#252925] hover:bg-[#f3f6f0]"}`}><FiHelpCircle aria-hidden="true" className="mr-2 inline size-4" />All Questions ({faqs.length})</button>{categoryCounts.map(({ category, count }) => <button key={category} type="button" aria-pressed={selectedCategory === category} onClick={() => onSelect(category)} className={`shrink-0 rounded-full border px-4 py-2 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] sm:text-sm ${selectedCategory === category ? "border-[#063f31] bg-[#063f31] text-white" : "border-[#d8d9d4] bg-white text-[#252925] hover:bg-[#f3f6f0]"}`}><FiShoppingBag aria-hidden="true" className="mr-2 inline size-4" />{category} ({count})</button>)}</div>;
+  return <div className="mb-5 flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Filter FAQs by category"><button type="button" aria-pressed={selectedCategory === "all"} onClick={() => onSelect("all")} className={`inline-flex min-h-[50px] shrink-0 items-center gap-3 rounded-full border px-5 text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] sm:px-7 sm:text-[16px] ${selectedCategory === "all" ? "border-[#063f31] bg-[#063f31] text-white" : "border-[#d8d9d4] bg-white/60 text-[#252925] hover:bg-white"}`}><FiGrid aria-hidden="true" className="size-6" />All Questions ({faqs.length})</button>{categoryCounts.map(({ category, count }) => <button key={category} type="button" aria-pressed={selectedCategory === category} onClick={() => onSelect(category)} className={`inline-flex min-h-[50px] shrink-0 items-center gap-3 rounded-full border px-5 text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] sm:px-6 sm:text-[16px] ${selectedCategory === category ? "border-[#063f31] bg-[#063f31] text-white" : "border-[#d8d9d4] bg-white/60 text-[#252925] hover:bg-white"}`}><FiShoppingBag aria-hidden="true" className="size-5" />{category} ({count})</button>)}</div>;
 }
 
 function DemoReviewForm({ onAdd, photoUrlsRef }) {

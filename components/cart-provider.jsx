@@ -17,6 +17,7 @@ function toCartItem(product) {
     id: product.id,
     cartKey: `${mode}:${product.id}`,
     mode,
+    quantity: mode === "buy" ? 1 : null,
     previewOnly: Boolean(product.previewOnly),
     name: product.name,
     category: product.category || null,
@@ -80,9 +81,18 @@ export function CartProvider({ children }) {
     );
   }, []);
 
+  const updateQuantity = useCallback((cartKey, quantity) => {
+    if (!Number.isSafeInteger(quantity) || quantity < 1) return;
+    setItems((currentItems) => currentItems.map((item) => (
+      item.cartKey === cartKey && item.mode === "buy"
+        ? { ...item, quantity }
+        : item
+    )));
+  }, []);
+
   const value = useMemo(
-    () => ({ items, addItem, removeItem }),
-    [items, addItem, removeItem],
+    () => ({ items, addItem, removeItem, updateQuantity }),
+    [items, addItem, removeItem, updateQuantity],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
