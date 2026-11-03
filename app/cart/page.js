@@ -6,7 +6,7 @@ import { useMemo } from "react";
 import { useCart } from "@/components/cart-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { FiArrowRight, FiCalendar, FiCheck, FiCreditCard, FiInfo, FiMinus, FiPlus, FiRefreshCw, FiShoppingCart, FiTrash2, FiTruck } from "react-icons/fi";
+import { FiArrowRight, FiCalendar, FiCreditCard, FiMinus, FiPlus, FiRefreshCw, FiShoppingCart, FiTool, FiTrash2, FiTruck } from "react-icons/fi";
 
 function formatINRFromPaise(amountPaise) {
   if (!Number.isSafeInteger(amountPaise) || amountPaise < 0) return null;
@@ -49,7 +49,7 @@ export default function CartPage() {
   return (
     <>
       <SiteHeader />
-      <main className="min-h-[62vh] bg-[#fbfaf7] px-4 py-8 sm:px-7 sm:py-12 lg:px-10">
+      <main className={`${items.length === 0 ? "min-h-[calc(100svh-204px)] px-4 py-3 sm:px-7 sm:py-3 lg:min-h-[calc(100svh-152px)] lg:px-10" : "min-h-[62vh] px-4 py-8 sm:px-7 sm:py-12 lg:px-10"} bg-[#fbfaf7]`}>
         <div className="mx-auto max-w-[1440px]">
           {items.length === 0 ? (
             <EmptyCart />
@@ -87,35 +87,28 @@ export default function CartPage() {
 function EmptyCart() {
   return (
     <div className="mx-auto max-w-[1280px]">
-      <section className="grid min-h-[540px] items-center gap-7 py-8 md:grid-cols-[0.96fr_1.04fr] lg:min-h-[590px] lg:gap-12">
-        <div className="relative mx-auto aspect-[1.3/1] w-full max-w-[600px]" role="img" aria-label="Illustrative arrangement of an armchair, refrigerator, washing machine and plant">
-          <div className="absolute left-[9%] top-[6%] aspect-square w-[78%] rounded-full bg-[radial-gradient(circle,#e9f1e9_0%,#eff4ea_61%,rgba(248,247,242,0)_73%)]" />
-          <div className="absolute bottom-[5%] left-[37%] z-10 h-[82%] w-[27%]">
-            <Image src="/images/category-refrigerators-cutout.webp" alt="" fill sizes="160px" className="object-contain object-bottom" />
-          </div>
-          <div className="absolute bottom-[5%] left-[58%] z-20 h-[62%] w-[27%]">
-            <Image src="/images/category-washing-machines-cutout.webp" alt="" fill sizes="160px" className="object-contain object-bottom" />
-          </div>
-          <div className="absolute bottom-[1%] left-[-2%] z-30 h-[66%] w-[66%]">
-            <Image src="/images/faq-lounge-cutout-v3.webp" alt="" fill sizes="390px" className="object-contain object-bottom" />
-          </div>
+      <section className="cart-empty-hero grid min-h-[380px] items-center gap-5 py-3 md:grid-cols-[0.96fr_1.04fr] lg:grid-cols-[0.9fr_1.1fr] lg:h-[calc(100svh-370px)] lg:gap-10 lg:py-2" style={{ transform: "translateY(32px)", marginBottom: 32 }}>
+        <div className="relative mx-auto aspect-[1.3/1] w-full max-w-[540px] md:aspect-auto md:h-[390px] lg:-translate-x-3" style={{ minHeight: "min(390px, 75vw)" }} role="img" aria-label="Illustrative arrangement of an armchair, refrigerator, washing machine and plant">
+          <div className="absolute left-[7%] top-[6%] aspect-square w-[85%] rounded-full" style={{ background: "radial-gradient(circle, #dcebdd 0%, #e4eee1 61%, rgba(248,247,242,0) 73%)", transform: "translateY(15px)" }} />
+          <div aria-hidden="true" className="absolute bottom-[12.5%] left-[4%] z-[1] h-[10%] w-[92%] rounded-[50%] bg-[#756b57]/20 blur-xl" />
+          <Image src="/images/empty-cart-arrangement.webp" alt="" fill priority sizes="(max-width: 768px) 92vw, 540px" className="absolute inset-0 z-10 object-contain" style={{ transform: "translateY(60px) scaleY(.92)" }} />
         </div>
-        <div className="max-w-[610px] pb-2">
-          <div className="mb-5 grid size-[82px] place-items-center rounded-[22px] bg-[#edf5ec] text-[#017F36]"><FiShoppingCart aria-hidden="true" className="size-11" /></div>
-          <h1 className="font-sans text-4xl font-extrabold tracking-[-0.035em] text-[#124734] sm:text-5xl lg:text-[3rem]">Your Cart is Empty</h1>
-          <p className="mt-4 text-xl font-medium text-[#4d5655] sm:text-2xl">You haven’t added any items yet.</p>
-          <p className="mt-3 max-w-[580px] text-base leading-7 text-[#59635c] sm:text-lg">Explore furniture, home appliances and combo options for rent or purchase on Rento Comforts.</p>
-          {process.env.NODE_ENV === "development" && <p role="note" className="mt-4 text-xs leading-5 text-[#69736b]">Development preview only. Product examples and prices are illustrative.</p>}
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-            <Link href="/products" style={{ color: "#fff" }} className="inline-flex min-h-[54px] items-center justify-center gap-2 rounded-full bg-[#017F36] px-7 text-base font-bold shadow-sm transition-colors hover:bg-[#124734] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]">Explore Products <FiArrowRight aria-hidden="true" className="size-5" /></Link>
-            <Link href="/products?mode=rent" style={{ color: "#124734" }} className="inline-flex min-h-[54px] items-center justify-center rounded-full border-2 border-[#017F36] bg-white px-7 text-base font-bold transition-colors hover:bg-[#edf5ec] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36]">Continue Shopping</Link>
+        <div className="max-w-[570px] pb-2 lg:translate-x-6 lg:-translate-y-[13px]">
+          <div className="mb-4 grid place-items-center bg-[#edf5ec] text-[#017F36]" style={{ width: 88, height: 88, borderRadius: 20 }}><FiShoppingCart aria-hidden="true" className="size-12" /></div>
+          <h1 className="font-sans text-4xl font-extrabold tracking-[-0.035em] text-[#124734] sm:text-5xl lg:text-[2.75rem]">Your Cart is Empty</h1>
+          <p className="mt-3 text-lg font-medium text-[#4d5655] sm:text-xl">You haven’t added any items yet.</p>
+          <p className="mt-2 max-w-[540px] text-base leading-6 text-[#59635c] sm:text-lg">Explore furniture, home appliances and combo options for rent or purchase on Rento Comforts.</p>
+          <div className="mt-12 flex flex-col gap-3 sm:flex-row sm:gap-6" style={{ marginTop: 56 }}>
+            <Link href="/products" style={{ color: "#fff", minWidth: 238, minHeight: 52 }} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#017F36] px-6 text-base font-bold shadow-sm transition-colors hover:bg-[#124734] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] sm:w-auto">Explore Products <FiArrowRight aria-hidden="true" className="size-5" /></Link>
+            <Link href="/products?mode=rent" style={{ color: "#124734", minWidth: 228, minHeight: 52 }} className="inline-flex w-full items-center justify-center rounded-full border-2 border-[#017F36] bg-white px-6 text-base font-bold transition-colors hover:bg-[#edf5ec] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] sm:w-auto">Continue Shopping</Link>
           </div>
         </div>
       </section>
-      <div className="mx-auto grid max-w-[1120px] gap-5 border-t border-[#e8e6df] py-5 text-sm text-[#37453c] sm:grid-cols-3 sm:py-7">
-        <div className="flex items-center justify-center gap-2"><FiShoppingCart className="size-5 text-[#017F36]" />Browse furniture and appliances</div>
-        <div className="flex items-center justify-center gap-2"><FiCheck className="size-5 text-[#017F36]" />Choose rent or purchase options</div>
-        <div className="flex items-center justify-center gap-2"><FiInfo aria-hidden="true" className="size-5 text-[#017F36]" />Preview terms before proceeding</div>
+      <div className="cart-empty-benefits mx-auto mt-3 grid min-h-[64px] max-w-[1440px] grid-cols-2 items-center gap-x-2 gap-y-2 py-2 text-xs text-[#252925] sm:text-sm lg:grid-cols-4 lg:gap-0 lg:py-1 lg:text-base" style={{ marginTop: "clamp(24px, 8vw, 90px)" }}>
+        <div className="flex items-center gap-3 sm:justify-center lg:border-r lg:border-[#c9cbc5]"><FiCalendar aria-hidden="true" className="size-10 shrink-0 text-[#017F36]" /><p className="leading-[1.3]" style={{ fontSize: 16 }}>Rental plan<br />information</p></div>
+        <div className="flex items-center gap-3 sm:justify-center lg:border-r lg:border-[#c9cbc5]"><FiTruck aria-hidden="true" className="size-10 shrink-0 text-[#017F36]" /><p className="leading-[1.3]" style={{ fontSize: 16 }}>Delivery &amp; setup<br />information</p></div>
+        <div className="flex items-center gap-3 sm:justify-center lg:border-r lg:border-[#c9cbc5]"><FiTool aria-hidden="true" className="size-10 shrink-0 text-[#017F36]" /><p className="leading-[1.3]" style={{ fontSize: 16 }}>Maintenance<br />details</p></div>
+        <div className="flex items-center gap-3 sm:justify-center"><FiRefreshCw aria-hidden="true" className="size-10 shrink-0 text-[#017F36]" /><p className="leading-[1.3]" style={{ fontSize: 16 }}>Purchase<br />options</p></div>
       </div>
     </div>
   );

@@ -680,6 +680,9 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   html { scroll-behavior: auto; }
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+@media (min-width: 1024px) {
+  .cart-empty-benefits { width: calc(100% + 120px); transform: translateX(-60px); }
+}
 
 /* Customer FAQ */
 .faq-section { overflow: hidden; padding-block: 76px 34px; background: var(--warm-ivory); }
