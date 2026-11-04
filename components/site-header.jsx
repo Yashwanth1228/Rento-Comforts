@@ -11,6 +11,7 @@ import {
   FiShield,
 } from "react-icons/fi";
 import { useCart } from "@/components/cart-provider";
+import { AuthModal } from "@/components/auth-modal";
 import { megaMenuNavigation } from "@/data/mega-menu-navigation";
 
 // Primary Links: Strictly "Rent" and "Buy"
@@ -104,9 +105,11 @@ export function SiteHeader() {
   const [pin, setPin] = useState("");
   const [pinMessage, setPinMessage] = useState("");
   const [notice, setNotice] = useState("");
+  const [authOpen, setAuthOpen] = useState(false);
   const [savedPin, setSavedPin] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const headerRef = useRef(null);
+  const authTriggerRef = useRef(null);
   const searchRef = useRef(null);
   const pinRef = useRef(null);
   const closeTimer = useRef(null);
@@ -424,8 +427,11 @@ export function SiteHeader() {
 
               {/* Account */}
               <button
+                ref={authTriggerRef}
                 type="button"
-                onClick={() => setNotice("Account access is not available yet.")}
+                onClick={() => setAuthOpen(true)}
+                aria-haspopup="dialog"
+                aria-expanded={authOpen}
                 className="editorial-control-btn group cursor-pointer"
                 aria-label="Account"
               >
@@ -492,6 +498,8 @@ export function SiteHeader() {
         </div>
         <div className="mobile-nav__utility"><button type="button" onClick={() => { setPinOpen(true); setMobileOpen(false); }}>Enter delivery PIN</button><a href="#faq-heading" onClick={closeNavigation}>Help / FAQs</a><span>Track Order and Contact Us destinations are not configured.</span></div>
       </nav>}
+
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} returnFocusRef={authTriggerRef} />
     </header>
   );
 }
