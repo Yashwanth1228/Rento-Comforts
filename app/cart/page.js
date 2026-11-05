@@ -49,7 +49,7 @@ export default function CartPage() {
   return (
     <>
       <SiteHeader />
-      <main className={`${items.length === 0 ? "min-h-[calc(100svh-204px)] px-4 py-3 sm:px-7 sm:py-3 lg:min-h-[calc(100svh-152px)] lg:px-10" : "min-h-[62vh] px-4 py-5 sm:px-7 sm:py-6 lg:px-10"} bg-[#fbfaf7]`}>
+      <main className={`${items.length === 0 ? "min-h-0 px-4 py-2 sm:px-7 sm:py-2 lg:px-10" : "min-h-[62vh] px-4 py-5 sm:px-7 sm:py-6 lg:px-10"} bg-[#fbfaf7]`}>
         <div className="mx-auto max-w-[1536px]">
           {items.length === 0 ? (
             <EmptyCart />
@@ -88,24 +88,24 @@ export default function CartPage() {
 function EmptyCart() {
   return (
     <div className="mx-auto max-w-[1280px]">
-      <section className="cart-empty-hero grid min-h-[380px] items-center gap-5 py-3 md:grid-cols-[0.96fr_1.04fr] lg:grid-cols-[0.9fr_1.1fr] lg:h-[calc(100svh-370px)] lg:gap-10 lg:py-2" style={{ transform: "translateY(32px)", marginBottom: 32 }}>
-        <div className="relative mx-auto aspect-[1.3/1] w-full max-w-[540px] md:aspect-auto md:h-[390px] lg:-translate-x-3" style={{ minHeight: "min(390px, 75vw)" }} role="img" aria-label="Illustrative arrangement of an armchair, refrigerator, washing machine and plant">
-          <div className="absolute left-[7%] top-[6%] aspect-square w-[85%] rounded-full" style={{ background: "radial-gradient(circle, #dcebdd 0%, #e4eee1 61%, rgba(248,247,242,0) 73%)", transform: "translateY(15px)" }} />
+      <section className="cart-empty-hero grid min-h-[300px] items-center gap-5 py-2 md:grid-cols-[0.96fr_1.04fr] md:min-h-0 md:h-[320px] lg:grid-cols-[0.9fr_1.1fr] lg:gap-8">
+        <div className="relative mx-auto aspect-[1.3/1] w-full max-w-[500px] md:aspect-auto md:h-[300px] lg:-translate-x-3" role="img" aria-label="Illustrative arrangement of an armchair, refrigerator, washing machine and plant">
+          <div className="absolute inset-x-[7%] inset-y-0 rounded-full" style={{ background: "radial-gradient(ellipse, #c8dec9 0%, #d5e5d4 61%, rgba(248,247,242,0) 73%)" }} />
           <div aria-hidden="true" className="absolute bottom-[12.5%] left-[4%] z-[1] h-[10%] w-[92%] rounded-[50%] bg-[#756b57]/20 blur-xl" />
-          <Image src="/images/empty-cart-arrangement.webp" alt="" fill priority sizes="(max-width: 768px) 92vw, 540px" className="absolute inset-0 z-10 object-contain" style={{ transform: "translateY(60px) scaleY(.92)" }} />
+          <Image src="/images/empty-cart-arrangement.webp" alt="" fill priority sizes="(max-width: 768px) 92vw, 500px" className="absolute inset-0 z-10 object-contain" />
         </div>
-        <div className="max-w-[570px] pb-2 lg:translate-x-6 lg:-translate-y-[13px]">
-          <div className="mb-4 grid place-items-center bg-[#edf5ec] text-[#017F36]" style={{ width: 88, height: 88, borderRadius: 20 }}><FiShoppingCart aria-hidden="true" className="size-12" /></div>
-          <h1 className="font-sans text-4xl font-extrabold tracking-[-0.035em] text-[#124734] sm:text-5xl lg:text-[2.75rem]">Your Cart is Empty</h1>
-          <p className="mt-3 text-lg font-medium text-[#4d5655] sm:text-xl">You haven’t added any items yet.</p>
-          <p className="mt-2 max-w-[540px] text-base leading-6 text-[#59635c] sm:text-lg">Explore furniture, home appliances and combo options for rent or purchase on Rento Comforts.</p>
-          <div className="mt-12 flex flex-col gap-3 sm:flex-row sm:gap-6" style={{ marginTop: 56 }}>
+        <div className="max-w-[570px]">
+          <div className="mb-3 grid place-items-center bg-[#edf5ec] text-[#017F36]" style={{ width: 72, height: 72, borderRadius: 18 }}><FiShoppingCart aria-hidden="true" className="size-10" /></div>
+          <h1 className="font-sans text-4xl font-extrabold tracking-[-0.035em] text-[#124734] sm:text-5xl lg:text-[2.5rem]">Your Cart is Empty</h1>
+          <p className="mt-2 text-lg font-medium text-[#4d5655] sm:text-xl">You haven’t added any items yet.</p>
+          <p className="mt-1 max-w-[540px] text-base leading-6 text-[#59635c] sm:text-lg">Explore furniture, home appliances and combo options for rent or purchase on Rento Comforts.</p>
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:gap-4">
             <Link href="/products?mode=buy" style={{ color: "#fff", minWidth: 238, minHeight: 52 }} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#017F36] px-6 text-base font-bold shadow-sm transition-colors hover:bg-[#124734] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] sm:w-auto">Explore Products to Buy <FiArrowRight aria-hidden="true" className="size-5" /></Link>
             <Link href="/products?mode=rent" style={{ color: "#124734", minWidth: 228, minHeight: 52 }} className="inline-flex w-full items-center justify-center rounded-full border-2 border-[#017F36] bg-white px-6 text-base font-bold transition-colors hover:bg-[#edf5ec] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] sm:w-auto">Explore Rental Options</Link>
           </div>
         </div>
       </section>
-      <div className="cart-empty-benefits mx-auto mt-3 grid min-h-[64px] max-w-[1440px] grid-cols-2 items-center gap-x-2 gap-y-2 py-2 text-xs text-[#252925] sm:text-sm lg:grid-cols-4 lg:gap-0 lg:py-1 lg:text-base" style={{ marginTop: "clamp(24px, 8vw, 90px)" }}>
+      <div className="cart-empty-benefits mx-auto mt-4 grid min-h-[64px] max-w-[1280px] grid-cols-2 items-center gap-x-2 gap-y-2 py-2 text-xs text-[#252925] sm:text-sm lg:grid-cols-4 lg:gap-0 lg:py-1 lg:text-base">
         <div className="flex items-center gap-3 sm:justify-center lg:border-r lg:border-[#c9cbc5]"><FiCalendar aria-hidden="true" className="size-10 shrink-0 text-[#017F36]" /><p className="leading-[1.3]" style={{ fontSize: 16 }}>Rental plan<br />information</p></div>
         <div className="flex items-center gap-3 sm:justify-center lg:border-r lg:border-[#c9cbc5]"><FiTruck aria-hidden="true" className="size-10 shrink-0 text-[#017F36]" /><p className="leading-[1.3]" style={{ fontSize: 16 }}>Delivery &amp; setup<br />information</p></div>
         <div className="flex items-center gap-3 sm:justify-center lg:border-r lg:border-[#c9cbc5]"><FiTool aria-hidden="true" className="size-10 shrink-0 text-[#017F36]" /><p className="leading-[1.3]" style={{ fontSize: 16 }}>Maintenance<br />details</p></div>
