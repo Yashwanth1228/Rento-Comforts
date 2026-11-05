@@ -137,7 +137,7 @@ function FilterOptions({ products, filters, onChange, onClear, onApply, idPrefix
   );
 }
 
-export function ProductCatalogue({ products = [], initialParams = {}, isDevelopmentPreview = false }) {
+export function  ProductCatalogue({ products = [], initialParams = {}, isDevelopmentPreview = false }) {
   const [filters, setFilters] = useState(() => readInitialFilters(initialParams));
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [desktopFiltersVisible, setDesktopFiltersVisible] = useState(true);

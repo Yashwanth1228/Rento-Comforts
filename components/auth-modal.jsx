@@ -59,7 +59,7 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
       <div className="auth-modal-shell">
         <div className="auth-background-layer" aria-hidden="true">
           <Image
-            src="/images/auth-modal-backdrop-v2.webp"
+            src="/images/auth-modal-backdrop-v6.webp"
             alt=""
             fill
             priority
