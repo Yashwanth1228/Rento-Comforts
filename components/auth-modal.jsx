@@ -4,16 +4,32 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
-import { FiEye, FiEyeOff, FiLock, FiUser, FiX } from "react-icons/fi";
+import { FiArrowLeft, FiEye, FiEyeOff, FiLock, FiMail, FiPhone, FiUser, FiX } from "react-icons/fi";
 
 export function AuthModal({ open, onClose, returnFocusRef }) {
   const dialogRef = useRef(null);
   const identityRef = useRef(null);
+  const phoneRef = useRef(null);
+  const otpRefs = useRef([]);
   const [identity, setIdentity] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [message, setMessage] = useState("");
+  const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [signupStage, setSignupStage] = useState("phone");
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [otpNotice, setOtpNotice] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [accountPassword, setAccountPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showAccountPassword, setShowAccountPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [accountErrors, setAccountErrors] = useState({});
+  const [accountNotice, setAccountNotice] = useState("");
   const [screen, setScreen] = useState("login");
 
   useEffect(() => {
@@ -21,12 +37,16 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
     if (!dialog) return undefined;
 
     if (open && !dialog.open) {
-      const previousOverflow = document.body.style.overflow;
+      const previousBodyOverflow = document.body.style.overflow;
+      const previousRootOverflow = document.documentElement.style.overflow;
       dialog.showModal();
       document.body.style.overflow = "hidden";
-      requestAnimationFrame(() => identityRef.current?.focus());
+      document.documentElement.style.overflow = "hidden";
+      dialog.scrollTop = 0;
+      requestAnimationFrame(() => identityRef.current?.focus({ preventScroll: true }));
       return () => {
-        document.body.style.overflow = previousOverflow;
+        document.body.style.overflow = previousBodyOverflow;
+        document.documentElement.style.overflow = previousRootOverflow;
       };
     }
 
@@ -34,9 +54,35 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
     return undefined;
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    requestAnimationFrame(() => {
+      const dialog = dialogRef.current;
+      if (!dialog) return;
+      dialog.scrollTop = 0;
+      if (screen === "signup" && signupStage === "otp") otpRefs.current[0]?.focus({ preventScroll: true });
+      else if (screen === "signup" && signupStage === "phone") phoneRef.current?.focus({ preventScroll: true });
+      else if (screen === "signup" && signupStage === "details") document.getElementById("signup-full-name")?.focus({ preventScroll: true });
+      else identityRef.current?.focus({ preventScroll: true });
+    });
+  }, [screen, signupStage, open]);
+
   function handleClose() {
     setMessage("");
     setScreen("login");
+    setPhone("");
+    setPhoneError("");
+    setOtp(["", "", "", "", "", ""]);
+    setOtpNotice("");
+    setSignupStage("phone");
+    setPassword("");
+    setFullName("");
+    setEmail("");
+    setAccountPassword("");
+    setConfirmPassword("");
+    setTermsAccepted(false);
+    setAccountErrors({});
+    setAccountNotice("");
     onClose();
     requestAnimationFrame(() => returnFocusRef.current?.focus());
   }
@@ -46,10 +92,182 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
     setMessage("Sign-in is a visual preview. No account details are sent and no session is created.");
   }
 
+  function handleSignupSubmit(event) {
+    event.preventDefault();
+    if (signupStage !== "phone") return;
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      setPhoneError("Enter a valid 10-digit Indian mobile number.");
+      return;
+    }
+    setPhoneError("");
+    setOtp(["", "", "", "", "", ""]);
+    setOtpNotice("");
+    setSignupStage("otp");
+  }
+
+  function handlePhoneChange(event) {
+    const digits = event.target.value.replace(/\D/g, "");
+    const nationalNumber = digits.length === 12 && digits.startsWith("91")
+      ? digits.slice(2)
+      : digits.slice(0, 10);
+    setPhone(nationalNumber);
+    setPhoneError("");
+  }
+
+  function handleOtpChange(index, value) {
+    const digits = value.replace(/\D/g, "");
+    if (!digits) {
+      setOtp((current) => current.map((digit, digitIndex) => digitIndex === index ? "" : digit));
+      setOtpNotice("");
+      return;
+    }
+
+    const nextOtp = [...otp];
+    digits.slice(0, 6 - index).split("").forEach((digit, offset) => {
+      nextOtp[index + offset] = digit;
+    });
+    setOtp(nextOtp);
+    setOtpNotice("");
+    otpRefs.current[Math.min(index + digits.length, 5)]?.focus();
+  }
+
+  function handleOtpPaste(event, index) {
+    const digits = event.clipboardData.getData("text").replace(/\D/g, "");
+    if (!digits) return;
+    event.preventDefault();
+    const nextOtp = [...otp];
+    digits.slice(0, 6 - index).split("").forEach((digit, offset) => {
+      nextOtp[index + offset] = digit;
+    });
+    setOtp(nextOtp);
+    setOtpNotice("");
+    otpRefs.current[Math.min(index + digits.length, 5)]?.focus();
+  }
+
+  function handleOtpKeyDown(event, index) {
+    if (event.key === "Backspace" && !otp[index] && index > 0) {
+      event.preventDefault();
+      otpRefs.current[index - 1]?.focus();
+      return;
+    }
+    if (event.key === "ArrowLeft" && index > 0) {
+      event.preventDefault();
+      otpRefs.current[index - 1]?.focus();
+    } else if (event.key === "ArrowRight" && index < 5) {
+      event.preventDefault();
+      otpRefs.current[index + 1]?.focus();
+    }
+  }
+
+  function handleVerifyPreview() {
+    if (otp.some((digit) => !digit)) {
+      setOtpNotice("Enter all six digits to continue.");
+      return;
+    }
+    setOtpNotice("UI Preview only. This step does not verify your mobile number.");
+    setAccountErrors({});
+    setAccountNotice("");
+    setSignupStage("details");
+  }
+
+  function handleAccountSubmit(event) {
+    event.preventDefault();
+    const cleanName = fullName.trim();
+    setFullName(cleanName);
+    const errors = {};
+    if (!cleanName) errors.fullName = "Enter your full name.";
+    else if (!/^(?=.*\p{L})[\p{L}\p{M} .'-]{2,80}$/u.test(cleanName)) errors.fullName = "Enter a name using letters, spaces, periods, apostrophes, or hyphens.";
+
+    const cleanEmail = email.trim();
+    if (!cleanEmail) errors.email = "Enter your email address.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail)) errors.email = "Enter a valid email address.";
+
+    if (!accountPassword) errors.accountPassword = "Create a password.";
+    else if (accountPassword.length < 8) errors.accountPassword = "Use at least 8 characters.";
+    if (!confirmPassword) errors.confirmPassword = "Confirm your password.";
+    else if (confirmPassword !== accountPassword) errors.confirmPassword = "Passwords do not match.";
+    if (!termsAccepted) errors.termsAccepted = "Please agree to the Terms & Conditions and Privacy Policy.";
+
+    setAccountErrors(errors);
+    if (Object.keys(errors).length) {
+      setAccountNotice("");
+      return;
+    }
+    setEmail(cleanEmail);
+    setAccountNotice("Account creation is not connected yet. This form is currently a UI preview.");
+  }
+
+  function updateAccountField(field, value, setter) {
+    setter(value);
+    setAccountErrors((current) => {
+      const next = { ...current };
+      delete next[field];
+      if (field === "accountPassword" && confirmPassword && value !== confirmPassword) next.confirmPassword = "Passwords do not match.";
+      else if (field === "accountPassword") delete next.confirmPassword;
+      if (field === "confirmPassword" && value && value !== accountPassword) next.confirmPassword = "Passwords do not match.";
+      return next;
+    });
+    setAccountNotice("");
+  }
+
+  function backToOtp() {
+    setAccountNotice("");
+    setAccountErrors({});
+    setSignupStage("otp");
+  }
+
+  function changeMobileNumber() {
+    setOtp(["", "", "", "", "", ""]);
+    setOtpNotice("");
+    setPhoneError("");
+    setFullName("");
+    setEmail("");
+    setAccountPassword("");
+    setConfirmPassword("");
+    setTermsAccepted(false);
+    setAccountErrors({});
+    setAccountNotice("");
+    setSignupStage("phone");
+  }
+
+  function showSignup() {
+    setMessage("");
+    setPhone("");
+    setPhoneError("");
+    setOtp(["", "", "", "", "", ""]);
+    setOtpNotice("");
+    setSignupStage("phone");
+    setFullName("");
+    setEmail("");
+    setAccountPassword("");
+    setConfirmPassword("");
+    setTermsAccepted(false);
+    setAccountErrors({});
+    setAccountNotice("");
+    setScreen("signup");
+  }
+
+  function showLogin() {
+    setPhoneError("");
+    setMessage("");
+    setPhone("");
+    setOtp(["", "", "", "", "", ""]);
+    setOtpNotice("");
+    setSignupStage("phone");
+    setFullName("");
+    setEmail("");
+    setAccountPassword("");
+    setConfirmPassword("");
+    setTermsAccepted(false);
+    setAccountErrors({});
+    setAccountNotice("");
+    setScreen("login");
+  }
+
   return (
     <dialog
       ref={dialogRef}
-      className="auth-dialog"
+      className={`auth-dialog${screen === "signup" && signupStage === "otp" ? " auth-dialog--otp" : screen === "signup" && signupStage === "details" ? " auth-dialog--details" : ""}`}
       aria-labelledby="auth-modal-title"
       onClose={handleClose}
       onClick={(event) => {
@@ -148,15 +366,130 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
                   </button>
                 </div>
                 <p className="auth-preview-note">Google sign-in is a visual preview only. Authentication is not connected.</p>
-                <p className="auth-signup-prompt">Don&apos;t have an account? <button type="button" onClick={() => { setMessage(""); setScreen("signup-preview"); }}>Sign Up</button></p>
+                <p className="auth-signup-prompt">Don&apos;t have an account? <button type="button" onClick={showSignup}>Sign Up</button></p>
               </div>
             </div>
           ) : (
             <div className="auth-form-card">
-              <div className="auth-form-content auth-next-screen" aria-live="polite">
-                <h1 id="auth-modal-title">Sign Up</h1>
-                <p className="auth-subtitle">This screen is planned for the next authentication design step.</p>
-                <button type="button" className="auth-continue-button" onClick={() => setScreen("login")}>Back to Welcome Back</button>
+              <div className="auth-form-content auth-signup-screen">
+                {signupStage === "details" ? (
+                  <>
+                    <button type="button" className="auth-back-link" onClick={backToOtp}><FiArrowLeft aria-hidden="true" /> Back to verification</button>
+                    <h1 id="auth-modal-title">Create Your Account</h1>
+                    <p id="account-details-description" className="auth-subtitle">Just a few details to get started.</p>
+
+                    <div className="auth-mobile-summary" aria-label={`Mobile number +91 ${phone}; not verified in preview`}>
+                      <FiPhone aria-hidden="true" />
+                      <span className="auth-mobile-summary__label">Mobile number</span>
+                      <strong>+91 {phone.slice(0, 5)} {phone.slice(5)}</strong>
+                      <span className="auth-preview-badge">UI Preview · Not verified</span>
+                    </div>
+                    <p className="auth-account-disclaimer" role="status">{otpNotice || "Preview navigation only. Your mobile number has not been verified."}</p>
+
+                    <form className="auth-account-form" onSubmit={handleAccountSubmit} noValidate>
+                      <div className="auth-account-fields">
+                        <div className="auth-details-field">
+                        <label className="auth-details-label" htmlFor="signup-full-name">Full Name</label>
+                        <div className="auth-input-field">
+                          <FiUser aria-hidden="true" className="auth-input-icon" />
+                          <input id="signup-full-name" name="full-name" type="text" autoComplete="name" required value={fullName} onChange={(event) => updateAccountField("fullName", event.target.value, setFullName)} aria-invalid={Boolean(accountErrors.fullName)} aria-describedby={accountErrors.fullName ? "signup-full-name-error" : undefined} placeholder="Enter your full name" />
+                        </div>
+                        {accountErrors.fullName && <p id="signup-full-name-error" className="auth-form-message auth-form-error" role="alert">{accountErrors.fullName}</p>}
+                        </div>
+
+                        <div className="auth-details-field">
+                        <label className="auth-details-label" htmlFor="signup-email">Email Address</label>
+                        <div className="auth-input-field">
+                          <FiMail aria-hidden="true" className="auth-input-icon" />
+                          <input id="signup-email" name="email" type="email" autoComplete="email" required value={email} onChange={(event) => updateAccountField("email", event.target.value, setEmail)} aria-invalid={Boolean(accountErrors.email)} aria-describedby={accountErrors.email ? "signup-email-error" : undefined} placeholder="Enter your email address" />
+                        </div>
+                        {accountErrors.email && <p id="signup-email-error" className="auth-form-message auth-form-error" role="alert">{accountErrors.email}</p>}
+                        </div>
+
+                        <div className="auth-details-field">
+                        <label className="auth-details-label" htmlFor="signup-password">Password</label>
+                        <div className="auth-input-field">
+                          <FiLock aria-hidden="true" className="auth-input-icon" />
+                          <input id="signup-password" name="new-password" type={showAccountPassword ? "text" : "password"} autoComplete="new-password" required value={accountPassword} onChange={(event) => updateAccountField("accountPassword", event.target.value, setAccountPassword)} aria-invalid={Boolean(accountErrors.accountPassword)} aria-describedby={accountErrors.accountPassword ? "signup-password-error" : "signup-password-help"} placeholder="Create password" />
+                          <button className="auth-password-toggle" type="button" aria-label={showAccountPassword ? "Hide password" : "Show password"} aria-pressed={showAccountPassword} onClick={() => setShowAccountPassword((visible) => !visible)}>{showAccountPassword ? <FiEye aria-hidden="true" /> : <FiEyeOff aria-hidden="true" />}</button>
+                        </div>
+                        {accountErrors.accountPassword ? <p id="signup-password-error" className="auth-form-message auth-form-error" role="alert">{accountErrors.accountPassword}</p> : <p id="signup-password-help" className="auth-field-hint">Use at least 8 characters.</p>}
+                        </div>
+
+                        <div className="auth-details-field">
+                        <label className="auth-details-label" htmlFor="signup-confirm-password">Confirm Password</label>
+                        <div className="auth-input-field">
+                          <FiLock aria-hidden="true" className="auth-input-icon" />
+                          <input id="signup-confirm-password" name="confirm-password" type={showConfirmPassword ? "text" : "password"} autoComplete="new-password" required value={confirmPassword} onChange={(event) => updateAccountField("confirmPassword", event.target.value, setConfirmPassword)} aria-invalid={Boolean(accountErrors.confirmPassword)} aria-describedby={accountErrors.confirmPassword ? "signup-confirm-password-error" : undefined} placeholder="Confirm your password" />
+                          <button className="auth-password-toggle" type="button" aria-label={showConfirmPassword ? "Hide confirmation password" : "Show confirmation password"} aria-pressed={showConfirmPassword} onClick={() => setShowConfirmPassword((visible) => !visible)}>{showConfirmPassword ? <FiEye aria-hidden="true" /> : <FiEyeOff aria-hidden="true" />}</button>
+                        </div>
+                        {accountErrors.confirmPassword && <p id="signup-confirm-password-error" className="auth-form-message auth-form-error" role="alert">{accountErrors.confirmPassword}</p>}
+                        </div>
+                      </div>
+
+                      <div className="auth-terms-block">
+                        <label className="auth-terms-option">
+                          <input type="checkbox" required checked={termsAccepted} onChange={(event) => { setTermsAccepted(event.target.checked); setAccountErrors((current) => { const next = { ...current }; delete next.termsAccepted; return next; }); setAccountNotice(""); }} aria-invalid={Boolean(accountErrors.termsAccepted)} aria-describedby={accountErrors.termsAccepted ? "signup-terms-error" : "signup-policy-pending"} />
+                          <span>I agree to the <span className="auth-policy-name">Terms &amp; Conditions</span> and <span className="auth-policy-name">Privacy Policy</span></span>
+                        </label>
+                        {accountErrors.termsAccepted && <p id="signup-terms-error" className="auth-form-message auth-form-error" role="alert">{accountErrors.termsAccepted}</p>}
+                        <p id="signup-policy-pending" className="auth-field-hint">Policy pages are not available yet.</p>
+                      </div>
+
+                      {accountNotice && <p className="auth-form-message auth-account-notice" role="status">{accountNotice}</p>}
+                      <button type="submit" className="auth-continue-button">Create Account</button>
+                    </form>
+
+                    <p className="auth-signup-prompt">Already have an account? <button type="button" onClick={showLogin}>Sign In</button></p>
+                  </>
+                ) : (
+                  <>
+                    <h1 id="auth-modal-title">Create Your Account</h1>
+                    <p id="signup-description" className="auth-subtitle">Start by verifying your mobile number.</p>
+
+                    <form className="auth-login-form" onSubmit={handleSignupSubmit} noValidate>
+                      <label className="auth-input-field auth-phone-field">
+                        <FiPhone aria-hidden="true" className="auth-input-icon" />
+                        <span className="sr-only">Mobile number with India country code +91</span>
+                        <span className="auth-country-prefix" aria-hidden="true">+91</span>
+                        <input ref={phoneRef} name="mobile-number" type="tel" inputMode="numeric" autoComplete="tel-national" maxLength={10} readOnly={signupStage === "otp"} value={phone} onChange={handlePhoneChange} placeholder="Enter 10-digit mobile number" aria-invalid={Boolean(phoneError)} aria-describedby={phoneError ? "signup-phone-error" : "signup-description"} />
+                      </label>
+
+                      {signupStage === "phone" ? (
+                        <>
+                          {phoneError && <p id="signup-phone-error" className="auth-form-message auth-form-error" role="alert">{phoneError}</p>}
+                          <button type="submit" className="auth-continue-button">Send OTP</button>
+                        </>
+                      ) : (
+                        <section className="auth-otp-section" aria-labelledby="auth-otp-heading">
+                          <div className="auth-otp-heading-row">
+                            <h2 id="auth-otp-heading">Enter Verification Code</h2>
+                            <span className="auth-preview-badge">UI Preview</span>
+                          </div>
+                          <p className="auth-otp-description">Enter the 6-digit code for +91 XXXXX {phone.slice(-5)}</p>
+
+                          <div className="auth-otp-inputs" role="group" aria-label="Six-digit verification code">
+                            {otp.map((digit, index) => (
+                              <input key={index} ref={(element) => { otpRefs.current[index] = element; }} type="text" inputMode="numeric" pattern="[0-9]*" autoComplete={index === 0 ? "one-time-code" : "off"} maxLength={1} value={digit} aria-label={`Digit ${index + 1} of 6`} onChange={(event) => handleOtpChange(index, event.target.value)} onPaste={(event) => handleOtpPaste(event, index)} onKeyDown={(event) => handleOtpKeyDown(event, index)} />
+                            ))}
+                          </div>
+                          <p className="auth-otp-hint" aria-live="polite">{otp.every(Boolean) ? "All six digits entered." : "Enter all six digits to enable verification."}</p>
+
+                          <div className="auth-otp-resend-row">
+                            <span>Resend OTP</span>
+                            <button type="button" disabled title="Resend is unavailable in UI Preview mode">Unavailable in UI Preview</button>
+                          </div>
+                          <p className="auth-otp-preview-note">UI Preview only. No SMS was sent.</p>
+                          {otpNotice && <p className="auth-form-message auth-otp-status" role="status">{otpNotice}</p>}
+                          <button type="button" className="auth-continue-button" disabled={otp.some((digit) => !digit)} onClick={handleVerifyPreview}>Verify &amp; Continue</button>
+                          <button type="button" className="auth-change-number" onClick={changeMobileNumber}>Change Mobile Number</button>
+                        </section>
+                      )}
+                    </form>
+
+                    <p className="auth-signup-prompt">Already have an account? <button type="button" onClick={showLogin}>Sign In</button></p>
+                  </>
+                )}
               </div>
             </div>
           )}
