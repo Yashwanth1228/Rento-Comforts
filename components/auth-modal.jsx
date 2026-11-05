@@ -6,9 +6,47 @@ import { useEffect, useRef, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { FiArrowLeft, FiEye, FiEyeOff, FiLock, FiMail, FiPhone, FiUser, FiX } from "react-icons/fi";
 
+function maskRecoveryIdentifier(value) {
+  if (value.includes("@")) {
+    const [localPart, domain = ""] = value.split("@");
+    const dotIndex = domain.lastIndexOf(".");
+    const domainName = dotIndex > -1 ? domain.slice(0, dotIndex) : domain;
+    const suffix = dotIndex > -1 ? domain.slice(dotIndex) : "";
+    return localPart.slice(0, 1) + "***@" + domainName.slice(0, 1) + "***" + suffix;
+  }
+
+  const digits = value.replace(/\D/g, "");
+  const nationalNumber = digits.length === 12 && digits.startsWith("91") ? digits.slice(2) : digits.slice(-10);
+  return "+91 ****** " + nationalNumber.slice(-4);
+}
+
+function OtpInputGroup({ otp, refs, onChange, onPaste, onKeyDown, labelPrefix = "Digit", groupLabel = "Six-digit verification code" }) {
+  return (
+    <div className="auth-otp-inputs" role="group" aria-label={groupLabel}>
+      {otp.map((digit, index) => (
+        <input
+          key={`${labelPrefix}-${index}`}
+          ref={(element) => { refs.current[index] = element; }}
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          autoComplete={index === 0 ? "one-time-code" : "off"}
+          maxLength={1}
+          value={digit}
+          aria-label={`${labelPrefix} ${index + 1} of 6`}
+          onChange={(event) => onChange(index, event.target.value)}
+          onPaste={(event) => onPaste(event, index)}
+          onKeyDown={(event) => onKeyDown(event, index)}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function AuthModal({ open, onClose, returnFocusRef }) {
   const dialogRef = useRef(null);
   const identityRef = useRef(null);
+  const recoveryIdentityRef = useRef(null);
   const phoneRef = useRef(null);
   const otpRefs = useRef([]);
   const [identity, setIdentity] = useState("");
@@ -16,6 +54,17 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [message, setMessage] = useState("");
+  const [recoveryIdentity, setRecoveryIdentity] = useState("");
+  const [recoveryError, setRecoveryError] = useState("");
+  const [recoveryNotice, setRecoveryNotice] = useState("");
+  const [recoveryStage, setRecoveryStage] = useState("identifier");
+  const [recoveryOtpNotice, setRecoveryOtpNotice] = useState("");
+  const [recoveryPassword, setRecoveryPassword] = useState("");
+  const [recoveryConfirmPassword, setRecoveryConfirmPassword] = useState("");
+  const [showRecoveryPassword, setShowRecoveryPassword] = useState(false);
+  const [showRecoveryConfirmPassword, setShowRecoveryConfirmPassword] = useState(false);
+  const [recoveryPasswordErrors, setRecoveryPasswordErrors] = useState({});
+  const [recoveryPasswordNotice, setRecoveryPasswordNotice] = useState("");
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [signupStage, setSignupStage] = useState("phone");
@@ -63,12 +112,26 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
       if (screen === "signup" && signupStage === "otp") otpRefs.current[0]?.focus({ preventScroll: true });
       else if (screen === "signup" && signupStage === "phone") phoneRef.current?.focus({ preventScroll: true });
       else if (screen === "signup" && signupStage === "details") document.getElementById("signup-full-name")?.focus({ preventScroll: true });
+      else if (screen === "recovery" && recoveryStage === "otp") otpRefs.current[0]?.focus({ preventScroll: true });
+      else if (screen === "recovery" && recoveryStage === "password") document.getElementById("recovery-new-password")?.focus({ preventScroll: true });
+      else if (screen === "recovery") recoveryIdentityRef.current?.focus({ preventScroll: true });
       else identityRef.current?.focus({ preventScroll: true });
     });
-  }, [screen, signupStage, open]);
+  }, [screen, signupStage, recoveryStage, open]);
 
   function handleClose() {
     setMessage("");
+    setRecoveryIdentity("");
+    setRecoveryError("");
+    setRecoveryNotice("");
+    setRecoveryStage("identifier");
+    setRecoveryOtpNotice("");
+    setRecoveryPassword("");
+    setRecoveryConfirmPassword("");
+    setRecoveryPasswordErrors({});
+    setRecoveryPasswordNotice("");
+    setShowRecoveryPassword(false);
+    setShowRecoveryConfirmPassword(false);
     setScreen("login");
     setPhone("");
     setPhoneError("");
@@ -76,10 +139,13 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
     setOtpNotice("");
     setSignupStage("phone");
     setPassword("");
+    setShowPassword(false);
     setFullName("");
     setEmail("");
     setAccountPassword("");
     setConfirmPassword("");
+    setShowAccountPassword(false);
+    setShowConfirmPassword(false);
     setTermsAccepted(false);
     setAccountErrors({});
     setAccountNotice("");
@@ -90,6 +156,135 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
   function handleSubmit(event) {
     event.preventDefault();
     setMessage("Sign-in is a visual preview. No account details are sent and no session is created.");
+  }
+
+  function showRecovery() {
+    setMessage("");
+    setRecoveryIdentity("");
+    setRecoveryError("");
+    setRecoveryNotice("");
+    setRecoveryStage("identifier");
+    setOtp(["", "", "", "", "", ""]);
+    setRecoveryOtpNotice("");
+    setRecoveryPassword("");
+    setRecoveryConfirmPassword("");
+    setRecoveryPasswordErrors({});
+    setRecoveryPasswordNotice("");
+    setShowRecoveryPassword(false);
+    setShowRecoveryConfirmPassword(false);
+    setScreen("recovery");
+  }
+
+  function backToSignin() {
+    leaveRecoveryFlow();
+    setScreen("login");
+  }
+
+  function handleRecoverySubmit(event) {
+    event.preventDefault();
+    const value = recoveryIdentity.trim();
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+    const phoneValid = /^(?:\+91[\s-]?)?[6-9]\d{9}$/.test(value);
+
+    if (!emailValid && !phoneValid) {
+      setRecoveryError("Enter a valid email address or 10-digit Indian mobile number.");
+      setRecoveryNotice("");
+      return;
+    }
+
+    setRecoveryIdentity(value);
+    setRecoveryError("");
+    setRecoveryNotice("");
+    setOtp(["", "", "", "", "", ""]);
+    setRecoveryOtpNotice("UI Preview only. No verification code has been sent.");
+    setRecoveryPassword("");
+    setRecoveryConfirmPassword("");
+    setRecoveryPasswordErrors({});
+    setRecoveryPasswordNotice("");
+    setShowRecoveryPassword(false);
+    setShowRecoveryConfirmPassword(false);
+    setRecoveryStage("otp");
+  }
+
+  function updateRecoveryIdentity(value) {
+    setRecoveryIdentity(value);
+    setRecoveryError("");
+    setRecoveryNotice("");
+  }
+
+  function backToRecoveryIdentifier() {
+    setRecoveryStage("identifier");
+    setOtp(["", "", "", "", "", ""]);
+    setRecoveryOtpNotice("");
+    setRecoveryPassword("");
+    setRecoveryConfirmPassword("");
+    setRecoveryPasswordErrors({});
+    setRecoveryPasswordNotice("");
+  }
+
+  function continueRecoveryPreview() {
+    if (otp.some((digit) => !digit)) {
+      setRecoveryOtpNotice("Enter all six digits to continue. No code has been verified.");
+      return;
+    }
+    setRecoveryOtpNotice("UI Preview only. Verification is not connected; no password can be reset.");
+    setRecoveryPasswordErrors({});
+    setRecoveryPasswordNotice("");
+    setRecoveryStage("password");
+  }
+
+  function backToRecoveryOtp() {
+    setRecoveryPassword("");
+    setRecoveryConfirmPassword("");
+    setRecoveryPasswordErrors({});
+    setRecoveryPasswordNotice("");
+    setRecoveryStage("otp");
+  }
+
+  function handleRecoveryPasswordSubmit(event) {
+    event.preventDefault();
+    const errors = {};
+    if (!recoveryPassword) errors.recoveryPassword = "Enter a new password.";
+    else if (recoveryPassword.length < 8) errors.recoveryPassword = "Use at least 8 characters.";
+    if (!recoveryConfirmPassword) errors.recoveryConfirmPassword = "Confirm your new password.";
+    else if (recoveryPassword !== recoveryConfirmPassword) errors.recoveryConfirmPassword = "Passwords do not match.";
+    setRecoveryPasswordErrors(errors);
+    if (Object.keys(errors).length) {
+      setRecoveryPasswordNotice("");
+      return;
+    }
+    setRecoveryPasswordNotice("Password reset is not connected yet. Backend verification is required.");
+  }
+
+  function updateRecoveryPassword(field, value) {
+    if (field === "recoveryPassword") setRecoveryPassword(value);
+    else setRecoveryConfirmPassword(value);
+    setRecoveryPasswordErrors((current) => {
+      const next = { ...current };
+      delete next[field];
+      const nextPassword = field === "recoveryPassword" ? value : recoveryPassword;
+      const nextConfirm = field === "recoveryConfirmPassword" ? value : recoveryConfirmPassword;
+      if (nextConfirm && nextPassword !== nextConfirm) next.recoveryConfirmPassword = "Passwords do not match.";
+      else if (field === "recoveryPassword" || field === "recoveryConfirmPassword") delete next.recoveryConfirmPassword;
+      if (field === "recoveryPassword" && value.length > 0 && value.length < 8) next.recoveryPassword = "Use at least 8 characters.";
+      return next;
+    });
+    setRecoveryPasswordNotice("");
+  }
+
+  function leaveRecoveryFlow() {
+    setRecoveryIdentity("");
+    setRecoveryError("");
+    setRecoveryNotice("");
+    setRecoveryStage("identifier");
+    setOtp(["", "", "", "", "", ""]);
+    setRecoveryOtpNotice("");
+    setRecoveryPassword("");
+    setRecoveryConfirmPassword("");
+    setShowRecoveryPassword(false);
+    setShowRecoveryConfirmPassword(false);
+    setRecoveryPasswordErrors({});
+    setRecoveryPasswordNotice("");
   }
 
   function handleSignupSubmit(event) {
@@ -213,6 +408,10 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
   function backToOtp() {
     setAccountNotice("");
     setAccountErrors({});
+    setAccountPassword("");
+    setConfirmPassword("");
+    setShowAccountPassword(false);
+    setShowConfirmPassword(false);
     setSignupStage("otp");
   }
 
@@ -224,6 +423,8 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
     setEmail("");
     setAccountPassword("");
     setConfirmPassword("");
+    setShowAccountPassword(false);
+    setShowConfirmPassword(false);
     setTermsAccepted(false);
     setAccountErrors({});
     setAccountNotice("");
@@ -244,6 +445,9 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
     setTermsAccepted(false);
     setAccountErrors({});
     setAccountNotice("");
+    setShowAccountPassword(false);
+    setShowConfirmPassword(false);
+    leaveRecoveryFlow();
     setScreen("signup");
   }
 
@@ -261,6 +465,10 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
     setTermsAccepted(false);
     setAccountErrors({});
     setAccountNotice("");
+    setShowPassword(false);
+    setShowAccountPassword(false);
+    setShowConfirmPassword(false);
+    leaveRecoveryFlow();
     setScreen("login");
   }
 
@@ -292,8 +500,17 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
               <span><strong>RENTO</strong><small>COMFORTS</small></span>
             </Link>
             <div className="auth-brand-copy">
-              <h2>Rent. Set Up.<br />Live Comfortably.</h2>
-              <p>Furniture, home appliances and more on flexible rental plans in Bengaluru.</p>
+              {screen === "recovery" ? (
+                <>
+                  <h2>Reset Your Password</h2>
+                  <p>No worries! We&apos;ll help you get back to your account.</p>
+                </>
+              ) : (
+                <>
+                  <h2>Rent. Set Up.<br />Live Comfortably.</h2>
+                  <p>Furniture, home appliances and more on flexible rental plans in Bengaluru.</p>
+                </>
+              )}
             </div>
           </div>
         </section>
@@ -352,7 +569,7 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
                       <input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} />
                       <span>Remember me</span>
                     </label>
-                    <button className="auth-text-link" type="button" onClick={() => setMessage("Password recovery is not available in this preview.")}>Forgot password?</button>
+                    <button className="auth-text-link" type="button" onClick={showRecovery}>Forgot password?</button>
                   </div>
 
                   {message && <p className="auth-form-message" role="status">{message}</p>}
@@ -367,6 +584,93 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
                 </div>
                 <p className="auth-preview-note">Google sign-in is a visual preview only. Authentication is not connected.</p>
                 <p className="auth-signup-prompt">Don&apos;t have an account? <button type="button" onClick={showSignup}>Sign Up</button></p>
+              </div>
+            </div>
+          ) : screen === "recovery" ? (
+            <div className="auth-form-card">
+              <div className="auth-form-content auth-recovery-screen">
+                {recoveryStage === "identifier" ? (
+                  <>
+                    <button type="button" className="auth-back-link" onClick={backToSignin}><FiArrowLeft aria-hidden="true" /> Back to Sign In</button>
+                    <h1 id="auth-modal-title">Forgot Password?</h1>
+                    <p id="recovery-description" className="auth-subtitle">Enter your registered email or mobile number and we&apos;ll send you a verification code.</p>
+
+                    <form className="auth-login-form" onSubmit={handleRecoverySubmit} noValidate>
+                      <label className="auth-input-field">
+                        <FiUser aria-hidden="true" className="auth-input-icon" />
+                        <span className="sr-only">Email or Mobile Number</span>
+                        <input
+                          ref={recoveryIdentityRef}
+                          name="recovery-identity"
+                          type="text"
+                          inputMode="text"
+                          autoComplete="username"
+                          value={recoveryIdentity}
+                          onChange={(event) => updateRecoveryIdentity(event.target.value)}
+                          aria-invalid={Boolean(recoveryError)}
+                          aria-describedby={recoveryError ? "recovery-error" : "recovery-description"}
+                          placeholder="Email or Mobile Number"
+                        />
+                      </label>
+                      {recoveryError && <p id="recovery-error" className="auth-form-message auth-form-error" role="alert">{recoveryError}</p>}
+                      <button type="submit" className="auth-continue-button">Send Verification Code</button>
+                    </form>
+                  </>
+                ) : recoveryStage === "otp" ? (
+                  <>
+                    <button type="button" className="auth-back-link" onClick={backToRecoveryIdentifier}><FiArrowLeft aria-hidden="true" /> Back</button>
+                    <h1 id="auth-modal-title">Verify Your Account</h1>
+                    <p className="auth-subtitle">Enter the 6-digit verification code to continue.</p>
+                    <div className="auth-mobile-summary" aria-label={`Recovery account ${maskRecoveryIdentifier(recoveryIdentity)}`}>
+                      <FiUser aria-hidden="true" />
+                      <span className="auth-mobile-summary__label">Recovery account</span>
+                      <strong>{maskRecoveryIdentifier(recoveryIdentity)}</strong>
+                    </div>
+
+                    <section className="auth-otp-section auth-recovery-otp" aria-label="Recovery verification code">
+                      <OtpInputGroup otp={otp} refs={otpRefs} onChange={handleOtpChange} onPaste={handleOtpPaste} onKeyDown={handleOtpKeyDown} labelPrefix="Recovery code digit" groupLabel="Six-digit recovery verification code" />
+                      <div className="auth-otp-resend-row">
+                        <span>Resend code</span>
+                        <button type="button" disabled title="Code delivery is unavailable in UI Preview">Unavailable in UI Preview</button>
+                      </div>
+                      <p className="auth-otp-preview-note">UI Preview only. No verification code has been sent.</p>
+                      {recoveryOtpNotice && <p className="auth-form-message auth-recovery-notice" role="status">{recoveryOtpNotice}</p>}
+                      <button type="button" className="auth-continue-button" disabled={otp.some((digit) => !digit)} onClick={continueRecoveryPreview}>Verify &amp; Continue</button>
+                    </section>
+                  </>
+                ) : (
+                  <>
+                    <button type="button" className="auth-back-link" onClick={backToRecoveryOtp}><FiArrowLeft aria-hidden="true" /> Back to Verification</button>
+                    <h1 id="auth-modal-title">Set New Password</h1>
+                    <p className="auth-subtitle">Create a new password for your Rento Comforts account.</p>
+                    <p className="auth-account-disclaimer" role="status">UI Preview only. Recovery verification has not been performed.</p>
+
+                    <form className="auth-account-form auth-recovery-password-form" onSubmit={handleRecoveryPasswordSubmit} noValidate>
+                      <div className="auth-details-field">
+                        <label className="auth-details-label" htmlFor="recovery-new-password">New Password</label>
+                        <div className="auth-input-field">
+                          <FiLock aria-hidden="true" className="auth-input-icon" />
+                          <input id="recovery-new-password" name="new-password" type={showRecoveryPassword ? "text" : "password"} autoComplete="new-password" value={recoveryPassword} onChange={(event) => updateRecoveryPassword("recoveryPassword", event.target.value)} aria-invalid={Boolean(recoveryPasswordErrors.recoveryPassword)} aria-describedby={recoveryPasswordErrors.recoveryPassword ? "recovery-password-error" : "recovery-password-help"} placeholder="Enter new password" />
+                          <button className="auth-password-toggle" type="button" aria-label={showRecoveryPassword ? "Hide new password" : "Show new password"} aria-pressed={showRecoveryPassword} onClick={() => setShowRecoveryPassword((visible) => !visible)}>{showRecoveryPassword ? <FiEye aria-hidden="true" /> : <FiEyeOff aria-hidden="true" />}</button>
+                        </div>
+                        {recoveryPasswordErrors.recoveryPassword ? <p id="recovery-password-error" className="auth-form-message auth-form-error" role="alert">{recoveryPasswordErrors.recoveryPassword}</p> : <p id="recovery-password-help" className="auth-field-hint">Use at least 8 characters.</p>}
+                      </div>
+
+                      <div className="auth-details-field">
+                        <label className="auth-details-label" htmlFor="recovery-confirm-password">Confirm New Password</label>
+                        <div className="auth-input-field">
+                          <FiLock aria-hidden="true" className="auth-input-icon" />
+                          <input id="recovery-confirm-password" name="confirm-new-password" type={showRecoveryConfirmPassword ? "text" : "password"} autoComplete="new-password" value={recoveryConfirmPassword} onChange={(event) => updateRecoveryPassword("recoveryConfirmPassword", event.target.value)} aria-invalid={Boolean(recoveryPasswordErrors.recoveryConfirmPassword)} aria-describedby={recoveryPasswordErrors.recoveryConfirmPassword ? "recovery-confirm-password-error" : undefined} placeholder="Confirm new password" />
+                          <button className="auth-password-toggle" type="button" aria-label={showRecoveryConfirmPassword ? "Hide confirmation password" : "Show confirmation password"} aria-pressed={showRecoveryConfirmPassword} onClick={() => setShowRecoveryConfirmPassword((visible) => !visible)}>{showRecoveryConfirmPassword ? <FiEye aria-hidden="true" /> : <FiEyeOff aria-hidden="true" />}</button>
+                        </div>
+                        {recoveryPasswordErrors.recoveryConfirmPassword && <p id="recovery-confirm-password-error" className="auth-form-message auth-form-error" role="alert">{recoveryPasswordErrors.recoveryConfirmPassword}</p>}
+                      </div>
+
+                      {recoveryPasswordNotice && <p className="auth-form-message auth-recovery-notice" role="status">{recoveryPasswordNotice}</p>}
+                      <button type="submit" className="auth-continue-button">Reset Password</button>
+                    </form>
+                  </>
+                )}
               </div>
             </div>
           ) : (
@@ -468,11 +772,7 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
                           </div>
                           <p className="auth-otp-description">Enter the 6-digit code for +91 XXXXX {phone.slice(-5)}</p>
 
-                          <div className="auth-otp-inputs" role="group" aria-label="Six-digit verification code">
-                            {otp.map((digit, index) => (
-                              <input key={index} ref={(element) => { otpRefs.current[index] = element; }} type="text" inputMode="numeric" pattern="[0-9]*" autoComplete={index === 0 ? "one-time-code" : "off"} maxLength={1} value={digit} aria-label={`Digit ${index + 1} of 6`} onChange={(event) => handleOtpChange(index, event.target.value)} onPaste={(event) => handleOtpPaste(event, index)} onKeyDown={(event) => handleOtpKeyDown(event, index)} />
-                            ))}
-                          </div>
+                          <OtpInputGroup otp={otp} refs={otpRefs} onChange={handleOtpChange} onPaste={handleOtpPaste} onKeyDown={handleOtpKeyDown} />
                           <p className="auth-otp-hint" aria-live="polite">{otp.every(Boolean) ? "All six digits entered." : "Enter all six digits to enable verification."}</p>
 
                           <div className="auth-otp-resend-row">

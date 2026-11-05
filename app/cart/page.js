@@ -100,8 +100,8 @@ function EmptyCart() {
           <p className="mt-3 text-lg font-medium text-[#4d5655] sm:text-xl">You haven’t added any items yet.</p>
           <p className="mt-2 max-w-[540px] text-base leading-6 text-[#59635c] sm:text-lg">Explore furniture, home appliances and combo options for rent or purchase on Rento Comforts.</p>
           <div className="mt-12 flex flex-col gap-3 sm:flex-row sm:gap-6" style={{ marginTop: 56 }}>
-            <Link href="/products" style={{ color: "#fff", minWidth: 238, minHeight: 52 }} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#017F36] px-6 text-base font-bold shadow-sm transition-colors hover:bg-[#124734] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] sm:w-auto">Explore Products <FiArrowRight aria-hidden="true" className="size-5" /></Link>
-            <Link href="/products?mode=rent" style={{ color: "#124734", minWidth: 228, minHeight: 52 }} className="inline-flex w-full items-center justify-center rounded-full border-2 border-[#017F36] bg-white px-6 text-base font-bold transition-colors hover:bg-[#edf5ec] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] sm:w-auto">Continue Shopping</Link>
+            <Link href="/products?mode=buy" style={{ color: "#fff", minWidth: 238, minHeight: 52 }} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#017F36] px-6 text-base font-bold shadow-sm transition-colors hover:bg-[#124734] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] sm:w-auto">Explore Products to Buy <FiArrowRight aria-hidden="true" className="size-5" /></Link>
+            <Link href="/products?mode=rent" style={{ color: "#124734", minWidth: 228, minHeight: 52 }} className="inline-flex w-full items-center justify-center rounded-full border-2 border-[#017F36] bg-white px-6 text-base font-bold transition-colors hover:bg-[#edf5ec] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017F36] sm:w-auto">Explore Rental Options</Link>
           </div>
         </div>
       </section>
