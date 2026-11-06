@@ -1,4 +1,5 @@
 "use client";
+import { createClient } from "@/lib/supabase/client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -53,6 +54,7 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [recoveryIdentity, setRecoveryIdentity] = useState("");
   const [recoveryError, setRecoveryError] = useState("");
@@ -153,10 +155,68 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
     requestAnimationFrame(() => returnFocusRef.current?.focus());
   }
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    setMessage("Sign-in is a visual preview. No account details are sent and no session is created.");
+  async function handleSubmit(event) {
+  event.preventDefault();
+
+  // A disabled button prevents most repeat clicks; this also guards the handler.
+  if (isSubmitting) return;
+
+  const enteredIdentity = identity.trim();
+
+  if (!enteredIdentity) {
+    setMessage("Enter your email address.");
+    return;
   }
+
+  // This first implementation supports email only.
+  if (!enteredIdentity.includes("@")) {
+    setMessage("Mobile-number login is not connected yet. Enter your email address.");
+    return;
+  }
+
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  if (!emailPattern.test(enteredIdentity)) {
+    setMessage("Enter a valid email address.");
+    return;
+  }
+
+  if (!password) {
+    setMessage("Enter your password.");
+    return;
+  }
+
+  setMessage("");
+  setIsSubmitting(true);
+
+  try {
+    const supabase = createClient();
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: enteredIdentity.toLowerCase(),
+      password,
+    });
+
+    if (error) {
+      if (error.status === 429) {
+        setMessage("Too many sign-in attempts. Wait a moment and try again.");
+      } else if (error.status === 0 || error.status >= 500) {
+        setMessage("The sign-in service is temporarily unavailable. Try again shortly.");
+      } else {
+        setMessage("Unable to sign in with those details. Check your email and password.");
+      }
+      return;
+    }
+
+    setIdentity(enteredIdentity.toLowerCase());
+    setMessage("Signed in successfully.");
+  } catch {
+    // Do not display raw errors or credentials in the UI.
+    setMessage("Could not reach the sign-in service. Check your connection and try again.");
+  } finally {
+    setIsSubmitting(false);
+  }
+}
 
   function showRecovery() {
     setMessage("");
@@ -573,7 +633,14 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
                   </div>
 
                   {message && <p className="auth-form-message" role="status">{message}</p>}
-                  <button type="submit" className="auth-continue-button">Sign In</button>
+                  <button
+                    type="submit"
+                    className="auth-continue-button"
+                    disabled={isSubmitting}
+                    aria-busy={isSubmitting}
+                  >
+                    {isSubmitting ? "Signing in…" : "Sign In"}
+                  </button>
                 </form>
 
                 <div className="auth-social-divider" aria-label="or continue with"><span>or continue with</span></div>
