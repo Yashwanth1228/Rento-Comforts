@@ -44,7 +44,12 @@ function OtpInputGroup({ otp, refs, onChange, onPaste, onKeyDown, labelPrefix = 
   );
 }
 
-export function AuthModal({ open, onClose, returnFocusRef }) {
+export function AuthModal({
+  open,
+  onClose,
+  onAuthenticated,
+  returnFocusRef,
+}) {
   const dialogRef = useRef(null);
   const identityRef = useRef(null);
   const recoveryIdentityRef = useRef(null);
@@ -208,8 +213,8 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
       return;
     }
 
-    setIdentity(enteredIdentity.toLowerCase());
-    setMessage("Signed in successfully.");
+    onAuthenticated?.();
+handleClose();
   } catch {
     // Do not display raw errors or credentials in the UI.
     setMessage("Could not reach the sign-in service. Check your connection and try again.");
@@ -640,6 +645,7 @@ export function AuthModal({ open, onClose, returnFocusRef }) {
                     aria-busy={isSubmitting}
                   >
                     {isSubmitting ? "Signing in…" : "Sign In"}
+                  
                   </button>
                 </form>
 

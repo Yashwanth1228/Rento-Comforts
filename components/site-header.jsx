@@ -13,6 +13,7 @@ import {
 import { useCart } from "@/components/cart-provider";
 import { AuthModal } from "@/components/auth-modal";
 import { megaMenuNavigation } from "@/data/mega-menu-navigation";
+import { createClient } from "@/lib/supabase/client";
 
 // Primary Links: Strictly "Rent" and "Buy"
 const primaryLinks = [
@@ -92,6 +93,14 @@ function CategoryMenu({ id, compact = false, onSelect, expandedGroup = "", onTog
   );
 }
 
+function getAccountDisplay(user){
+  if(!user) return null;
+  
+  return{
+    email: typeof user.email === "string" ? user.email:"",
+  }
+}
+
 export function SiteHeader() {
   const router = useRouter();
   const { items: cartItems } = useCart();
@@ -105,10 +114,16 @@ export function SiteHeader() {
   const [pin, setPin] = useState("");
   const [pinMessage, setPinMessage] = useState("");
   const [notice, setNotice] = useState("");
+  const [accountUser, setAccountUser] = useState(null);
+  const [authReady, setAuthReady] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState("");
   const [authOpen, setAuthOpen] = useState(false);
   const [savedPin, setSavedPin] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const headerRef = useRef(null);
+  const accountPopoverRef = useRef(null);
   const authTriggerRef = useRef(null);
   const searchRef = useRef(null);
   const pinRef = useRef(null);
@@ -132,12 +147,76 @@ export function SiteHeader() {
       }
       if (searchRef.current && !searchRef.current.contains(event.target)) setSearchOpen(false);
       if (pinRef.current && !pinRef.current.contains(event.target)) setPinOpen(false);
+      if (
+  accountPopoverRef.current &&
+  !accountPopoverRef.current.contains(event.target)
+) {
+  setAccountMenuOpen(false);
+}
     }
     document.addEventListener("pointerdown", handleOutside);
     return () => document.removeEventListener("pointerdown", handleOutside);
   }, []);
 
   useEffect(() => () => window.clearTimeout(closeTimer.current), []);
+
+  useEffect(()=>{
+    let isMounted = true;
+    let authEventVersion =0;
+    let supabase;
+
+    try{
+      supabase = createClient()
+    } catch {
+    const fallbackTimer = window.setTimeout(() => {
+      if (isMounted) setAuthReady(true);
+    }, 0);
+
+    return () => {
+      isMounted = false;
+      window.clearTimeout(fallbackTimer);
+    };
+  }
+
+    const {
+      data:{subscription},
+    } = supabase.auth.onAuthStateChange((_event,session)=>{
+      authEventVersion += 1;
+
+      if(!isMounted) return
+
+      const nextUser = getAccountDisplay(session?.user ?? null);
+      setAccountUser(nextUser);
+      setAuthReady(true)
+
+      if(!nextUser){
+        setAccountMenuOpen(false);
+      }
+    })
+
+    const versionAtRequest= authEventVersion;
+
+    supabase.auth
+      .getUser()
+      .then(({data,error})=>{
+        if(!isMounted || authEventVersion !== versionAtRequest) return
+
+        setAccountUser(error ? null :getAccountDisplay(data.user))
+        setAuthReady(true);
+      })
+      .catch(()=>{
+        if(!isMounted || authEventVersion !== versionAtRequest) return;
+
+        setAccountUser(null);
+        setAuthReady(true);
+      })
+
+      return ()=>{
+        isMounted = false;
+        subscription.unsubscribe();
+      };
+
+  },[])
 
   function openMenu(id) {
     window.clearTimeout(closeTimer.current);
@@ -155,7 +234,12 @@ export function SiteHeader() {
       setMobileOpen(false);
       setSearchOpen(false);
       setPinOpen(false);
-      categoryButtonRefs.current[activeMenu]?.focus();
+      setAccountMenuOpen(false);
+      if (accountMenuOpen) {
+  authTriggerRef.current?.focus();
+} else {
+  categoryButtonRefs.current[activeMenu]?.focus();
+}
     }
   }
 
@@ -176,6 +260,54 @@ export function SiteHeader() {
     setMobileGroup("");
     setActiveMenu("");
   }
+
+  function handleAccountClick() {
+  if (!authReady) return;
+
+  setNotice("");
+
+  if (accountUser) {
+    setLogoutError("");
+    setAccountMenuOpen((isOpen) => !isOpen);
+    return;
+  }
+
+  setAccountMenuOpen(false);
+  setAuthOpen(true);
+}
+
+function handleAuthenticated() {
+  setAccountMenuOpen(false);
+  setAuthOpen(false);
+  setNotice("Signed in successfully.");
+}
+
+async function handleLogout() {
+  if (isLoggingOut) return;
+
+  setIsLoggingOut(true);
+  setLogoutError("");
+
+  try {
+    const supabase = createClient();
+    const { error } = await supabase.auth.signOut({ scope: "local" });
+
+    // Supabase clears this browser's session before attempting server revocation.
+    setAccountUser(null);
+    setAccountMenuOpen(false);
+    setNotice(
+      error
+        ? "Signed out on this device. Server-side session revocation could not be confirmed."
+        : "You have been signed out on this device."
+    );
+
+    router.refresh();
+  } catch {
+    setLogoutError("Logout could not be completed. Please try again.");
+  } finally {
+    setIsLoggingOut(false);
+  }
+}
 
   return (
     <header ref={headerRef} className="site-header" onKeyDown={handleKeyDown}>
@@ -426,20 +558,54 @@ export function SiteHeader() {
               </button>
 
               {/* Account */}
-              <button
-                ref={authTriggerRef}
-                type="button"
-                onClick={() => setAuthOpen(true)}
-                aria-haspopup="dialog"
-                aria-expanded={authOpen}
-                className="editorial-control-btn group cursor-pointer"
-                aria-label="Account"
-              >
-                <FiUser className="w-[18px] h-[18px] text-[#2b3a31] group-hover:text-[#017F36] transition-colors" />
-                <span className="editorial-control-label text-[#2b3a31] group-hover:text-[#017F36] transition-colors flex items-center gap-0.5">
-                  Account <FiChevronDown className="w-2.5 h-2.5 text-charcoal/60" />
-                </span>
-              </button>
+              <div className="account-dropdown-anchor" ref={accountPopoverRef}>
+  <button
+    ref={authTriggerRef}
+    type="button"
+    onClick={handleAccountClick}
+    aria-haspopup={accountUser ? undefined : "dialog"}
+    aria-expanded={accountUser ? accountMenuOpen : authOpen}
+    aria-controls={accountUser ? "account-dropdown" : undefined}
+    aria-busy={!authReady}
+    aria-label="Account"
+    className="editorial-control-btn group cursor-pointer"
+  >
+    <FiUser className="w-[18px] h-[18px] text-[#2b3a31] group-hover:text-[#017F36] transition-colors" />
+    <span className="editorial-control-label text-[#2b3a31] group-hover:text-[#017F36] transition-colors flex items-center gap-0.5">
+      Account <FiChevronDown className="w-2.5 h-2.5 text-charcoal/60" />
+    </span>
+  </button>
+
+  {accountUser && (
+    <section
+      id="account-dropdown"
+      className="account-dropdown"
+      aria-labelledby="account-dropdown-heading"
+      hidden={!accountMenuOpen}
+    >
+      <h2 id="account-dropdown-heading">My Account</h2>
+      <p className="account-dropdown__email">
+        {accountUser.email || "Signed-in Rento customer"}
+      </p>
+
+      {logoutError && (
+        <p className="account-dropdown__error" role="alert">
+          {logoutError}
+        </p>
+      )}
+
+      <button
+        type="button"
+        className="account-dropdown__logout"
+        onClick={handleLogout}
+        disabled={isLoggingOut}
+        aria-busy={isLoggingOut}
+      >
+        {isLoggingOut ? "Logging out…" : "Logout"}
+      </button>
+    </section>
+  )}
+</div>
 
               {/* Cart */}
               <Link
@@ -499,7 +665,12 @@ export function SiteHeader() {
         <div className="mobile-nav__utility"><button type="button" onClick={() => { setPinOpen(true); setMobileOpen(false); }}>Enter delivery PIN</button><a href="#faq-heading" onClick={closeNavigation}>Help / FAQs</a><span>Track Order and Contact Us destinations are not configured.</span></div>
       </nav>}
 
-      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} returnFocusRef={authTriggerRef} />
+      <AuthModal
+  open={authOpen}
+  onClose={() => setAuthOpen(false)}
+  onAuthenticated={handleAuthenticated}
+  returnFocusRef={authTriggerRef}
+/>
     </header>
   );
 }

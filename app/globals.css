@@ -1700,3 +1700,86 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 @media (prefers-reduced-motion: reduce) {
   .auth-close, .auth-input-field, .auth-continue-button { transition: none; }
 }
+
+/* Account disclosure: anchored to the existing navbar control without shifting layout. */
+.account-dropdown-anchor {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.account-dropdown {
+  position: absolute;
+  z-index: 160;
+  top: calc(100% + 10px);
+  right: 0;
+  width: min(270px, calc(100vw - 24px));
+  padding: 16px;
+  border: 1px solid rgba(18, 71, 52, 0.14);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 14px 34px rgba(18, 47, 35, 0.18);
+  color: #252925;
+}
+
+.account-dropdown[hidden] {
+  display: none;
+}
+
+.account-dropdown h2 {
+  margin: 0;
+  color: #124734;
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.account-dropdown__email {
+  overflow-wrap: anywhere;
+  margin: 5px 0 14px;
+  color: #606860;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.account-dropdown__logout {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid rgba(1, 127, 54, 0.22);
+  border-radius: 9px;
+  padding: 8px 12px;
+  background: #f7faf5;
+  color: #124734;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.account-dropdown__logout:hover {
+  background: #e9f1e9;
+}
+
+.account-dropdown__logout:focus-visible {
+  outline: 3px solid rgba(1, 127, 54, 0.35);
+  outline-offset: 2px;
+}
+
+.account-dropdown__logout:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.account-dropdown__error {
+  margin: -5px 0 12px;
+  color: #a23d32;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Let the Account panel extend below the navbar and remain clickable. */
+.editorial-navbar-card {
+  overflow: visible;
+  z-index: 70;
+}
