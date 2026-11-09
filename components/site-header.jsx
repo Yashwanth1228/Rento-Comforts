@@ -577,34 +577,43 @@ async function handleLogout() {
   </button>
 
   {accountUser && (
-    <section
-      id="account-dropdown"
-      className="account-dropdown"
-      aria-labelledby="account-dropdown-heading"
-      hidden={!accountMenuOpen}
-    >
-      <h2 id="account-dropdown-heading">My Account</h2>
-      <p className="account-dropdown__email">
-        {accountUser.email || "Signed-in Rento customer"}
-      </p>
-
-      {logoutError && (
-        <p className="account-dropdown__error" role="alert">
-          {logoutError}
-        </p>
-      )}
-
-      <button
-        type="button"
-        className="account-dropdown__logout"
-        onClick={handleLogout}
-        disabled={isLoggingOut}
-        aria-busy={isLoggingOut}
+  <section
+    id="account-dropdown"
+    className="account-dropdown"
+    aria-labelledby="account-dropdown-heading"
+    hidden={!accountMenuOpen}
+  >
+    <h2 id="account-dropdown-heading">
+      <Link
+        href="/account"
+        onClick={() => setAccountMenuOpen(false)}
+        className="text-inherit no-underline hover:text-[#017f36] focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017f36]"
       >
-        {isLoggingOut ? "Logging out…" : "Logout"}
-      </button>
-    </section>
-  )}
+        My Account
+      </Link>
+    </h2>
+
+    <p className="account-dropdown__email">
+      {accountUser.email || "Signed-in Rento customer"}
+    </p>
+
+    {logoutError && (
+      <p className="account-dropdown__error" role="alert">
+        {logoutError}
+      </p>
+    )}
+
+    <button
+      type="button"
+      className="account-dropdown__logout"
+      onClick={handleLogout}
+      disabled={isLoggingOut}
+      aria-busy={isLoggingOut}
+    >
+      {isLoggingOut ? "Logging out…" : "Logout"}
+    </button>
+  </section>
+)}
 </div>
 
               {/* Cart */}
