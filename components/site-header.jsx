@@ -5,9 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
-  FiArrowRight, FiChevronDown, FiHeart, FiMapPin, FiMenu,
+  FiArrowRight, FiCalendar, FiChevronDown, FiGrid, FiHeart, FiLogOut, FiMapPin, FiMenu,
   FiSearch, FiShoppingCart, FiTruck, FiUser, FiX,
-  FiHome, FiArrowUpRight,
+  FiHome, FiArrowUpRight, FiPackage, FiSettings,
   FiShield,
 } from "react-icons/fi";
 import { useCart } from "@/components/cart-provider";
@@ -97,8 +97,17 @@ function getAccountDisplay(user){
   if(!user) return null;
   
   return{
+    id: typeof user.id === "string" ? user.id : "",
     email: typeof user.email === "string" ? user.email:"",
   }
+}
+
+function getAccountInitial(fullName, email) {
+  const firstName = typeof fullName === "string" ? fullName.trim().split(/\s+/)[0] : "";
+  if (firstName) return firstName.charAt(0).toUpperCase();
+
+  const emailInitial = typeof email === "string" ? email.trim().charAt(0) : "";
+  return emailInitial ? emailInitial.toUpperCase() : "";
 }
 
 export function SiteHeader() {
@@ -115,11 +124,13 @@ export function SiteHeader() {
   const [pinMessage, setPinMessage] = useState("");
   const [notice, setNotice] = useState("");
   const [accountUser, setAccountUser] = useState(null);
+  const [accountProfile, setAccountProfile] = useState({ userId: "", fullName: "" });
   const [authReady, setAuthReady] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [logoutError, setLogoutError] = useState("");
   const [authOpen, setAuthOpen] = useState(false);
+  const [authInitialScreen, setAuthInitialScreen] = useState("login");
   const [savedPin, setSavedPin] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const headerRef = useRef(null);
@@ -128,6 +139,8 @@ export function SiteHeader() {
   const searchRef = useRef(null);
   const pinRef = useRef(null);
   const closeTimer = useRef(null);
+  const accountCloseTimer = useRef(null);
+  const accountHoverOpened = useRef(false);
   const categoryButtonRefs = useRef({});
   const matches = query.trim() ? allCategoryLabels.filter((name) => name.toLowerCase().includes(query.trim().toLowerCase())) : [];
 
@@ -185,7 +198,10 @@ useEffect(() => {
     return () => document.removeEventListener("pointerdown", handleOutside);
   }, []);
 
-  useEffect(() => () => window.clearTimeout(closeTimer.current), []);
+  useEffect(() => () => {
+    window.clearTimeout(closeTimer.current);
+    window.clearTimeout(accountCloseTimer.current);
+  }, []);
 
   useEffect(()=>{
     let isMounted = true;
@@ -245,6 +261,38 @@ useEffect(() => {
 
   },[])
 
+  useEffect(() => {
+    const userId = accountUser?.id;
+    if (!userId) return undefined;
+
+    let active = true;
+    const controller = new AbortController();
+
+    fetch("/api/account/profile", {
+      method: "GET",
+      cache: "no-store",
+      credentials: "same-origin",
+      headers: { Accept: "application/json" },
+      signal: controller.signal,
+    })
+      .then(async (response) => response.ok ? response.json() : null)
+      .then((result) => {
+        if (!active) return;
+        const fullName = typeof result?.profile?.full_name === "string"
+          ? result.profile.full_name.trim()
+          : "";
+        setAccountProfile({ userId, fullName });
+      })
+      .catch(() => {
+        if (active) setAccountProfile({ userId, fullName: "" });
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [accountUser?.id]);
+
   function openMenu(id) {
     window.clearTimeout(closeTimer.current);
     setActiveMenu(id);
@@ -292,15 +340,44 @@ useEffect(() => {
   if (!authReady) return;
 
   setNotice("");
+  window.clearTimeout(accountCloseTimer.current);
+  setLogoutError("");
 
-  if (accountUser) {
-    setLogoutError("");
-    setAccountMenuOpen((isOpen) => !isOpen);
+  if (!accountUser) {
+    openAccountAuth("login");
     return;
   }
 
+  setAccountMenuOpen((isOpen) => {
+    if (accountHoverOpened.current && isOpen) {
+      accountHoverOpened.current = false;
+      return true;
+    }
+    accountHoverOpened.current = false;
+    return !isOpen;
+  });
+}
+
+function openAccountAuth(mode) {
   setAccountMenuOpen(false);
+  accountHoverOpened.current = false;
+  setAuthInitialScreen(mode);
   setAuthOpen(true);
+}
+
+function handleAccountPointerEnter(event) {
+  if (!authReady || !accountUser || isMobile || event.pointerType !== "mouse") return;
+  window.clearTimeout(accountCloseTimer.current);
+  accountHoverOpened.current = true;
+  setAccountMenuOpen(true);
+}
+
+function handleAccountPointerLeave(event) {
+  if (!accountUser || isMobile || event.pointerType !== "mouse") return;
+  accountHoverOpened.current = false;
+  if (accountPopoverRef.current?.contains(document.activeElement)) return;
+  window.clearTimeout(accountCloseTimer.current);
+  accountCloseTimer.current = window.setTimeout(() => setAccountMenuOpen(false), 180);
 }
 
 function handleAuthenticated() {
@@ -585,62 +662,100 @@ async function handleLogout() {
               </button>
 
               {/* Account */}
-              <div className="account-dropdown-anchor" ref={accountPopoverRef}>
-  <button
-    ref={authTriggerRef}
-    type="button"
-    onClick={handleAccountClick}
-    aria-haspopup={accountUser ? undefined : "dialog"}
-    aria-expanded={accountUser ? accountMenuOpen : authOpen}
-    aria-controls={accountUser ? "account-dropdown" : undefined}
-    aria-busy={!authReady}
-    aria-label="Account"
-    className="editorial-control-btn group cursor-pointer"
-  >
-    <FiUser className="w-[18px] h-[18px] text-[#2b3a31] group-hover:text-[#017F36] transition-colors" />
-    <span className="editorial-control-label text-[#2b3a31] group-hover:text-[#017F36] transition-colors flex items-center gap-0.5">
-      Account <FiChevronDown className="w-2.5 h-2.5 text-charcoal/60" />
-    </span>
-  </button>
+              <div
+                className="account-dropdown-anchor"
+                ref={accountPopoverRef}
+                onPointerEnter={handleAccountPointerEnter}
+                onPointerLeave={handleAccountPointerLeave}
+              >
+                {!authReady ? (
+                  <button type="button" className="account-login-loading" aria-label="Checking account status" disabled aria-busy="true">
+                    <span aria-hidden="true" />
+                  </button>
+                ) : accountUser ? (
+                  <>
+                    <button
+                      ref={authTriggerRef}
+                      type="button"
+                      onClick={handleAccountClick}
+                      aria-haspopup="true"
+                      aria-expanded={accountMenuOpen}
+                      aria-controls={accountMenuOpen ? "account-dropdown" : undefined}
+                      aria-label="Open customer account menu"
+                      className="account-avatar-trigger"
+                    >
+                      <span className="account-trigger-avatar" aria-hidden="true">
+                        {getAccountInitial(
+                          accountProfile.userId === accountUser.id ? accountProfile.fullName : "",
+                          accountUser.email
+                        ) || <FiUser aria-hidden="true" />}
+                      </span>
+                      <FiChevronDown className="account-avatar-chevron" aria-hidden="true" />
+                    </button>
 
-  {accountUser && (
+                    {accountMenuOpen && (
   <section
     id="account-dropdown"
-    className="account-dropdown"
+    className="account-dropdown account-dropdown--signed-in"
     aria-labelledby="account-dropdown-heading"
-    hidden={!accountMenuOpen}
+    aria-describedby="account-dropdown-description"
   >
-    <h2 id="account-dropdown-heading">
-      <Link
-        href="/account"
-        onClick={() => setAccountMenuOpen(false)}
-        className="text-inherit no-underline hover:text-[#017f36] focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017f36]"
-      >
-        My Account
-      </Link>
-    </h2>
+        <div className="account-dropdown__profile">
+          <span className="account-dropdown__avatar" aria-hidden="true">
+            {getAccountInitial(
+              accountProfile.userId === accountUser.id ? accountProfile.fullName : "",
+              accountUser.email
+            ) || <FiUser aria-hidden="true" />}
+          </span>
+          <div className="account-dropdown__profile-copy">
+            <p className="account-dropdown__eyebrow">MY ACCOUNT</p>
+            <h2 id="account-dropdown-heading">
+              {accountProfile.userId === accountUser.id && accountProfile.fullName
+                ? accountProfile.fullName
+                : "Welcome back"}
+            </h2>
+            <p id="account-dropdown-description" className="account-dropdown__email">
+              {accountUser.email || "Your Rento Comforts account"}
+            </p>
+          </div>
+        </div>
 
-    <p className="account-dropdown__email">
-      {accountUser.email || "Signed-in Rento customer"}
-    </p>
+        {logoutError && <p className="account-dropdown__error" role="alert">{logoutError}</p>}
 
-    {logoutError && (
-      <p className="account-dropdown__error" role="alert">
-        {logoutError}
-      </p>
-    )}
+        <nav className="account-dropdown__nav" aria-label="Customer account">
+          <Link href="/account" onClick={() => setAccountMenuOpen(false)} className="account-dropdown__item account-dropdown__item--active">
+            <FiGrid aria-hidden="true" /><span>My Dashboard</span><FiArrowRight className="account-dropdown__item-arrow" aria-hidden="true" />
+          </Link>
+          <span className="account-dropdown__item account-dropdown__item--planned" aria-disabled="true"><FiPackage aria-hidden="true" /><span>My Orders</span><small>Coming soon</small></span>
+          <span className="account-dropdown__item account-dropdown__item--planned" aria-disabled="true"><FiCalendar aria-hidden="true" /><span>My Rentals</span><small>Coming soon</small></span>
+          <span className="account-dropdown__item account-dropdown__item--planned" aria-disabled="true"><FiHeart aria-hidden="true" /><span>Wishlist</span><small>Coming soon</small></span>
+          <span className="account-dropdown__item account-dropdown__item--planned" aria-disabled="true"><FiMapPin aria-hidden="true" /><span>My Addresses</span><small>Coming soon</small></span>
+          <span className="account-dropdown__item account-dropdown__item--planned" aria-disabled="true"><FiSettings aria-hidden="true" /><span>Account Settings</span><small>Coming soon</small></span>
+        </nav>
 
-    <button
-      type="button"
-      className="account-dropdown__logout"
-      onClick={handleLogout}
-      disabled={isLoggingOut}
-      aria-busy={isLoggingOut}
-    >
-      {isLoggingOut ? "Logging out…" : "Logout"}
-    </button>
+        <button
+          type="button"
+          className="account-dropdown__logout"
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          aria-busy={isLoggingOut}
+        >
+          <FiLogOut aria-hidden="true" />
+          <span>{isLoggingOut ? "Signing out…" : "Logout"}</span>
+        </button>
   </section>
-)}
+                    )}
+                  </>
+                ) : (
+                  <button
+                    ref={authTriggerRef}
+                    type="button"
+                    onClick={() => openAccountAuth("login")}
+                    className="account-login-button"
+                  >
+                    Login
+                  </button>
+                )}
 </div>
 
               {/* Cart */}
@@ -702,7 +817,9 @@ async function handleLogout() {
       </nav>}
 
       <AuthModal
+  key={`${authOpen ? "open" : "closed"}-${authInitialScreen}`}
   open={authOpen}
+  initialScreen={authInitialScreen}
   onClose={() => setAuthOpen(false)}
   onAuthenticated={handleAuthenticated}
   returnFocusRef={authTriggerRef}

@@ -46,6 +46,7 @@ function OtpInputGroup({ otp, refs, onChange, onPaste, onKeyDown, labelPrefix = 
 
 export function AuthModal({
   open,
+  initialScreen = "login",
   onClose,
   onAuthenticated,
   returnFocusRef,
@@ -87,7 +88,7 @@ export function AuthModal({
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [accountErrors, setAccountErrors] = useState({});
   const [accountNotice, setAccountNotice] = useState("");
-  const [screen, setScreen] = useState("login");
+  const [screen, setScreen] = useState(initialScreen === "signup" ? "signup" : "login");
 
   useEffect(() => {
     const dialog = dialogRef.current;
