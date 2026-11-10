@@ -93,7 +93,10 @@ export async function GET() {
       hasFullName,
       emailVerified,
       phoneVerified,
-      onboardingCompleted: Boolean(profile?.onboarding_completed_at),
+      onboardingCompleted:
+  Boolean(profile?.onboarding_completed_at) &&
+  emailVerified &&
+  phoneVerified,
     });
   } catch {
     return jsonResponse(

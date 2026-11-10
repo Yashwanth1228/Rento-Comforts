@@ -169,13 +169,32 @@ export async function GET() {
   }
 
   try {
-    const { data: profile, error } = await auth.supabase
+    const {
+      data: { user },
+      error: userError,
+    } = await auth.supabase.auth.getUser();
+
+    if (userError) {
+      return jsonResponse(
+        { ok: false, message: "Authentication could not be checked." },
+        503
+      );
+    }
+
+    if (!user || user.id !== auth.userId) {
+      return jsonResponse(
+        { ok: false, message: "Sign in is required." },
+        401
+      );
+    }
+
+    const { data: profile, error: profileError } = await auth.supabase
       .from("customer_profiles")
       .select("full_name, onboarding_completed_at, updated_at")
       .eq("user_id", auth.userId)
       .maybeSingle();
 
-    if (error) {
+    if (profileError) {
       return jsonResponse(
         { ok: false, message: "The profile could not be loaded." },
         503
@@ -189,11 +208,16 @@ export async function GET() {
       );
     }
 
+    const onboardingCompleted =
+      Boolean(profile.onboarding_completed_at) &&
+      Boolean(user.email_confirmed_at) &&
+      Boolean(user.phone_confirmed_at);
+
     return jsonResponse({
       ok: true,
       profile: {
         full_name: profile.full_name,
-        onboardingCompleted: Boolean(profile.onboarding_completed_at),
+        onboardingCompleted,
         updated_at: profile.updated_at,
       },
     });
