@@ -59,6 +59,7 @@ export function AuthModal({
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [recoveryIdentity, setRecoveryIdentity] = useState("");
@@ -160,12 +161,37 @@ export function AuthModal({
     requestAnimationFrame(() => returnFocusRef.current?.focus());
   }
 
+  async function handleGoogleSignIn() {
+  if (isSubmitting || isGoogleSubmitting) return;
+
+  setMessage("");
+  setIsGoogleSubmitting(true);
+
+  try {
+    const supabase = createClient();
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+
+    if (error || !data?.url) {
+      setMessage("Google sign-in could not be started. Please try again.");
+      setIsGoogleSubmitting(false);
+    }
+  } catch {
+    setMessage("Could not reach Google sign-in. Check your connection and try again.");
+    setIsGoogleSubmitting(false);
+  }
+}
+
   async function handleSubmit(event) {
   event.preventDefault();
 
   // A disabled button prevents most repeat clicks; this also guards the handler.
-  if (isSubmitting) return;
-
+if (isSubmitting || isGoogleSubmitting) return;
   const enteredIdentity = identity.trim();
 
   if (!enteredIdentity) {
@@ -651,11 +677,22 @@ handleClose();
 
                 <div className="auth-social-divider" aria-label="or continue with"><span>or continue with</span></div>
                 <div className="auth-social-options">
-                  <button type="button" className="auth-social-button" disabled title="Google sign-in is not configured">
-                    <FcGoogle aria-hidden="true" /> <span>Continue with Google</span>
-                  </button>
-                </div>
-                <p className="auth-preview-note">Google sign-in is a visual preview only. Authentication is not connected.</p>
+  <button
+    type="button"
+    className="auth-social-button"
+    onClick={handleGoogleSignIn}
+    disabled={isGoogleSubmitting || isSubmitting}
+    aria-busy={isGoogleSubmitting}
+  >
+    <FcGoogle aria-hidden="true" />
+    <span>
+      {isGoogleSubmitting ? "Connecting to Google..." : "Continue with Google"}
+    </span>
+  </button>
+</div>
+<p className="auth-preview-note">
+  You’ll return to Rento Comforts after Google sign-in.
+</p>
                 <p className="auth-signup-prompt">Don&apos;t have an account? <button type="button" onClick={showSignup}>Sign Up</button></p>
               </div>
             </div>

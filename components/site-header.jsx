@@ -131,6 +131,33 @@ export function SiteHeader() {
   const categoryButtonRefs = useRef({});
   const matches = query.trim() ? allCategoryLabels.filter((name) => name.toLowerCase().includes(query.trim().toLowerCase())) : [];
 
+useEffect(() => {
+  const currentUrl = new URL(window.location.href);
+  const result = currentUrl.searchParams.get("google");
+
+  if (result !== "cancelled" && result !== "error") {
+    return undefined;
+  }
+
+  const notice =
+    result === "cancelled"
+      ? "Google sign-in was cancelled."
+      : "Google sign-in could not be completed. Please try again.";
+
+  // Schedule the state update after the effect to avoid synchronous
+  // state updates during effect execution.
+  const timer = window.setTimeout(() => setNotice(notice), 0);
+
+  currentUrl.searchParams.delete("google");
+  window.history.replaceState(
+    window.history.state,
+    "",
+    `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`
+  );
+
+  return () => window.clearTimeout(timer);
+}, []);
+
   useEffect(() => {
     const media = window.matchMedia("(max-width: 1050px)");
     const update = () => setIsMobile(media.matches);
