@@ -413,6 +413,7 @@ async function handleLogout() {
   }
 }
 
+
   return (
     <header ref={headerRef} className="site-header" onKeyDown={handleKeyDown}>
       {/* 1. Top Utility Bar (Full-width, no outer margin) */}

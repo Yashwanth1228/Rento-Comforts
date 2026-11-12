@@ -8,9 +8,14 @@ function getInitial(fullName) {
   return getFirstName(fullName).charAt(0).toUpperCase();
 }
 
-export function AccountWelcomeBanner({ fullName = "" }) {
+export function AccountWelcomeBanner({
+  fullName = "",
+  title,
+  description = "Manage your account, orders, rentals, and saved items.",
+}) {
   const firstName = getFirstName(fullName);
   const initial = getInitial(fullName);
+  const heading = title || (firstName ? `Welcome back, ${firstName}` : "Welcome back");
 
   return (
     <header
@@ -39,11 +44,11 @@ export function AccountWelcomeBanner({ fullName = "" }) {
             aria-hidden="true"
           />
           <span className="min-w-0">
-            <h1 className="font-serif text-[27px] font-bold leading-[1.05] tracking-tight text-[#124734] sm:text-[36px] lg:text-[38px]">
-              {firstName ? `Welcome back, ${firstName}` : "Welcome back"}
+            <h1 className={`${title ? "font-sans text-[30px] sm:text-[36px] lg:text-[40px]" : "font-serif text-[27px] sm:text-[36px] lg:text-[38px]"} font-bold leading-[1.05] tracking-tight text-[#124734]`}>
+              {heading}
             </h1>
             <p className="mt-2 max-w-lg text-xs leading-5 text-[#3f4841] sm:text-sm sm:leading-6 lg:text-base">
-              Manage your account, orders, rentals, and saved items.
+              {description}
             </p>
           </span>
         </div>

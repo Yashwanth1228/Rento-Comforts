@@ -19,8 +19,8 @@ import {
 } from "react-icons/fi";
 
 const sidebarItems = [
-  { label: "Overview", Icon: FiHome, active: true },
-  { label: "Personal Information", Icon: FiUser, href: "#personal-information" },
+  { label: "Overview", Icon: FiHome, href: "/account", section: "overview" },
+  { label: "Personal Information", Icon: FiUser, href: "/account/personal-information", section: "personal-information" },
   { label: "My Orders", Icon: FiBox },
   { label: "My Rentals", Icon: FiTruck },
   { label: "Wishlist", Icon: FiHeart },
@@ -36,7 +36,7 @@ const quickActions = [
     compactLabel: "Personal info",
     description: "View and manage your profile",
     Icon: FiUser,
-    href: "#personal-information",
+    href: "/account/personal-information",
   },
   {
     label: "My Addresses",
@@ -104,35 +104,32 @@ function RetryPanel({ title, message, onRetry, alert = false }) {
   );
 }
 
-function DashboardSidebar() {
+export function AccountSidebar({ activeSection = "overview", spacious = false }) {
   return (
     <aside className="hidden xl:block">
       <nav
         aria-label="Account sections"
-        className="sticky top-6 rounded-2xl border border-[#e8e6df] bg-white p-2.5 shadow-[0_5px_22px_rgba(37,41,37,0.05)]"
+        className={`sticky top-6 rounded-2xl border border-[#e8e6df] bg-white shadow-[0_5px_22px_rgba(37,41,37,0.05)] ${spacious ? "p-3" : "p-2.5"}`}
       >
         <ul className="space-y-0">
-          {sidebarItems.map(({ label, Icon, href, active }) => (
+          {sidebarItems.map(({ label, Icon, href, section }) => (
             <li key={label} className="border-b border-[#eceae4] last:border-b-0">
-              {active ? (
-                <span
-                  className="my-0.5 flex min-h-[40px] items-center gap-2.5 rounded-lg px-2.5 text-[13px] font-bold text-white"
-                  aria-current="page"
-                >
-                  <Icon aria-hidden="true" className="size-[18px] shrink-0" />
-                  {label}
-                </span>
-              ) : href ? (
-                <a
+              {href ? (
+                <Link
                   href={href}
-                  className="flex min-h-[40px] items-center gap-2.5 px-2.5 text-[13px] font-semibold text-[#303731] transition-colors hover:bg-[#f3f6f1] hover:text-[#124734] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017f36]"
+                  aria-current={activeSection === section ? "page" : undefined}
+                  className={`flex items-center rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017f36] ${spacious ? "min-h-[54px] gap-3 px-3 text-sm" : "min-h-[40px] gap-2.5 px-2.5 text-[13px]"} ${
+                    activeSection === section
+                      ? "my-0.5 bg-[#08763b] font-bold !text-white"
+                      : "font-semibold text-[#303731] hover:bg-[#f3f6f1] hover:text-[#124734]"
+                  }`}
                 >
                   <Icon aria-hidden="true" className="size-[18px] shrink-0" />
                   {label}
-                </a>
+                </Link>
               ) : (
                 <span
-                  className="flex min-h-[40px] cursor-not-allowed items-center gap-2.5 px-2.5 text-[13px] text-[#687169]"
+                  className={`flex cursor-not-allowed items-center text-[#687169] ${spacious ? "min-h-[54px] gap-3 px-3 text-sm" : "min-h-[40px] gap-2.5 px-2.5 text-[13px]"}`}
                   aria-disabled="true"
                   title={`${label} is not connected yet`}
                 >
@@ -432,7 +429,7 @@ export function AccountDashboard({
             <>
               <MobileAccountSections />
               <div className="grid items-start gap-4 xl:grid-cols-[280px_minmax(0,1fr)] xl:gap-4">
-                <DashboardSidebar />
+                <AccountSidebar activeSection="overview" />
                 <div className="min-w-0 space-y-4 sm:space-y-5 xl:space-y-2.5">
                   <AccountSetupBanner account={account} />
                   <div className="grid items-stretch gap-4 lg:grid-cols-2 lg:gap-5 xl:gap-4">

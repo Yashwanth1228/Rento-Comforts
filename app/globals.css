@@ -1785,6 +1785,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   color: #fff;
   font-size: 14px;
   font-weight: 800;
+  
 }
 
 .account-trigger-avatar svg { width: 15px; height: 15px; }
