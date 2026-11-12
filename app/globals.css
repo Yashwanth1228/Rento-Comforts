@@ -2063,3 +2063,37 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   .account-login-loading { width: 84px; height: 38px; padding-inline: 12px; font-size: 13px; }
   .account-avatar-trigger { min-width: 52px; height: 38px; }
 }
+
+/* My Orders desktop layout: reserve a reference-sized card, then scale artwork with viewport height. */
+@media (min-width: 1280px) {
+  .account-orders-panel {
+    height: clamp(455px, calc(100dvh - 289px), 552px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .account-orders-content {
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .account-orders-artwork {
+    width: clamp(228px, 28.7vh, 310px);
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 1669 / 1024;
+  }
+
+  .account-orders-artwork-image {
+    display: block;
+  }
+
+  .account-orders-package-logo {
+    height: auto;
+  }
+}
+
+.account-orders-cta { color: #fff; background-color: #017f36; }
+.account-orders-cta svg { color: #fff; }
+.account-orders-cta:hover { background-color: #124734; }
+.account-orders-cta:focus-visible { outline: 3px solid var(--ring); outline-offset: 3px; }

@@ -21,7 +21,7 @@ import {
 const sidebarItems = [
   { label: "Overview", Icon: FiHome, href: "/account", section: "overview" },
   { label: "Personal Information", Icon: FiUser, href: "/account/personal-information", section: "personal-information" },
-  { label: "My Orders", Icon: FiBox },
+  { label: "My Orders", Icon: FiBox, href: "/account/orders", section: "orders" },
   { label: "My Rentals", Icon: FiTruck },
   { label: "Wishlist", Icon: FiHeart },
   { label: "My Addresses", Icon: FiMapPin },
