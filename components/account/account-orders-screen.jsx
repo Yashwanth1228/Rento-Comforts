@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   FiAlertCircle,
-  FiArrowLeft,
   FiBox,
   FiRefreshCw,
 } from "react-icons/fi";
@@ -15,29 +14,20 @@ import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
 function MobileOrdersHero() {
   return (
     <header
-      className="relative isolate overflow-hidden bg-[#f8f2e9] xl:hidden"
+      className="mobile-orders-hero relative isolate overflow-hidden bg-[#f8f2e9] xl:hidden"
       style={{
-        backgroundImage: "linear-gradient(90deg, rgba(248,247,242,0.98) 0%, rgba(248,247,242,0.9) 45%, rgba(248,247,242,0.08) 100%), url('/images/account-welcome-banner-v1.png')",
-        backgroundSize: "100% 100%, auto 230px",
-        backgroundPosition: "center, 70% 56%",
+        backgroundImage: "linear-gradient(90deg, rgba(248,247,242,0.98) 0%, rgba(248,247,242,0.94) 39%, rgba(248,247,242,0.36) 66%, rgba(248,247,242,0.02) 100%), url('/images/orders-mobile-hero.png')",
+        backgroundSize: "100% 100%, auto 100%",
+        backgroundPosition: "center, right center",
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="mx-auto flex min-h-[184px] max-w-[1560px] items-center px-4 py-6 sm:min-h-[204px] sm:px-7">
-        <div className="flex max-w-[68%] items-start gap-2 sm:max-w-[60%] sm:gap-3">
-          <Link
-            href="/account"
-            aria-label="Back to account overview"
-            className="mt-1 inline-flex size-9 shrink-0 items-center justify-center rounded-full text-[#124734] hover:bg-white/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017f36]"
-          >
-            <FiArrowLeft aria-hidden="true" className="size-6" />
-          </Link>
-          <div>
-            <h1 className="font-serif text-[32px] font-bold leading-tight text-[#124734] sm:text-[36px]">My Orders</h1>
-            <p className="mt-2 max-w-[310px] text-sm leading-5 text-[#454c47] sm:text-base sm:leading-6">
-              View and track your purchase and rental orders.
-            </p>
-          </div>
+      <div className="mx-auto flex min-h-[122px] max-w-[1560px] items-center px-6 py-3 sm:min-h-[150px] sm:px-7">
+        <div className="max-w-[64%] sm:max-w-[60%]">
+          <h1 className="font-serif text-[32px] font-bold leading-tight text-[#124734] sm:text-[36px]">My Orders</h1>
+          <p className="mt-1 max-w-[310px] text-base leading-6 text-[#454c47]">
+            View and track your purchase and rental orders.
+          </p>
         </div>
       </div>
     </header>
@@ -140,7 +130,7 @@ export default function AccountOrdersScreen() {
       </div>
       <MobileOrdersHero />
 
-      <main className="bg-[#f8f7f2] px-4 py-4 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-2 xl:pb-3 xl:pl-8 xl:pr-10">
+      <main className="bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-2 xl:pb-3 xl:pl-8 xl:pr-10">
         <div className="mx-auto max-w-[1560px]">
           {loading ? <LoadingState /> : pageState === "signed-out" ? (
             <AccountState title="Sign in to view your account" message="Your session may have expired. Sign in using the Login control in the site header, then return here." signedOut />
