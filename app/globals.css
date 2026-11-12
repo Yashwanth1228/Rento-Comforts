@@ -2108,9 +2108,96 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .account-orders-cta svg { color: #fff; }
 .account-orders-cta:hover { background-color: #124734; }
 .account-orders-cta:focus-visible { outline: 3px solid var(--ring); outline-offset: 3px; }
+.orders-mobile-header { display: none; }
 
 /* Mobile Orders layout follows the dedicated narrow-screen composition. */
 @media (max-width: 639px) {
+  .site-header--orders .site-header__utility-bar,
+  .site-header--orders .editorial-navbar-card,
+  .site-header--orders .category-navigation {
+    display: none;
+  }
+
+  .site-header--orders .orders-mobile-header {
+    position: relative;
+    z-index: 70;
+    display: flex;
+    min-height: 70px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border-bottom: 1px solid #eceae4;
+    background: #fff;
+    padding: 7px 14px;
+  }
+
+  .orders-mobile-header__menu,
+  .orders-mobile-header__actions > button,
+  .orders-mobile-header__actions > a {
+    display: inline-flex;
+    width: 34px;
+    height: 40px;
+    flex: 0 0 34px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    color: #252925;
+  }
+
+  .orders-mobile-header__menu svg,
+  .orders-mobile-header__actions svg { width: 25px; height: 25px; stroke-width: 1.8; }
+
+  .orders-mobile-header__brand {
+    display: inline-flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 5px;
+    color: #063c2e;
+    text-decoration: none;
+  }
+
+  .orders-mobile-header__brand img { width: 35px; height: 35px; object-fit: contain; }
+  .orders-mobile-header__brand span { display: flex; flex-direction: column; line-height: 1; }
+  .orders-mobile-header__brand b { font-size: 18px; font-weight: 850; letter-spacing: 0.025em; }
+  .orders-mobile-header__brand small { margin-top: 3px; font-size: 8px; font-weight: 700; letter-spacing: 0.25em; }
+
+  .orders-mobile-header__actions { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; }
+  .orders-mobile-header__actions > a { position: relative; }
+  .orders-mobile-header__actions > a span {
+    position: absolute;
+    top: 3px;
+    right: 0;
+    display: grid;
+    width: 16px;
+    height: 16px;
+    place-items: center;
+    border-radius: 50%;
+    background: #017f36;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+  }
+
+  .site-header--orders .mobile-nav { top: 70px; }
+
+  .mobile-orders-main {
+    display: flex;
+    min-height: calc(100svh - 70px - 122px - 82px);
+    padding-bottom: 12px;
+  }
+
+  .mobile-orders-main > div { display: flex; width: 100%; flex: 1 1 auto; flex-direction: column; }
+  .mobile-orders-main > div > .grid { flex: 1 1 auto; }
+  .mobile-orders-main .account-orders-panel { display: flex; flex: 1 1 auto; flex-direction: column; }
+  .mobile-orders-main .account-orders-content { flex: 1 1 auto; }
+
+  .mobile-bottom-nav--orders { padding-top: 7px; }
+  .mobile-bottom-nav--orders a,
+  .mobile-bottom-nav--orders li > span { min-height: 62px; gap: 4px; border-radius: 16px; font-size: 13px; }
+  .mobile-bottom-nav--orders svg { width: 26px; height: 26px; stroke-width: 1.8; }
+
   .mobile-orders-hero {
     min-height: 122px;
     background-color: #f8f2e9;

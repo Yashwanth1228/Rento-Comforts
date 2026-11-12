@@ -35,7 +35,7 @@ export default function AccountOrdersEmptyState({
       </div>
       <div className="mobile-orders-artwork relative shrink-0 xl:hidden">
         <Image
-          src="/images/orders-empty-illustration-mobile.png"
+          src="/images/orders-empty-illustration-mobile-v2.png"
           alt="Two parcels beside a potted plant"
           width={1536}
           height={1024}
@@ -48,7 +48,7 @@ export default function AccountOrdersEmptyState({
           aria-hidden="true"
           width={173}
           height={144}
-          className="mobile-orders-package-logo absolute left-[43%] top-[52%] w-[8%] mix-blend-multiply"
+          className="mobile-orders-package-logo absolute left-[45%] top-[51%] w-[8%] mix-blend-multiply"
           priority
         />
       </div>

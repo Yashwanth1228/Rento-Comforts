@@ -17,7 +17,7 @@ function MobileOrdersHero() {
       className="mobile-orders-hero relative isolate overflow-hidden bg-[#f8f2e9] xl:hidden"
       style={{
         backgroundImage: "linear-gradient(90deg, rgba(248,247,242,0.98) 0%, rgba(248,247,242,0.94) 39%, rgba(248,247,242,0.36) 66%, rgba(248,247,242,0.02) 100%), url('/images/orders-mobile-hero.png')",
-        backgroundSize: "100% 100%, auto 100%",
+        backgroundSize: "100% 100%, auto 85%",
         backgroundPosition: "center, right center",
         backgroundRepeat: "no-repeat",
       }}
@@ -130,7 +130,7 @@ export default function AccountOrdersScreen() {
       </div>
       <MobileOrdersHero />
 
-      <main className="bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-2 xl:pb-3 xl:pl-8 xl:pr-10">
+      <main className="mobile-orders-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-2 xl:pb-3 xl:pl-8 xl:pr-10">
         <div className="mx-auto max-w-[1560px]">
           {loading ? <LoadingState /> : pageState === "signed-out" ? (
             <AccountState title="Sign in to view your account" message="Your session may have expired. Sign in using the Login control in the site header, then return here." signedOut />

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   FiArrowRight, FiCalendar, FiChevronDown, FiGrid, FiHeart, FiLogOut, FiMapPin, FiMenu,
@@ -111,6 +111,7 @@ function getAccountInitial(fullName, email) {
 }
 
 export function SiteHeader() {
+  const pathname = usePathname();
   const router = useRouter();
   const { items: cartItems } = useCart();
   const [activeMenu, setActiveMenu] = useState("");
@@ -415,7 +416,7 @@ async function handleLogout() {
 
 
   return (
-    <header ref={headerRef} className="site-header" onKeyDown={handleKeyDown}>
+    <header ref={headerRef} className={`site-header${pathname === "/account/orders" ? " site-header--orders" : ""}`} onKeyDown={handleKeyDown}>
       {/* 1. Top Utility Bar (Full-width, no outer margin) */}
       <div className="site-header__utility-bar">
         <div className="w-full flex items-center justify-between px-4 sm:px-6 lg:px-8 py-1 text-xs text-white">
@@ -461,6 +462,31 @@ async function handleLogout() {
             <span className="text-white/30 font-light">|</span>
             <a href="#site-footer" className="hover:text-white transition-colors">Contact Us</a>
           </nav>
+        </div>
+      </div>
+
+      <div className="orders-mobile-header" aria-label="Rento Comforts mobile header">
+        <button
+          className="orders-mobile-header__menu"
+          type="button"
+          aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-navigation"
+          onClick={() => setMobileOpen((open) => !open)}
+        >
+          {mobileOpen ? <FiX aria-hidden="true" /> : <FiMenu aria-hidden="true" />}
+        </button>
+        <Link href="/" className="orders-mobile-header__brand" aria-label="Rento Comforts home">
+          <Image src="/brand/rento-symbol-green.png" alt="" aria-hidden="true" width={40} height={40} priority />
+          <span><b>RENTO</b><small>COMFORTS</small></span>
+        </Link>
+        <div className="orders-mobile-header__actions">
+          <button type="button" aria-label="Search products" onClick={() => router.push("/products")}><FiSearch aria-hidden="true" /></button>
+          <button type="button" aria-label="Wishlist" onClick={() => setNotice("Wishlist is not available yet.")}><FiHeart aria-hidden="true" /></button>
+          <Link href="/cart" aria-label={`Cart, ${cartItems.length} items`}>
+            <FiShoppingCart aria-hidden="true" />
+            <span>{cartItems.length}</span>
+          </Link>
         </div>
       </div>
 

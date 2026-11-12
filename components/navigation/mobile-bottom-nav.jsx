@@ -24,7 +24,7 @@ export function MobileBottomNav() {
   return (
     <nav
       aria-label="Mobile navigation"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-[#e5e3dc] bg-white/95 px-2 pt-2 shadow-[0_-6px_24px_rgba(37,41,37,0.09)] backdrop-blur xl:hidden"
+      className={`fixed inset-x-0 bottom-0 z-40 border-t border-[#e5e3dc] bg-white/95 px-2 pt-2 shadow-[0_-6px_24px_rgba(37,41,37,0.09)] backdrop-blur xl:hidden${pathname === "/account/orders" ? " mobile-bottom-nav--orders" : ""}`}
       style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
     >
       <ul className="mx-auto grid max-w-xl grid-cols-5 gap-1">
