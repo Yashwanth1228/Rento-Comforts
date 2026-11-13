@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
 import {
@@ -105,11 +106,39 @@ function RetryPanel({ title, message, onRetry, alert = false }) {
 }
 
 export function AccountSidebar({ activeSection = "overview", spacious = false }) {
+  const sidebarRef = useRef(null);
+
+  useEffect(() => {
+    const sidebar = sidebarRef.current;
+    const siteHeader = document.querySelector(".site-header");
+    if (!sidebar || !siteHeader) return undefined;
+
+    const updateOffset = () => {
+      const stickyTop = window.innerWidth >= 1280
+        ? Math.max(0, Math.round(siteHeader.getBoundingClientRect().bottom)) + 8
+        : 0;
+      sidebar.style.setProperty("--account-sidebar-top", `${stickyTop}px`);
+    };
+
+    updateOffset();
+    window.addEventListener("scroll", updateOffset, { passive: true });
+    window.addEventListener("resize", updateOffset);
+    const resizeObserver = new ResizeObserver(updateOffset);
+    resizeObserver.observe(siteHeader);
+
+    return () => {
+      window.removeEventListener("scroll", updateOffset);
+      window.removeEventListener("resize", updateOffset);
+      resizeObserver.disconnect();
+      sidebar.style.removeProperty("--account-sidebar-top");
+    };
+  }, []);
+
   return (
-    <aside className="hidden xl:block">
+    <aside ref={sidebarRef} className="account-sidebar-sticky hidden xl:block">
       <nav
         aria-label="Account sections"
-        className={`sticky top-6 rounded-2xl border border-[#e8e6df] bg-white shadow-[0_5px_22px_rgba(37,41,37,0.05)] ${spacious ? "p-3" : "p-2.5"}`}
+        className={`account-sidebar-nav overflow-y-auto overscroll-contain rounded-2xl border border-[#e8e6df] bg-white shadow-[0_5px_22px_rgba(37,41,37,0.05)] ${spacious ? "p-3" : "p-2.5"}`}
       >
         <ul className="space-y-0">
           {sidebarItems.map(({ label, Icon, href, section }) => (

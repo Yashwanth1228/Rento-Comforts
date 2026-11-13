@@ -1487,6 +1487,19 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .catalogue-subcategory-scroll { scrollbar-width: none; -ms-overflow-style: none; }
 .catalogue-subcategory-scroll::-webkit-scrollbar { display: none; }
 
+@media (min-width: 1280px) {
+  .account-sidebar-sticky {
+    position: sticky;
+    top: var(--account-sidebar-top, 0px);
+    align-self: start;
+    z-index: 40;
+  }
+
+  .account-sidebar-nav {
+    max-height: calc(100dvh - var(--account-sidebar-top, 0px) - 1rem);
+  }
+}
+
 /* Keep the complete three-layer site navigation together while scrolling. */
 .site-header {
   position: sticky;
