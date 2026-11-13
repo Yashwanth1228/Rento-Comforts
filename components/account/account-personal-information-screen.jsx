@@ -249,8 +249,8 @@ export default function AccountPersonalInformationScreen() {
       </div>
       <MobileHero />
 
-      <main className="bg-[#f8f7f2] px-4 py-4 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-4 xl:pb-6 xl:pl-8 xl:pr-10">
-        <div className="mx-auto max-w-[1680px]">
+      <main className="bg-[#f8f7f2] px-4 py-4 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-4 xl:pb-6 xl:pl-8 xl:pr-4">
+        <div className="mx-auto max-w-[1640px]">
           <div className="grid items-start gap-4 xl:grid-cols-[clamp(250px,19.1vw,320px)_minmax(0,1fr)] xl:gap-5">
             <AccountSidebar activeSection="personal-information" spacious />
             <div className="min-w-0">

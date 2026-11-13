@@ -2191,6 +2191,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   .mobile-orders-main > div { display: flex; width: 100%; flex: 1 1 auto; flex-direction: column; }
   .mobile-orders-main > div > .grid { flex: 1 1 auto; }
   .mobile-orders-main .account-orders-panel { display: flex; flex: 1 1 auto; flex-direction: column; }
+  .mobile-orders-main .account-orders-preview-panel { display: flex; flex: 1 1 auto; flex-direction: column; }
   .mobile-orders-main .account-orders-content { flex: 1 1 auto; }
 
   .mobile-bottom-nav--orders { padding-top: 7px; }

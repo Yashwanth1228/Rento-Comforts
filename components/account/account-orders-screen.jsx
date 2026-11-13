@@ -11,12 +11,13 @@ import AccountOrdersEmptyState from "@/components/account/account-orders-empty-s
 import { AccountSidebar } from "@/components/account/account-dashboard";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
 
-function MobileOrdersHero() {
+export function MobileOrdersHero({ populated = false }) {
+  const heroImage = populated ? "/images/orders-populated-mobile-hero.png" : "/images/orders-mobile-hero.png";
   return (
     <header
       className="mobile-orders-hero relative isolate overflow-hidden bg-[#f8f2e9] xl:hidden"
       style={{
-        backgroundImage: "linear-gradient(90deg, rgba(248,247,242,0.98) 0%, rgba(248,247,242,0.94) 39%, rgba(248,247,242,0.36) 66%, rgba(248,247,242,0.02) 100%), url('/images/orders-mobile-hero.png')",
+        backgroundImage: `linear-gradient(90deg, rgba(248,247,242,0.98) 0%, rgba(248,247,242,0.94) 39%, rgba(248,247,242,0.36) 66%, rgba(248,247,242,0.02) 100%), url('${heroImage}')`,
         backgroundSize: "100% 100%, auto 85%",
         backgroundPosition: "center, right center",
         backgroundRepeat: "no-repeat",
@@ -130,8 +131,8 @@ export default function AccountOrdersScreen() {
       </div>
       <MobileOrdersHero />
 
-      <main className="mobile-orders-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-2 xl:pb-3 xl:pl-8 xl:pr-10">
-        <div className="mx-auto max-w-[1560px]">
+      <main className="mobile-orders-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-2 xl:pb-3 xl:pl-8 xl:pr-4">
+        <div className="mx-auto max-w-[1640px]">
           {loading ? <LoadingState /> : pageState === "signed-out" ? (
             <AccountState title="Sign in to view your account" message="Your session may have expired. Sign in using the Login control in the site header, then return here." signedOut />
           ) : pageState === "missing-profile" ? (
@@ -150,6 +151,13 @@ export default function AccountOrdersScreen() {
                   </div>
                 </header>
                 <AccountOrdersEmptyState />
+                {process.env.NODE_ENV === "development" && (
+                  <div className="mt-4 flex justify-center xl:justify-start">
+                    <Link href="/dev/orders-preview" className="rounded-full border border-[#b8d2bf] bg-[#f3f8f1] px-4 py-2 text-xs font-semibold text-[#124734] hover:bg-[#e9f1e9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017f36]">
+                      Sample Orders — UI Preview
+                    </Link>
+                  </div>
+                )}
               </section>
             </div>
           ) : null}

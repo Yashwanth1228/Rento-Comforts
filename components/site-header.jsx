@@ -416,7 +416,7 @@ async function handleLogout() {
 
 
   return (
-    <header ref={headerRef} className={`site-header${pathname === "/account/orders" ? " site-header--orders" : ""}`} onKeyDown={handleKeyDown}>
+    <header ref={headerRef} className={`site-header${pathname.startsWith("/account/orders") ? " site-header--orders" : ""}`} onKeyDown={handleKeyDown}>
       {/* 1. Top Utility Bar (Full-width, no outer margin) */}
       <div className="site-header__utility-bar">
         <div className="w-full flex items-center justify-between px-4 sm:px-6 lg:px-8 py-1 text-xs text-white">

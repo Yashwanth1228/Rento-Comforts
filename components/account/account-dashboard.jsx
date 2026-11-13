@@ -411,8 +411,8 @@ export function AccountDashboard({
     <>
       <AccountWelcomeBanner fullName={account?.fullName ?? ""} />
 
-      <main id="overview" className="overflow-x-clip bg-[#f8f7f2] px-4 py-4 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-2 xl:pb-2">
-        <div className="mx-auto max-w-[1560px]">
+      <main id="overview" className="overflow-x-clip bg-[#f8f7f2] px-4 py-4 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-2 xl:pb-2 xl:pl-8 xl:pr-4">
+        <div className="mx-auto max-w-[1640px]">
           {loading ? (
             <DashboardLoading />
           ) : signInRequired ? (

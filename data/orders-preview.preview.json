@@ -1,0 +1,41 @@
+[
+  {
+    "id": "UI-SAMPLE-ORD-003",
+    "name": "3-Seater Fabric Sofa",
+    "category": "Furniture",
+    "type": "rent",
+    "durationMonths": 6,
+    "status": "Delivered",
+    "statusTone": "success",
+    "date": "10 Nov 2026",
+    "price": 1499,
+    "image": "/images/product-gallery/sofa-2.webp",
+    "previewOnly": true
+  },
+  {
+    "id": "UI-SAMPLE-ORD-002",
+    "name": "Double Door Refrigerator",
+    "category": "Home Appliances",
+    "type": "buy",
+    "durationMonths": null,
+    "status": "Out for delivery",
+    "statusTone": "info",
+    "date": "08 Nov 2026",
+    "price": 28990,
+    "image": "/images/product-gallery/refrigerator-2.webp",
+    "previewOnly": true
+  },
+  {
+    "id": "UI-SAMPLE-ORD-001",
+    "name": "Front Load Washing Machine",
+    "category": "Home Appliances",
+    "type": "rent",
+    "durationMonths": 12,
+    "status": "Processing",
+    "statusTone": "pending",
+    "date": "07 Nov 2026",
+    "price": 1199,
+    "image": "/images/product-gallery/washing-machine-2.webp",
+    "previewOnly": true
+  }
+]
