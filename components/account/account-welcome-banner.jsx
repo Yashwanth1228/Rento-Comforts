@@ -20,7 +20,7 @@ export function AccountWelcomeBanner({
 
   return (
     <header
-      className={`relative isolate w-full overflow-hidden bg-[#f8f2e9] bg-cover ${compact ? "min-h-[128px] bg-center" : "min-h-[250px] bg-[position:64%_center] sm:min-h-[190px] sm:bg-center lg:min-h-[176px]"}`}
+      className={`account-welcome-banner relative isolate w-full overflow-hidden bg-[#f8f2e9] bg-cover ${compact ? "min-h-[128px] bg-center" : "min-h-[250px] bg-[position:64%_center] sm:min-h-[190px] sm:bg-center lg:min-h-[176px]"}`}
       style={{
         backgroundImage: "url('/images/account-welcome-banner-v1.png')",
       }}

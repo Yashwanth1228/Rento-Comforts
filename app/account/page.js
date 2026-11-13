@@ -2,9 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { AccountDashboard } from "@/components/account/account-dashboard";
-import { MobileBottomNav } from "@/components/navigation/mobile-bottom-nav";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
 
 export default function AccountPage() {
   const [retryKey, setRetryKey] = useState(0);
@@ -213,7 +210,6 @@ export default function AccountPage() {
 
   return (
     <>
-      <SiteHeader />
       <AccountDashboard
         loading={loading}
         account={account}
@@ -233,8 +229,6 @@ export default function AccountPage() {
         cancelEditingName={cancelEditingName}
         saveMessage={saveMessage}
       />
-      <SiteFooter />
-      <MobileBottomNav />
     </>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   FiAlertCircle,
@@ -8,7 +8,6 @@ import {
   FiRefreshCw,
 } from "react-icons/fi";
 import AccountOrdersEmptyState from "@/components/account/account-orders-empty-state";
-import { AccountSidebar } from "@/components/account/account-dashboard";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
 
 export function MobileOrdersHero({ populated = false }) {
@@ -131,17 +130,15 @@ export default function AccountOrdersScreen() {
       </div>
       <MobileOrdersHero />
 
-      <main className="mobile-orders-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-2 xl:pb-3 xl:pl-8 xl:pr-4">
-        <div className="mx-auto max-w-[1640px]">
-          {loading ? <LoadingState /> : pageState === "signed-out" ? (
-            <AccountState title="Sign in to view your account" message="Your session may have expired. Sign in using the Login control in the site header, then return here." signedOut />
-          ) : pageState === "missing-profile" ? (
-            <AccountState title="Account profile not available" message="We could not find a customer profile for this account." retry={retry} />
-          ) : pageState === "error" ? (
-            <AccountState title="Account information unavailable" message="We could not verify your account right now. Check your connection and try again." retry={retry} />
-          ) : account ? (
-            <div className="grid items-start gap-4 xl:grid-cols-[clamp(280px,19.6vw,328px)_minmax(0,1fr)] xl:gap-4">
-              <AccountSidebar activeSection="orders" />
+      <main className="mobile-orders-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-2 xl:pb-3 xl:pl-0 xl:pr-4">
+        <div className="mx-auto max-w-[1640px] xl:h-full xl:min-h-0">
+          {loading ? <div className="min-w-0"><LoadingState /></div> : pageState === "signed-out" ? (
+              <div className="min-w-0"><AccountState title="Sign in to view your account" message="Your session may have expired. Sign in using the Login control in the site header, then return here." signedOut /></div>
+            ) : pageState === "missing-profile" ? (
+              <div className="min-w-0"><AccountState title="Account profile not available" message="We could not find a customer profile for this account." retry={retry} /></div>
+            ) : pageState === "error" ? (
+              <div className="min-w-0"><AccountState title="Account information unavailable" message="We could not verify your account right now. Check your connection and try again." retry={retry} /></div>
+            ) : account ? (
               <section className="account-orders-panel min-w-0 rounded-2xl border border-[#e5e3dc] bg-white p-4 shadow-[0_5px_22px_rgba(37,41,37,0.045)] sm:p-5 xl:p-5">
                 <header className="hidden items-center gap-4 border-b border-[#eceae4] pb-3 xl:flex">
                   <span className="grid size-14 shrink-0 place-items-center rounded-full bg-[#e9f1e9] text-[#124734]"><FiBox aria-hidden="true" className="size-7" /></span>
@@ -159,8 +156,7 @@ export default function AccountOrdersScreen() {
                   </div>
                 )}
               </section>
-            </div>
-          ) : null}
+            ) : <div className="min-w-0" />}
         </div>
       </main>
     </>

@@ -14,7 +14,7 @@ import {
   FiTruck,
   FiX,
 } from "react-icons/fi";
-import { AccountSidebar } from "@/components/account/account-dashboard";
+import { AccountSidebar } from "@/components/account/account-sidebar";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
 import { MobileOrdersHero } from "@/components/account/account-orders-screen";
 

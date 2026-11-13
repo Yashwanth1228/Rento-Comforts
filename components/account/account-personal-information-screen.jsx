@@ -17,7 +17,6 @@ import {
   FiUser,
 } from "react-icons/fi";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
-import { AccountSidebar } from "@/components/account/account-dashboard";
 
 function StatusBadge({ verified, completeLabel = "Verified", pendingLabel = "Not Verified" }) {
   return (
@@ -249,11 +248,9 @@ export default function AccountPersonalInformationScreen() {
       </div>
       <MobileHero />
 
-      <main className="bg-[#f8f7f2] px-4 py-4 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-4 xl:pb-6 xl:pl-8 xl:pr-4">
-        <div className="mx-auto max-w-[1640px]">
-          <div className="grid items-start gap-4 xl:grid-cols-[clamp(250px,19.1vw,320px)_minmax(0,1fr)] xl:gap-5">
-            <AccountSidebar activeSection="personal-information" spacious />
-            <div className="min-w-0">
+      <main className="bg-[#f8f7f2] px-4 py-4 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-4 xl:pb-6 xl:pl-0 xl:pr-4">
+        <div className="mx-auto max-w-[1640px] xl:h-full xl:min-h-0">
+          <div className="min-w-0">
               {loading ? <LoadingCard /> : pageState === "signed-out" ? (
                 <StateCard title="Sign in to view your information" message="Your session may have expired. Sign in using the Login control in the site header, then return here." signedOut />
               ) : pageState === "missing-profile" ? (
@@ -373,7 +370,6 @@ export default function AccountPersonalInformationScreen() {
                   )}
                 </div>
               ) : null}
-            </div>
           </div>
         </div>
       </main>

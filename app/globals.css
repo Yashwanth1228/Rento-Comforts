@@ -1488,6 +1488,38 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .catalogue-subcategory-scroll::-webkit-scrollbar { display: none; }
 
 @media (min-width: 1280px) {
+  .account-layout-shell {
+    --account-sidebar-column: clamp(280px, 19.6vw, 328px);
+    position: relative;
+    display: grid;
+    width: 100%;
+    max-width: 1640px;
+    grid-template-columns: var(--account-sidebar-column) minmax(0, 1fr);
+    align-items: start;
+    column-gap: 16px;
+    margin-inline: auto;
+    padding-left: 32px;
+    padding-right: 16px;
+    background: #f8f7f2;
+  }
+
+  .account-layout-sidebar {
+    grid-column: 1;
+    grid-row: 1;
+    margin-top: var(--account-sidebar-flow-offset, 184px);
+  }
+
+  .account-layout-content {
+    grid-column: 2;
+    min-width: 0;
+  }
+
+  .account-layout-content .account-welcome-banner {
+    width: 100vw;
+    max-width: none;
+    margin-left: calc(-1 * (var(--account-sidebar-column) + 48px + max(0px, calc((100vw - 1640px) / 2))));
+  }
+
   .account-sidebar-sticky {
     position: sticky;
     top: var(--account-sidebar-top, 0px);
@@ -2077,14 +2109,8 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   .account-avatar-trigger { min-width: 52px; height: 38px; }
 }
 
-/* My Orders desktop layout: reserve a reference-sized card, then scale artwork with viewport height. */
+/* My Orders desktop illustration sizing. */
 @media (min-width: 1280px) {
-  .account-orders-panel {
-    height: clamp(455px, calc(100dvh - 289px), 552px);
-    display: flex;
-    flex-direction: column;
-  }
-
   .account-orders-content {
     min-height: 0;
     overflow: visible;

@@ -1,35 +1,17 @@
-import { useEffect, useRef } from "react";
 import Link from "next/link";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
 import {
   FiAlertCircle,
   FiArrowRight,
-  FiBox,
   FiCheckCircle,
-  FiCreditCard,
   FiEdit2,
-  FiHeadphones,
   FiHeart,
-  FiHome,
   FiLoader,
   FiMapPin,
   FiSettings,
   FiShield,
-  FiTruck,
   FiUser,
 } from "react-icons/fi";
-
-const sidebarItems = [
-  { label: "Overview", Icon: FiHome, href: "/account", section: "overview" },
-  { label: "Personal Information", Icon: FiUser, href: "/account/personal-information", section: "personal-information" },
-  { label: "My Orders", Icon: FiBox, href: "/account/orders", section: "orders" },
-  { label: "My Rentals", Icon: FiTruck },
-  { label: "Wishlist", Icon: FiHeart },
-  { label: "My Addresses", Icon: FiMapPin },
-  { label: "Payments & Invoices", Icon: FiCreditCard },
-  { label: "Help & Support", Icon: FiHeadphones },
-  { label: "Account Settings", Icon: FiSettings },
-];
 
 const quickActions = [
   {
@@ -102,76 +84,6 @@ function RetryPanel({ title, message, onRetry, alert = false }) {
         Retry
       </button>
     </section>
-  );
-}
-
-export function AccountSidebar({ activeSection = "overview", spacious = false }) {
-  const sidebarRef = useRef(null);
-
-  useEffect(() => {
-    const sidebar = sidebarRef.current;
-    const siteHeader = document.querySelector(".site-header");
-    if (!sidebar || !siteHeader) return undefined;
-
-    const updateOffset = () => {
-      const stickyTop = window.innerWidth >= 1280
-        ? Math.max(0, Math.round(siteHeader.getBoundingClientRect().bottom)) + 8
-        : 0;
-      sidebar.style.setProperty("--account-sidebar-top", `${stickyTop}px`);
-    };
-
-    updateOffset();
-    window.addEventListener("scroll", updateOffset, { passive: true });
-    window.addEventListener("resize", updateOffset);
-    const resizeObserver = new ResizeObserver(updateOffset);
-    resizeObserver.observe(siteHeader);
-
-    return () => {
-      window.removeEventListener("scroll", updateOffset);
-      window.removeEventListener("resize", updateOffset);
-      resizeObserver.disconnect();
-      sidebar.style.removeProperty("--account-sidebar-top");
-    };
-  }, []);
-
-  return (
-    <aside ref={sidebarRef} className="account-sidebar-sticky hidden xl:block">
-      <nav
-        aria-label="Account sections"
-        className={`account-sidebar-nav overflow-y-auto overscroll-contain rounded-2xl border border-[#e8e6df] bg-white shadow-[0_5px_22px_rgba(37,41,37,0.05)] ${spacious ? "p-3" : "p-2.5"}`}
-      >
-        <ul className="space-y-0">
-          {sidebarItems.map(({ label, Icon, href, section }) => (
-            <li key={label} className="border-b border-[#eceae4] last:border-b-0">
-              {href ? (
-                <Link
-                  href={href}
-                  aria-current={activeSection === section ? "page" : undefined}
-                  className={`flex items-center rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017f36] ${spacious ? "min-h-[54px] gap-3 px-3 text-sm" : "min-h-[40px] gap-2.5 px-2.5 text-[13px]"} ${
-                    activeSection === section
-                      ? "my-0.5 bg-[#08763b] font-bold !text-white"
-                      : "font-semibold text-[#303731] hover:bg-[#f3f6f1] hover:text-[#124734]"
-                  }`}
-                >
-                  <Icon aria-hidden="true" className="size-[18px] shrink-0" />
-                  {label}
-                </Link>
-              ) : (
-                <span
-                  className={`flex cursor-not-allowed items-center text-[#687169] ${spacious ? "min-h-[54px] gap-3 px-3 text-sm" : "min-h-[40px] gap-2.5 px-2.5 text-[13px]"}`}
-                  aria-disabled="true"
-                  title={`${label} is not connected yet`}
-                >
-                  <Icon aria-hidden="true" className="size-[18px] shrink-0" />
-                  <span className="min-w-0 flex-1">{label}</span>
-                  <span className="text-[10px] font-semibold uppercase tracking-wide text-[#8b928b]">Soon</span>
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </aside>
   );
 }
 
@@ -402,9 +314,7 @@ function AccountSetupBanner({ account }) {
 
 function DashboardLoading() {
   return (
-    <div className="grid gap-5 xl:grid-cols-[305px_minmax(0,1fr)]" role="status" aria-live="polite">
-      <div className="hidden min-h-[470px] animate-pulse rounded-2xl bg-white xl:block" />
-      <div className="space-y-4">
+    <div className="space-y-4" role="status" aria-live="polite">
         <div className="h-24 animate-pulse rounded-2xl bg-white" />
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="h-64 animate-pulse rounded-2xl bg-white" />
@@ -412,7 +322,6 @@ function DashboardLoading() {
         </div>
         <div className="h-52 animate-pulse rounded-2xl bg-white" />
         <span className="sr-only">Loading your account information…</span>
-      </div>
     </div>
   );
 }
@@ -436,30 +345,27 @@ export function AccountDashboard({
   cancelEditingName,
   saveMessage,
 }) {
+
   return (
     <>
       <AccountWelcomeBanner fullName={account?.fullName ?? ""} />
 
-      <main id="overview" className="overflow-x-clip bg-[#f8f7f2] px-4 py-4 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-2 xl:pb-2 xl:pl-8 xl:pr-4">
-        <div className="mx-auto max-w-[1640px]">
-          {loading ? (
-            <DashboardLoading />
-          ) : signInRequired ? (
-            <section className="mx-auto max-w-3xl rounded-2xl border border-[#e5e3dc] bg-white p-6 shadow-[0_5px_22px_rgba(37,41,37,0.05)] sm:p-8">
-              <h2 className="text-xl font-bold text-[#124734]">Sign in to view your account</h2>
-              <p className="mt-2 text-sm leading-6 text-[#59635c]">Your session may have expired. Use the Login control in the site header to sign in, then return to this page.</p>
-              <Link href="/" className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#017f36] px-5 font-bold text-white hover:bg-[#124734] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017f36]">Go to the home page</Link>
-            </section>
-          ) : profileMissing ? (
-            <RetryPanel title="Profile not available" message="We could not find a customer profile for this account. Your account information has not been changed." onRetry={retryLoading} />
-          ) : pageError ? (
-            <RetryPanel title="Account information unavailable" message={pageError} onRetry={retryLoading} alert />
-          ) : account ? (
-            <>
-              <MobileAccountSections />
-              <div className="grid items-start gap-4 xl:grid-cols-[280px_minmax(0,1fr)] xl:gap-4">
-                <AccountSidebar activeSection="overview" />
-                <div className="min-w-0 space-y-4 sm:space-y-5 xl:space-y-2.5">
+      <main id="overview" className="overflow-x-clip bg-[#f8f7f2] px-4 py-4 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-2 xl:pb-2 xl:pl-0 xl:pr-4">
+        <div className="mx-auto max-w-[1640px] xl:h-full xl:min-h-0">
+          <MobileAccountSections />
+          <div className="min-w-0">
+              {loading ? <DashboardLoading /> : signInRequired ? (
+                <section className="mx-auto max-w-3xl rounded-2xl border border-[#e5e3dc] bg-white p-6 shadow-[0_5px_22px_rgba(37,41,37,0.05)] sm:p-8">
+                  <h2 className="text-xl font-bold text-[#124734]">Sign in to view your account</h2>
+                  <p className="mt-2 text-sm leading-6 text-[#59635c]">Your session may have expired. Use the Login control in the site header to sign in, then return to this page.</p>
+                  <Link href="/" className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-[#017f36] px-5 font-bold text-white hover:bg-[#124734] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017f36]">Go to the home page</Link>
+                </section>
+              ) : profileMissing ? (
+                <RetryPanel title="Profile not available" message="We could not find a customer profile for this account. Your account information has not been changed." onRetry={retryLoading} />
+              ) : pageError ? (
+                <RetryPanel title="Account information unavailable" message={pageError} onRetry={retryLoading} alert />
+              ) : account ? (
+                <div className="space-y-4 sm:space-y-5 xl:space-y-2.5">
                   <AccountSetupBanner account={account} />
                   <div className="grid items-stretch gap-4 lg:grid-cols-2 lg:gap-5 xl:gap-4">
                     <ProfileCard
@@ -480,11 +386,10 @@ export function AccountDashboard({
                   </div>
                   <QuickActions />
                 </div>
-              </div>
-            </>
-          ) : (
-            <RetryPanel title="Account information unavailable" message="Account information is not available right now. Please retry." onRetry={retryLoading} />
-          )}
+              ) : (
+                <RetryPanel title="Account information unavailable" message="Account information is not available right now. Please retry." onRetry={retryLoading} />
+              )}
+          </div>
         </div>
       </main>
     </>
