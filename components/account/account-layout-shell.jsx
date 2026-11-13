@@ -5,10 +5,11 @@ import { usePathname } from "next/navigation";
 import { MobileBottomNav } from "@/components/navigation/mobile-bottom-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { AccountSidebar } from "@/components/account/account-sidebar";
+import { AccountCompactNavigation, AccountSidebar } from "@/components/account/account-sidebar";
 
 function getActiveSection(pathname) {
   if (pathname === "/account/orders") return "orders";
+  if (pathname === "/account/rentals") return "rentals";
   if (pathname === "/account/personal-information") return "personal-information";
   return "overview";
 }
@@ -55,7 +56,10 @@ export default function AccountLayoutShell({ children }) {
         style={{ "--account-sidebar-flow-offset": `${activeSection === "orders" ? 136 : activeSection === "personal-information" ? 192 : 184}px` }}
       >
         <AccountSidebar activeSection={activeSection} className="account-layout-sidebar" />
-        <div className="account-layout-content">{children}</div>
+        <div className="account-layout-content">
+          <AccountCompactNavigation activeSection={activeSection} />
+          {children}
+        </div>
       </div>
       <SiteFooter />
       <MobileBottomNav />

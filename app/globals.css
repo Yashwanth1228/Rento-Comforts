@@ -2153,11 +2153,15 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 @media (max-width: 639px) {
   .site-header--orders .site-header__utility-bar,
   .site-header--orders .editorial-navbar-card,
-  .site-header--orders .category-navigation {
+  .site-header--orders .category-navigation,
+  .site-header--rentals .site-header__utility-bar,
+  .site-header--rentals .editorial-navbar-card,
+  .site-header--rentals .category-navigation {
     display: none;
   }
 
-  .site-header--orders .orders-mobile-header {
+  .site-header--orders .orders-mobile-header,
+  .site-header--rentals .orders-mobile-header {
     position: relative;
     z-index: 70;
     display: flex;
@@ -2219,7 +2223,8 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
     font-weight: 700;
   }
 
-  .site-header--orders .mobile-nav { top: 70px; }
+  .site-header--orders .mobile-nav,
+  .site-header--rentals .mobile-nav { top: 70px; }
 
   .mobile-orders-main {
     display: flex;
@@ -2279,4 +2284,75 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
     color: #fff;
     font-size: 17px;
   }
+}
+
+/* My Rentals empty-state responsive composition. */
+.account-rentals-mobile-hero {
+  background-position: center, 64% center;
+  background-size: 100% 100%, cover;
+}
+
+.account-rentals-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 1280px) {
+  .account-rentals-scroll-area {
+    height: var(--account-rentals-area-height, auto);
+    min-height: 0;
+  }
+
+  .account-rentals-panel {
+    height: 100%;
+    min-height: 0;
+    overflow-y: hidden;
+  }
+
+  .account-rentals-scroll-active .account-rentals-panel {
+    overflow-y: auto;
+    overscroll-behavior-y: auto;
+  }
+}
+
+.account-rentals-empty-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 6px 22px;
+}
+
+.account-rentals-artwork {
+  width: min(100%, 380px);
+  aspect-ratio: 3 / 2;
+  flex: 0 0 auto;
+}
+
+.account-rentals-package-mark { height: auto; }
+
+.account-rentals-benefits > li:nth-child(2n) { padding-right: 0; }
+
+@media (min-width: 640px) {
+  .account-rentals-empty-body { padding: 12px 12px 26px; }
+  .account-rentals-artwork { width: min(100%, 440px); }
+}
+
+@media (min-width: 1280px) {
+  .account-rentals-main { padding-right: 16px; }
+  .account-rentals-empty-body { padding: 8px 12px 24px; }
+  .account-rentals-artwork { width: clamp(270px, 32vh, 360px); }
+}
+
+@media (max-width: 639px) {
+  .account-rentals-main { padding-bottom: max(104px, calc(90px + env(safe-area-inset-bottom))); }
+  .account-rentals-panel { border-radius: 22px; padding: 12px; }
+  .account-rentals-empty-body { padding: 12px 4px 20px; }
+  .account-rentals-artwork { width: min(100%, 350px); }
+  .account-rentals-empty-title { font-size: clamp(24px, 7vw, 29px); }
+  .account-rentals-empty-description { font-size: 16px; line-height: 1.5; }
+  .account-rentals-cta { min-height: 56px; }
+  .account-rentals-benefits > li { justify-content: center; gap: 5px; padding: 10px 3px; text-align: center; }
+  .account-rentals-benefits > li > span:last-child { text-align: center; }
+  .account-rentals-benefits > li > span:first-child { width: 32px; height: 32px; }
+  .account-rentals-benefits > li svg { width: 18px; height: 18px; }
 }

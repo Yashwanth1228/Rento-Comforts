@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   FiBox,
+  FiChevronDown,
   FiCreditCard,
   FiHeadphones,
   FiHeart,
@@ -18,7 +19,7 @@ const sidebarItems = [
   { label: "Overview", Icon: FiHome, href: "/account", section: "overview" },
   { label: "Personal Information", Icon: FiUser, href: "/account/personal-information", section: "personal-information" },
   { label: "My Orders", Icon: FiBox, href: "/account/orders", section: "orders" },
-  { label: "My Rentals", Icon: FiTruck },
+  { label: "My Rentals", Icon: FiTruck, href: "/account/rentals", section: "rentals" },
   { label: "Wishlist", Icon: FiHeart },
   { label: "My Addresses", Icon: FiMapPin },
   { label: "Payments & Invoices", Icon: FiCreditCard },
@@ -95,5 +96,43 @@ export function AccountSidebar({ activeSection = "overview", className = "" }) {
         </ul>
       </nav>
     </aside>
+  );
+}
+
+export function AccountCompactNavigation({ activeSection = "overview" }) {
+  const activeItem = sidebarItems.find((item) => item.section === activeSection);
+
+  return (
+    <nav aria-label="Account sections" className="account-compact-navigation mx-auto hidden w-full max-w-[1560px] px-4 pt-3 sm:block xl:hidden sm:px-7 lg:px-8">
+      <details className="group rounded-xl border border-[#e5e3dc] bg-white shadow-[0_3px_14px_rgba(37,41,37,0.04)]">
+        <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-xl px-4 text-sm font-semibold text-[#124734] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017f36] [&::-webkit-details-marker]:hidden">
+          <span className="flex min-w-0 items-center gap-2.5">
+            {activeItem?.Icon && <activeItem.Icon aria-hidden="true" className="size-5 shrink-0" />}
+            <span className="truncate">{activeItem?.label ?? "My Account"}</span>
+            <span className="text-xs font-normal text-[#69736b]">Account menu</span>
+          </span>
+          <FiChevronDown aria-hidden="true" className="size-4 shrink-0 transition-transform group-open:rotate-180" />
+        </summary>
+        <ul className="grid gap-1 border-t border-[#eceae4] p-2 sm:grid-cols-2 lg:grid-cols-4">
+          {sidebarItems.map(({ label, Icon, href, section }) => (
+            <li key={label}>
+              {href ? (
+                <Link
+                  href={href}
+                  aria-current={activeSection === section ? "page" : undefined}
+                  className={`flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#017f36] ${activeSection === section ? "bg-[#08763b] font-bold text-white" : "text-[#303731] hover:bg-[#f3f6f1]"}`}
+                >
+                  <Icon aria-hidden="true" className="size-4 shrink-0" />{label}
+                </Link>
+              ) : (
+                <span aria-disabled="true" className="flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm text-[#687169]">
+                  <Icon aria-hidden="true" className="size-4 shrink-0" />{label}<span className="ml-auto text-[10px] uppercase text-[#8b928b]">Soon</span>
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </details>
+    </nav>
   );
 }
