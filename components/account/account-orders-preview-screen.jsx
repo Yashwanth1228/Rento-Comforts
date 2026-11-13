@@ -60,22 +60,22 @@ function OrderCard({ order, onDetails }) {
 
   return (
     <article className="order-preview-card grid w-full min-w-0 grid-cols-[82px_minmax(0,1fr)] items-center gap-x-3 gap-y-3 rounded-2xl border border-[#e8e6df] bg-white p-3 shadow-[0_2px_8px_rgba(37,41,37,0.035)] sm:grid-cols-[110px_minmax(0,1fr)] sm:p-4 lg:grid-cols-[110px_minmax(0,1fr)] lg:gap-3 xl:grid-cols-[120px_minmax(0,1fr)_minmax(165px,190px)_160px] xl:gap-3">
-      <div className="relative aspect-square w-full min-w-0 overflow-hidden rounded-xl bg-[#f3f1eb] lg:aspect-[16/10]">
+      <div className="relative aspect-[1.2/1] w-full min-w-0 overflow-hidden rounded-xl bg-[#f3f1eb] sm:aspect-[1.6/1] lg:aspect-[16/10] xl:aspect-[16/10]">
         <Image src={order.image} alt={`${order.name}, illustrative preview`} fill sizes="(max-width: 639px) 82px, (max-width: 1023px) 110px, 150px" className="object-cover" />
         <span className="absolute bottom-1 left-1 rounded bg-white/90 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-[#124734] lg:hidden">Sample</span>
       </div>
 
-      <div className="min-w-0 self-stretch py-0.5 lg:py-1 xl:pr-3">
+      <div className="flex min-w-0 flex-col justify-center gap-1 self-stretch xl:pr-3">
         <div className="flex items-start justify-between gap-1.5 lg:items-center">
-        <h3 className="min-w-0 text-[15px] font-bold leading-[1.25] text-[#252925] sm:text-base lg:text-[17px]">{order.name}</h3>
+        <h3 className="min-w-0 text-[15px] font-bold leading-5 text-[#252925] sm:text-base lg:text-[17px]">{order.name}</h3>
           <span className="shrink-0 lg:hidden"><StatusBadge order={order} compact /></span>
         </div>
-        <p className="mt-2 truncate text-xs text-[#303731] sm:text-sm">Order ID: <span className="font-medium">{order.id}</span></p>
-        <div className="mt-1.5 flex min-w-0 flex-nowrap items-center gap-1.5 text-xs text-[#303731] sm:gap-2 xl:gap-2">
+        <p className="truncate text-xs leading-5 text-[#303731] sm:text-sm">Order ID: <span className="font-medium">{order.id}</span></p>
+        <div className="flex min-w-0 flex-nowrap items-center gap-1.5 text-xs text-[#303731] sm:gap-2 xl:gap-2">
           <FiCalendar aria-hidden="true" className="size-4 shrink-0 text-[#124734]" />
           <span className="whitespace-nowrap text-[13px] font-medium">Order Date: {order.date}</span>
-          <span aria-hidden="true" className="h-5 shrink-0 border-l border-[#c9ccc7]" />
-          <OrderTypeBadge order={order} />
+          <span aria-hidden="true" className="hidden h-5 shrink-0 border-l border-[#c9ccc7] lg:block" />
+          <span className="hidden lg:inline-flex"><OrderTypeBadge order={order} /></span>
         </div>
       </div>
 
