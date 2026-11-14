@@ -14,9 +14,7 @@ const rentalGuidance = [
   { title: "Pickup & returns", description: "Terms will be shown when available.", Icon: FiCheckCircle },
 ];
 
-export default function AccountRentalsEmptyState({ state = "not-connected" }) {
-  const isConfirmedEmpty = state === "empty";
-
+export default function AccountRentalsEmptyState() {
   return (
     <section className="account-rentals-panel rounded-2xl border border-[#e5e3dc] bg-white p-4 shadow-[0_5px_22px_rgba(37,41,37,0.045)] sm:p-5 xl:p-6" aria-labelledby="account-rentals-heading">
       <header className="flex items-center gap-4 border-b border-[#eceae4] pb-4">
@@ -50,12 +48,12 @@ export default function AccountRentalsEmptyState({ state = "not-connected" }) {
         </div>
 
         <h2 className="account-rentals-empty-title mt-1 text-[26px] font-bold leading-tight text-[#124734] sm:text-[30px]">
-          {isConfirmedEmpty ? "You don’t have any rentals yet" : "Rental management is not available yet."}
+          You don’t have any rentals yet
         </h2>
         <p className="account-rentals-empty-description mx-auto mt-2 max-w-[690px] text-base leading-6 text-[#5d625e] sm:text-[17px] sm:leading-7">
-          {isConfirmedEmpty
-            ? "When you rent a product, your active rentals, renewal options and payment information will appear here."
-            : "Your active rentals, renewal options and payment information will appear here once rental management is connected."}
+          <span className="block sm:hidden">Rent furniture and home appliances for a flexible, hassle-free lifestyle.</span>
+          <span className="hidden sm:block xl:hidden">Rent furniture and home appliances for your home, office, or short-term needs and manage them here easily.</span>
+          <span className="hidden xl:block">Rent furniture and home appliances for your home, office or any space, with flexible plans and hassle-free service.</span>
         </p>
 
         <Link
@@ -63,7 +61,8 @@ export default function AccountRentalsEmptyState({ state = "not-connected" }) {
           className="account-rentals-cta mt-5 inline-flex min-h-[52px] w-full max-w-[360px] items-center justify-center gap-3 rounded-xl bg-[#017f36] px-5 text-base font-bold text-white shadow-[0_3px_8px_rgba(1,127,54,0.15)] transition-colors hover:bg-[#124734] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#124734] sm:mt-6 sm:min-h-[56px] sm:text-lg"
         >
           <FiTruck aria-hidden="true" className="size-5 shrink-0" />
-          Explore Rental Products
+          <span className="sm:hidden xl:inline">Explore Rental Products</span>
+          <span className="hidden sm:inline xl:hidden">Explore Rental Collection</span>
           <span aria-hidden="true" className="text-xl leading-none">→</span>
         </Link>
       </div>

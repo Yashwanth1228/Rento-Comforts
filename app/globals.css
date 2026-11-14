@@ -2297,24 +2297,6 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   flex-direction: column;
 }
 
-@media (min-width: 1280px) {
-  .account-rentals-scroll-area {
-    height: var(--account-rentals-area-height, auto);
-    min-height: 0;
-  }
-
-  .account-rentals-panel {
-    height: 100%;
-    min-height: 0;
-    overflow-y: hidden;
-  }
-
-  .account-rentals-scroll-active .account-rentals-panel {
-    overflow-y: auto;
-    overscroll-behavior-y: auto;
-  }
-}
-
 .account-rentals-empty-body {
   display: flex;
   flex-direction: column;

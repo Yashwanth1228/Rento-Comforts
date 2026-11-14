@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
 import AccountRentalsEmptyState from "@/components/account/account-rentals-empty-state";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
-import { useRentalsPanelScrollArea } from "@/components/account/use-rentals-panel-scroll-area";
 
 function RentalsWelcomeHero() {
   return (
@@ -43,8 +42,6 @@ function RentalAccountMessage({ title, message, retry, signedOut = false }) {
 }
 
 export default function AccountRentalsScreen() {
-  const rentalsAreaRef = useRef(null);
-  useRentalsPanelScrollArea(rentalsAreaRef);
   const [retryKey, setRetryKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [pageState, setPageState] = useState("loading");
@@ -96,7 +93,7 @@ export default function AccountRentalsScreen() {
         <AccountWelcomeBanner title="My Account" description="Manage your profile, orders, rentals, and account preferences." compact />
       </div>
       <RentalsWelcomeHero />
-      <main ref={rentalsAreaRef} className="account-rentals-scroll-area account-rentals-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:px-0 xl:py-3 xl:pb-5">
+      <main className="account-rentals-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:px-0 xl:py-3 xl:pb-5">
         <div className="mx-auto max-w-[1640px]">
           {loading ? (
             <div className="min-h-[360px] animate-pulse rounded-2xl bg-white" role="status" aria-live="polite"><span className="sr-only">Checking your account…</span></div>
