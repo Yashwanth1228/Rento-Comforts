@@ -14,7 +14,6 @@ import {
   FiTruck,
   FiX,
 } from "react-icons/fi";
-import { AccountSidebar } from "@/components/account/account-sidebar";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
 import { MobileOrdersHero } from "@/components/account/account-orders-screen";
 
@@ -159,11 +158,9 @@ export default function AccountOrdersPreviewScreen({ orders }) {
       </div>
       <MobileOrdersHero populated />
 
-      <main className="mobile-orders-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-2 xl:pb-3 xl:pl-8 xl:pr-4">
-        <div className="mx-auto max-w-[1640px]">
-          <div className="grid items-start gap-4 xl:grid-cols-[clamp(280px,19.6vw,328px)_minmax(0,1fr)] xl:gap-4">
-            <AccountSidebar activeSection="orders" />
-            <section className="account-orders-preview-panel min-w-0 rounded-2xl border border-[#e5e3dc] bg-white p-4 shadow-[0_5px_22px_rgba(37,41,37,0.045)] sm:p-5 xl:p-5">
+      <main className="mobile-orders-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-2 xl:pb-3 xl:px-0">
+        <div className="account-page-container">
+            <section className="account-orders-panel account-orders-preview-panel min-w-0 w-full rounded-2xl border border-[#e5e3dc] bg-white p-4 shadow-[0_5px_22px_rgba(37,41,37,0.045)] sm:p-5 xl:p-5">
               <header className="hidden items-center gap-4 border-b border-[#eceae4] pb-3 xl:flex">
                 <span className="grid size-14 shrink-0 place-items-center rounded-full bg-[#e9f1e9] text-[#124734]"><FiPackage aria-hidden="true" className="size-7" /></span>
                 <div><h1 className="text-[28px] font-bold leading-tight text-[#252925]">My Orders</h1><p className="mt-1 text-base text-[#59635c]">View and track your purchases and rentals in one place.</p></div>
@@ -198,7 +195,6 @@ export default function AccountOrdersPreviewScreen({ orders }) {
                 <Link href="/account/orders" className="inline-flex min-h-10 items-center rounded-lg px-3 text-xs font-semibold text-[#124734] underline decoration-[#9ab6a3] underline-offset-4 hover:text-[#017f36] focus-visible:outline-2 focus-visible:outline-[#017f36]">Exit preview and return to My Orders</Link>
               </div>
             </section>
-          </div>
         </div>
       </main>
       <PreviewDetails order={selectedOrder} onClose={() => setSelectedOrder(null)} />

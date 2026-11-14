@@ -248,8 +248,8 @@ export default function AccountPersonalInformationScreen() {
       </div>
       <MobileHero />
 
-      <main className="bg-[#f8f7f2] px-4 py-4 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-4 xl:pb-6 xl:pl-0 xl:pr-4">
-        <div className="mx-auto max-w-[1640px] xl:h-full xl:min-h-0">
+      <main className="bg-[#f8f7f2] px-4 py-4 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-4 xl:pb-6 xl:px-0">
+        <div className="account-page-container xl:h-full xl:min-h-0">
           <div className="min-w-0">
               {loading ? <LoadingCard /> : pageState === "signed-out" ? (
                 <StateCard title="Sign in to view your information" message="Your session may have expired. Sign in using the Login control in the site header, then return here." signedOut />

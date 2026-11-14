@@ -1,7 +1,5 @@
 import { notFound } from "next/navigation";
-import { MobileBottomNav } from "@/components/navigation/mobile-bottom-nav";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import AccountLayoutShell from "@/components/account/account-layout-shell";
 
 export const metadata = {
   title: "Sample Orders Preview | Rento Comforts",
@@ -17,12 +15,5 @@ export default async function OrdersPreviewPage() {
   const sampleOrderPreviewRecords = JSON.parse(await readFile(previewFilePath, "utf8"));
   const { default: AccountOrdersPreviewScreen } = await import("@/components/account/account-orders-preview-screen");
 
-  return (
-    <div id="top" className="site-shell">
-      <SiteHeader />
-      <AccountOrdersPreviewScreen orders={sampleOrderPreviewRecords} />
-      <SiteFooter />
-      <MobileBottomNav />
-    </div>
-  );
+  return <AccountLayoutShell><AccountOrdersPreviewScreen orders={sampleOrderPreviewRecords} /></AccountLayoutShell>;
 }

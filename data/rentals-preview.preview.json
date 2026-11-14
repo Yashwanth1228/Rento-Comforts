@@ -1,0 +1,50 @@
+[
+  {
+    "id": "RT-UI-SAMPLE-003",
+    "name": "3-Seater Fabric Sofa",
+    "category": "Furniture",
+    "status": "Active",
+    "statusKey": "active",
+    "durationMonths": 6,
+    "remainingMonths": 5,
+    "monthlyRent": 1499,
+    "securityDeposit": 3000,
+    "startDate": "10 Oct 2026",
+    "endDate": "09 Apr 2027",
+    "nextPaymentDate": "15 Nov 2026",
+    "image": "/images/product-gallery/sofa-3.webp",
+    "previewOnly": true
+  },
+  {
+    "id": "RT-UI-SAMPLE-002",
+    "name": "Double Door Refrigerator",
+    "category": "Home Appliances",
+    "status": "Active",
+    "statusKey": "active",
+    "durationMonths": 12,
+    "remainingMonths": 10,
+    "monthlyRent": 1899,
+    "securityDeposit": 4000,
+    "startDate": "25 Sep 2026",
+    "endDate": "24 Sep 2027",
+    "nextPaymentDate": "25 Nov 2026",
+    "image": "/images/product-gallery/refrigerator-3.webp",
+    "previewOnly": true
+  },
+  {
+    "id": "RT-UI-SAMPLE-001",
+    "name": "Front Load Washing Machine",
+    "category": "Home Appliances",
+    "status": "Ending Soon",
+    "statusKey": "ending-soon",
+    "durationMonths": 12,
+    "remainingMonths": 1,
+    "monthlyRent": 1199,
+    "securityDeposit": 2500,
+    "startDate": "16 Dec 2025",
+    "endDate": "15 Dec 2026",
+    "nextPaymentDate": "15 Nov 2026",
+    "image": "/images/product-gallery/washing-machine-3.webp",
+    "previewOnly": true
+  }
+]

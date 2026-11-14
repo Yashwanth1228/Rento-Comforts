@@ -1493,7 +1493,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
     position: relative;
     display: grid;
     width: 100%;
-    max-width: 1640px;
+    max-width: 1712px;
     grid-template-columns: var(--account-sidebar-column) minmax(0, 1fr);
     align-items: start;
     column-gap: 16px;
@@ -1517,7 +1517,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   .account-layout-content .account-welcome-banner {
     width: 100vw;
     max-width: none;
-    margin-left: calc(-1 * (var(--account-sidebar-column) + 48px + max(0px, calc((100vw - 1640px) / 2))));
+    margin-left: calc(-1 * (var(--account-sidebar-column) + 48px + max(0px, calc((100vw - 1712px) / 2))));
   }
 
   .account-sidebar-sticky {
@@ -1530,6 +1530,14 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   .account-sidebar-nav {
     max-height: calc(100dvh - var(--account-sidebar-top, 0px) - 1rem);
   }
+}
+
+/* Keep the usable right-side content width consistent across account tabs. */
+.account-page-container {
+  width: 100%;
+  max-width: 1640px;
+  min-width: 0;
+  margin-inline: auto;
 }
 
 /* Keep the complete three-layer site navigation together while scrolling. */

@@ -8,8 +8,8 @@ import { SiteHeader } from "@/components/site-header";
 import { AccountCompactNavigation, AccountSidebar } from "@/components/account/account-sidebar";
 
 function getActiveSection(pathname) {
-  if (pathname === "/account/orders") return "orders";
-  if (pathname === "/account/rentals") return "rentals";
+  if (pathname === "/account/orders" || pathname === "/dev/orders-preview") return "orders";
+  if (pathname?.startsWith("/account/rentals")) return "rentals";
   if (pathname === "/account/personal-information") return "personal-information";
   return "overview";
 }

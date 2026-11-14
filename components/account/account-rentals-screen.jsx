@@ -6,7 +6,7 @@ import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
 import AccountRentalsEmptyState from "@/components/account/account-rentals-empty-state";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
 
-function RentalsWelcomeHero() {
+export function RentalsWelcomeHero() {
   return (
     <header
       className="account-rentals-mobile-hero relative isolate overflow-hidden bg-[#f8f2e9] xl:hidden"
@@ -94,11 +94,20 @@ export default function AccountRentalsScreen() {
       </div>
       <RentalsWelcomeHero />
       <main className="account-rentals-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:px-0 xl:py-3 xl:pb-5">
-        <div className="mx-auto max-w-[1640px]">
+        <div className="account-page-container">
           {loading ? (
             <div className="min-h-[360px] animate-pulse rounded-2xl bg-white" role="status" aria-live="polite"><span className="sr-only">Checking your account…</span></div>
           ) : pageState === "ready" ? (
-            <AccountRentalsEmptyState />
+            <>
+              <AccountRentalsEmptyState />
+              {process.env.NODE_ENV === "development" && (
+                <div className="mt-4 flex justify-center xl:justify-start">
+                  <Link href="/account/rentals/preview" className="rounded-full border border-[#b8d2bf] bg-[#f3f8f1] px-4 py-2 text-xs font-semibold text-[#124734] hover:bg-[#e9f1e9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017f36]">
+                    Sample Rentals — UI Preview
+                  </Link>
+                </div>
+              )}
+            </>
           ) : pageState === "signed-out" ? (
             <RentalAccountMessage title="Sign in to view your rentals" message="Your session may have expired. Sign in using the Login control in the site header, then return here." signedOut />
           ) : pageState === "missing-profile" ? (
