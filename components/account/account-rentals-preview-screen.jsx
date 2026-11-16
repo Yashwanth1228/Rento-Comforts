@@ -62,7 +62,7 @@ function RentalStatus({ rental }) {
 function RentalActionButton({ action, onClick }) {
   const { Icon, label, tone } = action;
   return (
-    <button type="button" onClick={onClick} className={`inline-flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-xl border px-2 text-[11px] font-bold leading-tight transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017f36] sm:min-h-11 sm:gap-2 sm:px-3 sm:text-xs ${tone === "primary" ? "border-[#08763b] bg-[#08763b] text-white hover:bg-[#075d32]" : "border-[#9cc7a7] bg-white text-[#124734] hover:bg-[#f0f7ef]"}`}>
+    <button type="button" onClick={onClick} className={`rental-preview-action ${tone === "primary" ? "rental-preview-action--primary" : "rental-preview-action--secondary"}`}>
       <Icon aria-hidden="true" className="size-4 shrink-0" />
       <span>{label}</span>
       {label === "View Details" && <FiArrowRight aria-hidden="true" className="hidden size-3.5 shrink-0 sm:block" />}
@@ -74,52 +74,54 @@ function RentalCard({ rental, onAction }) {
   const remainingPercent = Math.max(6, Math.min(100, (rental.remainingMonths / rental.durationMonths) * 100));
 
   return (
-    <article className="grid min-w-0 grid-cols-[112px_minmax(0,1fr)] gap-x-3 gap-y-3 rounded-2xl border border-[#e8e6df] bg-white p-3 shadow-[0_2px_9px_rgba(37,41,37,.045)] sm:grid-cols-[150px_minmax(0,1fr)] sm:gap-x-4 sm:p-4 xl:grid-cols-[110px_minmax(0,1.5fr)_minmax(100px,.8fr)_minmax(115px,.9fr)] xl:items-center xl:gap-3 xl:p-3 2xl:grid-cols-[128px_minmax(180px,1.35fr)_minmax(112px,.8fr)_minmax(120px,.8fr)_minmax(210px,1.15fr)]">
-      <div className="relative row-span-1 aspect-square w-full overflow-hidden rounded-xl bg-[#f3f1eb] sm:row-span-1 sm:aspect-[1.2/1] xl:aspect-[1.15/1] 2xl:aspect-[1.25/1]">
+    <article className="rental-preview-card">
+      <div className="rental-preview-card__image relative overflow-hidden rounded-xl bg-[#f3f1eb]">
         <Image src={rental.image} alt={`${rental.name}, sample rental preview`} fill sizes="(max-width: 639px) 112px, (max-width: 1279px) 150px, 128px" className="object-cover" />
         <span className="absolute bottom-1 left-1 rounded bg-white/90 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-[#124734]">Sample</span>
       </div>
 
-      <div className="flex min-w-0 flex-col justify-center gap-1 xl:gap-0.5">
-        <h3 className="text-sm font-bold leading-5 text-[#252925] sm:text-lg sm:leading-6">{rental.name}</h3>
-        <p className="truncate text-[11px] leading-4 text-[#4c554e] sm:text-sm">Rental ID: <span className="font-semibold">{rental.id}</span></p>
-        <p className="flex items-center gap-1.5 text-[11px] leading-4 text-[#39433c] sm:text-sm xl:mt-1"><FiCalendar aria-hidden="true" className="size-3.5 shrink-0 text-[#124734] sm:size-4" />Started: {rental.startDate}</p>
-        <p className="flex items-center gap-1.5 text-[11px] leading-4 text-[#39433c] sm:text-sm"><FiCalendar aria-hidden="true" className="size-3.5 shrink-0 text-[#124734] sm:size-4" />Ends: {rental.endDate}</p>
-      </div>
-
-      <div className="col-span-2 flex min-w-0 items-center justify-between gap-3 border-t border-[#efeee9] pt-2 sm:col-span-2 sm:pt-3 xl:col-span-1 xl:flex-col xl:items-start xl:justify-center xl:gap-2 xl:border-l xl:border-t-0 xl:py-1 xl:pl-3 xl:pt-1">
-        <div className="flex min-w-0 flex-col gap-1.5">
+      <div className="rental-preview-card__details">
+        <h3 className="rental-preview-card__name">{rental.name}</h3>
+        <p className="rental-preview-card__id">Rental ID: <span>{rental.id}</span></p>
+        <div className="rental-preview-card__plan">
           <RentalStatus rental={rental} />
-          <span className="whitespace-nowrap text-xs font-medium text-[#303731] sm:text-sm">{rental.durationMonths}-Month Rental</span>
+          <span className="rental-preview-card__plan-label"><FiCalendar aria-hidden="true" />{rental.durationMonths} Months Plan</span>
         </div>
-        <div className="min-w-[110px] rounded-lg bg-[#edf6ea] px-2.5 py-1.5 text-right text-[11px] font-semibold text-[#165b2e] sm:text-left xl:min-w-0 xl:text-xs">
-          <span className="xl:hidden">Remaining: </span>{rental.remainingMonths} {rental.remainingMonths === 1 ? "Month" : "Months"}
-          <div className="mt-1 hidden h-1.5 overflow-hidden rounded-full bg-[#d3e8cf] xl:block"><span className="block h-full rounded-full bg-[#08763b]" style={{ width: `${remainingPercent}%` }} /></div>
-        </div>
-      </div>
-
-      <div className="col-span-2 grid grid-cols-3 divide-x divide-[#e9e8e2] border-t border-[#efeee9] pt-2 sm:pt-3 xl:col-span-1 xl:grid-cols-1 xl:gap-1.5 xl:divide-x-0 xl:border-l xl:border-t-0 xl:py-1 xl:pl-3 xl:pt-1">
-        <div className="min-w-0 px-1 first:pl-0 xl:px-0">
-          <span className="block text-[9px] leading-3 text-[#59635c] sm:text-[11px] xl:text-[10px]">Monthly Rent</span>
-          <strong className="block whitespace-nowrap text-xs font-bold text-[#252925] sm:text-base">{formatINR(rental.monthlyRent)}<span className="hidden font-normal xl:inline">/mo</span></strong>
-        </div>
-        <div className="min-w-0 px-2 sm:px-3 xl:px-0">
-          <span className="block text-[9px] leading-3 text-[#59635c] sm:text-[11px] xl:text-[10px]">Security Deposit</span>
-          <strong className="block whitespace-nowrap text-xs font-bold text-[#252925] sm:text-base">{formatINR(rental.securityDeposit)}</strong>
-        </div>
-        <div className="min-w-0 px-2 sm:px-3 xl:px-0">
-          <span className="block text-[9px] leading-3 text-[#59635c] sm:text-[11px] xl:text-[10px]">Next Payment</span>
-          <strong className="block whitespace-nowrap text-[10px] font-bold text-[#252925] sm:text-sm">{rental.nextPaymentDate}</strong>
+        <div className="rental-preview-card__dates">
+          <p><FiCalendar aria-hidden="true" />Started: {rental.startDate}</p>
+          <p><FiCalendar aria-hidden="true" />Ends: {rental.endDate}</p>
         </div>
       </div>
 
-      <div className="col-span-2 grid grid-cols-2 gap-2 xl:col-span-4 xl:grid-cols-4 2xl:col-span-1 2xl:grid-cols-2 2xl:gap-2">
+      <div className="rental-preview-card__term">
+        <RentalStatus rental={rental} />
+        <span>{rental.durationMonths}-Month Rental</span>
+        <strong>{rental.remainingMonths} Months Remaining</strong>
+        <div className="rental-preview-card__progress"><span style={{ width: `${remainingPercent}%` }} /></div>
+      </div>
+
+      <div className="rental-preview-card__metrics">
+        <div className="rental-preview-card__metric">
+          <FiCreditCard aria-hidden="true" />
+          <span><small>Monthly Rent</small><strong>{formatINR(rental.monthlyRent)}<span className="rental-preview-card__per-month">/month</span></strong></span>
+        </div>
+        <div className="rental-preview-card__metric">
+          <FiShield aria-hidden="true" />
+          <span><small>Security Deposit</small><strong>{formatINR(rental.securityDeposit)}</strong><em>Refundable</em></span>
+        </div>
+        <div className="rental-preview-card__metric">
+          <FiCalendar aria-hidden="true" />
+          <span><small>Next Due Date</small><strong>{rental.nextPaymentDate}</strong></span>
+        </div>
+      </div>
+
+      <div className="rental-preview-card__actions">
         {actionItems.map((action) => <RentalActionButton key={action.label} action={action} onClick={() => onAction(rental, action.label)} />)}
       </div>
 
-      <div className="col-span-2 rounded-lg bg-[#f0f7ef] px-3 py-2 sm:px-4 xl:hidden">
-        <div className="flex items-center justify-between gap-2 text-[11px] text-[#39433c] sm:text-sm"><span>Remaining Term</span><strong className="text-[#124734]">{rental.remainingMonths} {rental.remainingMonths === 1 ? "Month" : "Months"} <span className="font-normal">(until {rental.endDate})</span></strong></div>
-        <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#d3e8cf]"><span className="block h-full rounded-full bg-[#08763b]" style={{ width: `${remainingPercent}%` }} /></div>
+      <div className="rental-preview-card__remaining-mobile">
+        <div><span>Remaining Term</span><strong>{rental.remainingMonths} Months <span>(until {rental.endDate})</span></strong></div>
+        <div className="rental-preview-card__progress"><span style={{ width: `${remainingPercent}%` }} /></div>
       </div>
     </article>
   );
@@ -189,7 +191,7 @@ export default function AccountRentalsPreviewScreen({ rentals }) {
             <div><h1 className="text-[28px] font-bold leading-tight text-[#252925]">My Rentals</h1><p className="mt-1 text-base text-[#59635c]">Manage your active rentals, renewals, payments, and service requests.</p></div>
           </header>
 
-          <div className="hidden grid-cols-2 gap-3 pt-3 xl:grid 2xl:grid-cols-4">
+          <div className="hidden grid-cols-4 gap-2.5 pt-3 xl:grid">
             <SummaryCard icon={FiCalendar} value={counts.active} label="Active Rentals" />
             <SummaryCard icon={FiClock} value={`${totals.remainingMonths} Months`} label="Total Remaining" tone="amber" />
             <SummaryCard icon={FiCreditCard} value={formatINR(totals.due)} label="Next Due (Total)" />
