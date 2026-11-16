@@ -182,24 +182,24 @@ export default function AccountRentalsPreviewScreen({ rentals }) {
 
   return (
     <>
-      <div className="hidden xl:block"><AccountWelcomeBanner title="My Account" description="Manage your profile, orders, rentals, and account preferences." compact /></div>
+      <div className="hidden min-[1024px]:block"><AccountWelcomeBanner title="My Account" description="Manage your profile, orders, rentals, and account preferences." compact /></div>
       <RentalsWelcomeHero />
-      <main className="account-rentals-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:px-0 xl:py-3 xl:pb-5">
+      <main className="account-rentals-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 md:pb-5 lg:px-0 xl:py-3 xl:pb-5">
         <AccountPageContainer as="section" className="rounded-2xl border border-[#e5e3dc] bg-white p-4 shadow-[0_5px_22px_rgba(37,41,37,.045)] sm:p-5 xl:p-5">
-          <header className="hidden items-center gap-4 border-b border-[#eceae4] pb-3 xl:flex">
+          <header className="hidden items-center gap-4 border-b border-[#eceae4] pb-3 min-[1024px]:flex">
             <span className="grid size-14 shrink-0 place-items-center rounded-full bg-[#e9f1e9] text-[#124734]"><FiTruck aria-hidden="true" className="size-7" /></span>
             <div><h1 className="text-[28px] font-bold leading-tight text-[#252925]">My Rentals</h1><p className="mt-1 text-base text-[#59635c]">Manage your active rentals, renewals, payments, and service requests.</p></div>
           </header>
 
-          <div className="hidden grid-cols-4 gap-2.5 pt-3 xl:grid">
+          <div className="account-rentals-summary-grid hidden grid-cols-4 gap-2.5 pt-3 xl:grid">
             <SummaryCard icon={FiCalendar} value={counts.active} label="Active Rentals" />
             <SummaryCard icon={FiClock} value={`${totals.remainingMonths} Months`} label="Total Remaining" tone="amber" />
             <SummaryCard icon={FiCreditCard} value={formatINR(totals.due)} label="Next Due (Total)" />
             <SummaryCard icon={FiShield} value={formatINR(totals.deposit)} label="Security Deposit (Total)" tone="amber" />
           </div>
 
-          <div className="mt-2 flex flex-col gap-3 border-b border-[#eceae4] pb-3 sm:mt-3 sm:flex-row sm:items-center sm:justify-between xl:mt-3">
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Filter sample rentals">
+          <div className="account-rentals-preview-controls mt-2 flex flex-col gap-3 border-b border-[#eceae4] pb-3 sm:mt-3 sm:flex-row sm:items-center sm:justify-between xl:mt-3">
+            <div className="account-rentals-preview-filter-buttons flex flex-wrap gap-2" role="group" aria-label="Filter sample rentals">
               {filters.map((item) => {
                 const count = item.id === "all" ? counts.all : item.id === "active" ? counts.active : counts.endingSoon;
                 return <button key={item.id} type="button" onClick={() => setFilter(item.id)} aria-pressed={filter === item.id} className={`min-h-10 rounded-full border px-3 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017f36] sm:px-4 sm:text-sm ${filter === item.id ? "border-[#00643c] bg-[#08763b] text-white shadow-sm" : "border-[#d8d9d3] bg-white text-[#252925] hover:border-[#9ab7a2] hover:bg-[#f7faf5]"}`}>{item.label} ({count})</button>;

@@ -18,6 +18,7 @@ export default function AccountLayoutShell({ children }) {
   const pathname = usePathname();
   const shellRef = useRef(null);
   const activeSection = getActiveSection(pathname);
+  const isRentalPreview = pathname === "/account/rentals/preview";
 
   useEffect(() => {
     const shell = shellRef.current;
@@ -30,6 +31,7 @@ export default function AccountLayoutShell({ children }) {
       const bannerHeight = banner?.getBoundingClientRect().height ?? 0;
       const mainInset = main ? Number.parseFloat(window.getComputedStyle(main).paddingTop) || 0 : 0;
       shell.style.setProperty("--account-sidebar-flow-offset", `${bannerHeight + mainInset}px`);
+      shell.style.setProperty("--account-viewport-width", `${document.documentElement.clientWidth}px`);
     };
 
     updateSidebarFlowOffset();
@@ -44,6 +46,7 @@ export default function AccountLayoutShell({ children }) {
       mutationObserver.disconnect();
       resizeObserver.disconnect();
       shell.style.removeProperty("--account-sidebar-flow-offset");
+      shell.style.removeProperty("--account-viewport-width");
     };
   }, [pathname]);
 
@@ -52,7 +55,7 @@ export default function AccountLayoutShell({ children }) {
       <SiteHeader />
       <div
         ref={shellRef}
-        className="account-layout-shell"
+        className={`account-layout-shell${isRentalPreview ? " account-layout-shell--rental-preview" : ""}`}
         style={{ "--account-sidebar-flow-offset": `${activeSection === "orders" ? 136 : activeSection === "personal-information" ? 192 : 184}px` }}
       >
         <AccountSidebar activeSection={activeSection} className="account-layout-sidebar" />
