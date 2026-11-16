@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AccountPageContainer from "@/components/account/account-page-container";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
 import {
   FiAlertCircle,
@@ -351,7 +352,7 @@ export function AccountDashboard({
       <AccountWelcomeBanner fullName={account?.fullName ?? ""} />
 
       <main id="overview" className="overflow-x-clip bg-[#f8f7f2] px-4 py-4 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-2 xl:pb-2 xl:px-0">
-        <div className="account-page-container xl:h-full xl:min-h-0">
+        <AccountPageContainer className="xl:h-full xl:min-h-0">
           <MobileAccountSections />
           <div className="min-w-0">
               {loading ? <DashboardLoading /> : signInRequired ? (
@@ -390,7 +391,7 @@ export function AccountDashboard({
                 <RetryPanel title="Account information unavailable" message="Account information is not available right now. Please retry." onRetry={retryLoading} />
               )}
           </div>
-        </div>
+        </AccountPageContainer>
       </main>
     </>
   );

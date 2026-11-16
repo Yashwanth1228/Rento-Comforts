@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
 import AccountRentalsEmptyState from "@/components/account/account-rentals-empty-state";
+import AccountPageContainer from "@/components/account/account-page-container";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
 
 export function RentalsWelcomeHero() {
@@ -94,7 +95,7 @@ export default function AccountRentalsScreen() {
       </div>
       <RentalsWelcomeHero />
       <main className="account-rentals-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:px-0 xl:py-3 xl:pb-5">
-        <div className="account-page-container">
+        <AccountPageContainer>
           {loading ? (
             <div className="min-h-[360px] animate-pulse rounded-2xl bg-white" role="status" aria-live="polite"><span className="sr-only">Checking your account…</span></div>
           ) : pageState === "ready" ? (
@@ -115,7 +116,7 @@ export default function AccountRentalsScreen() {
           ) : (
             <RentalAccountMessage title="Account information unavailable" message="We could not verify your account right now. Check your connection and try again." retry={retry} />
           )}
-        </div>
+        </AccountPageContainer>
       </main>
     </>
   );

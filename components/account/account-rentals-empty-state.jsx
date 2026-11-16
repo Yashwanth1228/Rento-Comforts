@@ -16,7 +16,7 @@ const rentalGuidance = [
 
 export default function AccountRentalsEmptyState() {
   return (
-    <section className="account-rentals-panel rounded-2xl border border-[#e5e3dc] bg-white p-4 shadow-[0_5px_22px_rgba(37,41,37,0.045)] sm:p-5 xl:p-6" aria-labelledby="account-rentals-heading">
+    <section className="account-rentals-panel rounded-2xl border border-[#e5e3dc] bg-white p-4 shadow-[0_5px_22px_rgba(37,41,37,0.045)] sm:p-5 xl:p-5" aria-labelledby="account-rentals-heading">
       <header className="flex items-center gap-4 border-b border-[#eceae4] pb-4">
         <span className="grid size-12 shrink-0 place-items-center rounded-full bg-[#e9f1e9] text-[#124734] sm:size-14">
           <FiTruck aria-hidden="true" className="size-6 sm:size-7" />

@@ -8,6 +8,7 @@ import {
   FiRefreshCw,
 } from "react-icons/fi";
 import AccountOrdersEmptyState from "@/components/account/account-orders-empty-state";
+import AccountPageContainer from "@/components/account/account-page-container";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
 
 export function MobileOrdersHero({ populated = false }) {
@@ -131,7 +132,7 @@ export default function AccountOrdersScreen() {
       <MobileOrdersHero />
 
       <main className="mobile-orders-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-2 xl:pb-3 xl:px-0">
-        <div className="account-page-container xl:h-full xl:min-h-0">
+        <AccountPageContainer className="xl:h-full xl:min-h-0">
           {loading ? <div className="min-w-0"><LoadingState /></div> : pageState === "signed-out" ? (
               <div className="min-w-0"><AccountState title="Sign in to view your account" message="Your session may have expired. Sign in using the Login control in the site header, then return here." signedOut /></div>
             ) : pageState === "missing-profile" ? (
@@ -157,7 +158,7 @@ export default function AccountOrdersScreen() {
                 )}
               </section>
             ) : <div className="min-w-0" />}
-        </div>
+        </AccountPageContainer>
       </main>
     </>
   );

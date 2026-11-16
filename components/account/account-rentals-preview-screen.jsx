@@ -18,6 +18,7 @@ import {
   FiX,
 } from "react-icons/fi";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
+import AccountPageContainer from "@/components/account/account-page-container";
 import { RentalsWelcomeHero } from "@/components/account/account-rentals-screen";
 
 const filters = [
@@ -182,7 +183,7 @@ export default function AccountRentalsPreviewScreen({ rentals }) {
       <div className="hidden xl:block"><AccountWelcomeBanner title="My Account" description="Manage your profile, orders, rentals, and account preferences." compact /></div>
       <RentalsWelcomeHero />
       <main className="account-rentals-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:px-0 xl:py-3 xl:pb-5">
-        <section className="account-page-container rounded-2xl border border-[#e5e3dc] bg-white p-4 shadow-[0_5px_22px_rgba(37,41,37,.045)] sm:p-5 xl:p-4">
+        <AccountPageContainer as="section" className="rounded-2xl border border-[#e5e3dc] bg-white p-4 shadow-[0_5px_22px_rgba(37,41,37,.045)] sm:p-5 xl:p-5">
           <header className="hidden items-center gap-4 border-b border-[#eceae4] pb-3 xl:flex">
             <span className="grid size-14 shrink-0 place-items-center rounded-full bg-[#e9f1e9] text-[#124734]"><FiTruck aria-hidden="true" className="size-7" /></span>
             <div><h1 className="text-[28px] font-bold leading-tight text-[#252925]">My Rentals</h1><p className="mt-1 text-base text-[#59635c]">Manage your active rentals, renewals, payments, and service requests.</p></div>
@@ -221,7 +222,7 @@ export default function AccountRentalsPreviewScreen({ rentals }) {
             <p className="text-[11px] leading-5 text-[#69736b]">Illustrative sample records. No real customer rental data is connected.</p>
             <Link href="/account/rentals" className="inline-flex min-h-10 items-center rounded-lg px-3 text-xs font-semibold text-[#124734] underline decoration-[#9ab6a3] underline-offset-4 hover:text-[#017f36] focus-visible:outline-2 focus-visible:outline-[#017f36]">Exit preview and return to My Rentals</Link>
           </footer>
-        </section>
+        </AccountPageContainer>
       </main>
       <RentalPreviewDialog selection={selection} onClose={() => setSelection(null)} />
     </>

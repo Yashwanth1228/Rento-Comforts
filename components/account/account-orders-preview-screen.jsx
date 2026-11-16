@@ -15,6 +15,7 @@ import {
   FiX,
 } from "react-icons/fi";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
+import AccountPageContainer from "@/components/account/account-page-container";
 import { MobileOrdersHero } from "@/components/account/account-orders-screen";
 
 const tabs = [
@@ -159,7 +160,7 @@ export default function AccountOrdersPreviewScreen({ orders }) {
       <MobileOrdersHero populated />
 
       <main className="mobile-orders-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 lg:px-10 xl:py-2 xl:pb-3 xl:px-0">
-        <div className="account-page-container">
+        <AccountPageContainer>
             <section className="account-orders-panel account-orders-preview-panel min-w-0 w-full rounded-2xl border border-[#e5e3dc] bg-white p-4 shadow-[0_5px_22px_rgba(37,41,37,0.045)] sm:p-5 xl:p-5">
               <header className="hidden items-center gap-4 border-b border-[#eceae4] pb-3 xl:flex">
                 <span className="grid size-14 shrink-0 place-items-center rounded-full bg-[#e9f1e9] text-[#124734]"><FiPackage aria-hidden="true" className="size-7" /></span>
@@ -195,7 +196,7 @@ export default function AccountOrdersPreviewScreen({ orders }) {
                 <Link href="/account/orders" className="inline-flex min-h-10 items-center rounded-lg px-3 text-xs font-semibold text-[#124734] underline decoration-[#9ab6a3] underline-offset-4 hover:text-[#017f36] focus-visible:outline-2 focus-visible:outline-[#017f36]">Exit preview and return to My Orders</Link>
               </div>
             </section>
-        </div>
+        </AccountPageContainer>
       </main>
       <PreviewDetails order={selectedOrder} onClose={() => setSelectedOrder(null)} />
     </>

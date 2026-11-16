@@ -2328,7 +2328,6 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 }
 
 @media (min-width: 1280px) {
-  .account-rentals-main { padding-right: 16px; }
   .account-rentals-empty-body { padding: 8px 12px 24px; }
   .account-rentals-artwork { width: clamp(270px, 32vh, 360px); }
 }
