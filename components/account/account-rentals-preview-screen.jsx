@@ -120,7 +120,7 @@ function RentalCard({ rental, onAction }) {
       </div>
 
       <div className="rental-preview-card__remaining-mobile">
-        <div><span>Remaining Term</span><strong>{rental.remainingMonths} Months <span>(until {rental.endDate})</span></strong></div>
+        <div><span>Remaining Term:</span><strong>{rental.remainingMonths} Months <span>(Till {rental.endDate})</span></strong></div>
         <div className="rental-preview-card__progress"><span style={{ width: `${remainingPercent}%` }} /></div>
       </div>
     </article>
@@ -158,7 +158,7 @@ function RentalPreviewDialog({ selection, onClose }) {
 }
 
 export default function AccountRentalsPreviewScreen({ rentals }) {
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState("active");
   const [search, setSearch] = useState("");
   const [selection, setSelection] = useState(null);
   const counts = useMemo(() => ({
@@ -183,9 +183,9 @@ export default function AccountRentalsPreviewScreen({ rentals }) {
   return (
     <>
       <div className="hidden min-[1024px]:block"><AccountWelcomeBanner title="My Account" description="Manage your profile, orders, rentals, and account preferences." compact /></div>
-      <RentalsWelcomeHero />
-      <main className="account-rentals-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 md:pb-5 lg:px-0 xl:py-3 xl:pb-5">
-        <AccountPageContainer as="section" className="rounded-2xl border border-[#e5e3dc] bg-white p-4 shadow-[0_5px_22px_rgba(37,41,37,.045)] sm:p-5 xl:p-5">
+      <RentalsWelcomeHero populatedPreview />
+      <main className="account-rentals-main account-rentals-preview-main bg-[#f8f7f2] px-3 py-3 pb-28 sm:px-7 sm:py-5 md:pb-5 lg:px-0 xl:py-3 xl:pb-5">
+        <AccountPageContainer as="section" className="account-rentals-preview-panel rounded-2xl border border-[#e5e3dc] bg-white p-4 shadow-[0_5px_22px_rgba(37,41,37,.045)] sm:p-5 xl:p-5">
           <header className="hidden items-center gap-4 border-b border-[#eceae4] pb-3 min-[1024px]:flex">
             <span className="grid size-14 shrink-0 place-items-center rounded-full bg-[#e9f1e9] text-[#124734]"><FiTruck aria-hidden="true" className="size-7" /></span>
             <div><h1 className="text-[28px] font-bold leading-tight text-[#252925]">My Rentals</h1><p className="mt-1 text-base text-[#59635c]">Manage your active rentals, renewals, payments, and service requests.</p></div>

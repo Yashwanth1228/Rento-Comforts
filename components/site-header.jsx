@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   FiArrowRight, FiCalendar, FiChevronDown, FiGrid, FiHeart, FiLogOut, FiMapPin, FiMenu,
-  FiSearch, FiShoppingCart, FiTruck, FiUser, FiX,
+  FiBell, FiSearch, FiShoppingCart, FiTruck, FiUser, FiX,
   FiHome, FiArrowUpRight, FiPackage, FiSettings,
   FiShield,
 } from "react-icons/fi";
@@ -112,6 +112,7 @@ function getAccountInitial(fullName, email) {
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const isRentalPreview = pathname === "/account/rentals/preview";
   const router = useRouter();
   const { items: cartItems } = useCart();
   const [activeMenu, setActiveMenu] = useState("");
@@ -416,7 +417,7 @@ async function handleLogout() {
 
 
   return (
-    <header ref={headerRef} className={`site-header${pathname.startsWith("/account/orders") ? " site-header--orders" : pathname.startsWith("/account/rentals") ? " site-header--rentals" : ""}`} onKeyDown={handleKeyDown}>
+    <header ref={headerRef} className={`site-header${pathname.startsWith("/account/orders") ? " site-header--orders" : pathname.startsWith("/account/rentals") ? " site-header--rentals" : ""}${isRentalPreview ? " site-header--rental-preview" : ""}`} onKeyDown={handleKeyDown}>
       {/* 1. Top Utility Bar (Full-width, no outer margin) */}
       <div className="site-header__utility-bar">
         <div className="w-full flex items-center justify-between px-4 sm:px-6 lg:px-8 py-1 text-xs text-white">
@@ -482,11 +483,20 @@ async function handleLogout() {
         </Link>
         <div className="orders-mobile-header__actions">
           <button type="button" aria-label="Search products" onClick={() => router.push("/products")}><FiSearch aria-hidden="true" /></button>
-          <button type="button" aria-label="Wishlist" onClick={() => setNotice("Wishlist is not available yet.")}><FiHeart aria-hidden="true" /></button>
-          <Link href="/cart" aria-label={`Cart, ${cartItems.length} items`}>
-            <FiShoppingCart aria-hidden="true" />
-            <span>{cartItems.length}</span>
-          </Link>
+          {isRentalPreview ? (
+            <>
+              <button type="button" aria-label="Notifications" onClick={() => setNotice("Notifications are not available yet.")}><FiBell aria-hidden="true" /><span className="orders-mobile-header__notification-dot" /></button>
+              <Link href="/account" className="orders-mobile-header__avatar" aria-label="My account">R</Link>
+            </>
+          ) : (
+            <>
+              <button type="button" aria-label="Wishlist" onClick={() => setNotice("Wishlist is not available yet.")}><FiHeart aria-hidden="true" /></button>
+              <Link href="/cart" aria-label={`Cart, ${cartItems.length} items`}>
+                <FiShoppingCart aria-hidden="true" />
+                <span>{cartItems.length}</span>
+              </Link>
+            </>
+          )}
         </div>
       </div>
 

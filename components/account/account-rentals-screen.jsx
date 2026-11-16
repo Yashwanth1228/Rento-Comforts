@@ -2,12 +2,29 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
+import { FiAlertCircle, FiRefreshCw, FiTruck } from "react-icons/fi";
 import AccountRentalsEmptyState from "@/components/account/account-rentals-empty-state";
 import AccountPageContainer from "@/components/account/account-page-container";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
 
-export function RentalsWelcomeHero() {
+export function RentalsWelcomeHero({ populatedPreview = false }) {
+  if (populatedPreview) {
+    return (
+      <header
+        className="account-rentals-mobile-hero account-rentals-preview-hero relative isolate overflow-hidden bg-[#f8f2e9] xl:hidden"
+        style={{ backgroundImage: "linear-gradient(90deg, rgba(248,247,242,.98) 0%, rgba(248,247,242,.94) 50%, rgba(248,247,242,.2) 100%), url('/images/account-welcome-banner-v1.png')" }}
+      >
+        <div className="mx-auto flex min-h-[174px] max-w-[1560px] items-center gap-4 px-5 py-5 sm:min-h-[190px] sm:px-8">
+          <span className="account-rentals-preview-hero__icon grid size-[88px] shrink-0 place-items-center rounded-full bg-[#e6f1e2] text-[#08763b] sm:size-[96px]"><FiTruck aria-hidden="true" /></span>
+          <div className="min-w-0 max-w-[440px]">
+            <h1 className="text-[30px] font-bold leading-tight text-[#124734] sm:text-[34px]">My Rentals</h1>
+            <p className="mt-1 text-[16px] leading-[1.45] text-[#303a34] sm:text-lg">Manage your active rentals, renewals, returns and service requests.</p>
+          </div>
+        </div>
+      </header>
+    );
+  }
+
   return (
     <header
       className="account-rentals-mobile-hero relative isolate overflow-hidden bg-[#f8f2e9] xl:hidden"
