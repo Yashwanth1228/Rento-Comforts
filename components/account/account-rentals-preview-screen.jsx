@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   FiArrowRight,
   FiCalendar,
@@ -10,6 +10,7 @@ import {
   FiClock,
   FiCreditCard,
   FiInfo,
+  FiFileText,
   FiRotateCcw,
   FiSearch,
   FiShield,
@@ -52,7 +53,7 @@ function SummaryCard({ icon: Icon, value, label, tone = "sage" }) {
 function RentalStatus({ rental }) {
   const ending = rental.statusKey === "ending-soon";
   return (
-    <span className={`inline-flex w-fit items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-bold sm:text-sm ${ending ? "bg-[#fff0d1] text-[#845000]" : "bg-[#e3f4e2] text-[#12612e]"}`}>
+    <span className={`rental-preview-status inline-flex w-fit items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-bold sm:text-sm ${ending ? "bg-[#fff0d1] text-[#845000]" : "bg-[#e3f4e2] text-[#12612e]"}`}>
       {ending ? <FiClock aria-hidden="true" className="size-4" /> : <FiCheckCircle aria-hidden="true" className="size-4" />}
       {rental.status}
     </span>
@@ -62,7 +63,7 @@ function RentalStatus({ rental }) {
 function RentalActionButton({ action, onClick }) {
   const { Icon, label, tone } = action;
   return (
-    <button type="button" onClick={onClick} className={`rental-preview-action ${tone === "primary" ? "rental-preview-action--primary" : "rental-preview-action--secondary"}`}>
+    <button type="button" onClick={(event) => onClick(event.currentTarget)} className={`rental-preview-action ${tone === "primary" ? "rental-preview-action--primary" : "rental-preview-action--secondary"}`}>
       <Icon aria-hidden="true" className="size-4 shrink-0" />
       <span>{label}</span>
       {label === "View Details" && <FiArrowRight aria-hidden="true" className="hidden size-3.5 shrink-0 sm:block" />}
@@ -116,7 +117,7 @@ function RentalCard({ rental, onAction }) {
       </div>
 
       <div className="rental-preview-card__actions">
-        {actionItems.map((action) => <RentalActionButton key={action.label} action={action} onClick={() => onAction(rental, action.label)} />)}
+        {actionItems.map((action) => <RentalActionButton key={action.label} action={action} onClick={(trigger) => onAction(rental, action.label, trigger)} />)}
       </div>
 
       <div className="rental-preview-card__remaining-mobile">
@@ -127,7 +128,25 @@ function RentalCard({ rental, onAction }) {
   );
 }
 
-function RentalPreviewDialog({ selection, onClose }) {
+const extensionOptions = [3, 6, 12];
+const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+function addCalendarMonths(dateLabel, monthCount) {
+  const match = /^(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})$/.exec(dateLabel);
+  if (!match) return dateLabel;
+
+  const day = Number(match[1]);
+  const month = monthNames.indexOf(match[2]);
+  const year = Number(match[3]);
+  if (month < 0 || !Number.isInteger(day) || day < 1 || !Number.isInteger(year)) return dateLabel;
+
+  const target = new Date(Date.UTC(year, month + monthCount, 1));
+  const lastDay = new Date(Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0)).getUTCDate();
+  const adjustedDay = Math.min(day, lastDay);
+  return `${String(adjustedDay).padStart(2, "0")} ${monthNames[target.getUTCMonth()]} ${target.getUTCFullYear()}`;
+}
+
+function RentalPreviewDialog({ selection, onClose, triggerRef }) {
   useEffect(() => {
     if (!selection) return undefined;
     const handleKeyDown = (event) => { if (event.key === "Escape") onClose(); };
@@ -136,6 +155,10 @@ function RentalPreviewDialog({ selection, onClose }) {
   }, [selection, onClose]);
 
   if (!selection) return null;
+  if (selection.action === "Extend Rental") {
+    return <ExtendRentalDialog key={selection.rental.id} rental={selection.rental} onClose={onClose} triggerRef={triggerRef} />;
+  }
+
   const { rental, action } = selection;
   return (
     <div className="fixed inset-0 z-[120] grid place-items-center bg-[#10271d]/55 p-4" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
@@ -144,7 +167,7 @@ function RentalPreviewDialog({ selection, onClose }) {
           <div><p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#688170]">Sample Rentals — UI Preview</p><h2 id="rental-preview-dialog-title" className="mt-1 text-xl font-bold text-[#124734]">{action}</h2></div>
           <button type="button" onClick={onClose} aria-label="Close sample rental preview" className="grid size-9 shrink-0 place-items-center rounded-full text-[#46534a] hover:bg-[#f2f5f0] focus-visible:outline-2 focus-visible:outline-[#017f36]"><FiX aria-hidden="true" /></button>
         </header>
-        <p className="mt-3 rounded-lg bg-[#f4f7f2] px-3 py-2 text-xs leading-5 text-[#44554a]">This is fictional development data. No rental will be extended, returned, serviced, or changed.</p>
+        <p className="mt-3 rounded-lg bg-[#f4f7f2] px-3 py-2 text-xs leading-5 text-[#44554a]">This is fictional development data. No real rental will be extended, returned, serviced, or changed.</p>
         <dl className="mt-4 grid grid-cols-[125px_1fr] gap-x-3 gap-y-3 text-sm">
           <dt className="text-[#667068]">Sample rental</dt><dd className="font-semibold text-[#252925]">{rental.name}</dd>
           <dt className="text-[#667068]">Sample rental ID</dt><dd className="font-semibold text-[#252925]">{rental.id}</dd>
@@ -157,10 +180,144 @@ function RentalPreviewDialog({ selection, onClose }) {
   );
 }
 
+function ExtensionFact({ icon: Icon, label, value }) {
+  return (
+    <div className="rental-extension-fact">
+      <Icon aria-hidden="true" />
+      <span><small>{label}</small><strong>{value}</strong></span>
+    </div>
+  );
+}
+
+function ExtendRentalDialog({ rental, onClose, triggerRef }) {
+  const dialogRef = useRef(null);
+  const [extensionMonths, setExtensionMonths] = useState(6);
+  const [showSummary, setShowSummary] = useState(false);
+  const newEndDate = addCalendarMonths(rental.endDate, extensionMonths);
+  const estimate = rental.monthlyRent * extensionMonths;
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    const triggerElement = triggerRef.current;
+    if (!dialog) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    dialog.focus();
+
+    function trapFocus(event) {
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = [...dialogRef.current.querySelectorAll('button:not([disabled]), input:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])')];
+      if (!focusable.length) {
+        event.preventDefault();
+        dialogRef.current.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && (document.activeElement === first || document.activeElement === dialogRef.current)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    window.addEventListener("keydown", trapFocus);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", trapFocus);
+      if (triggerElement?.isConnected) triggerElement.focus();
+    };
+  }, [triggerRef]);
+
+  return (
+    <div className="rental-extension-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+      <section ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="rental-extension-title" aria-describedby="rental-extension-safety" className="rental-extension-dialog">
+        <div className="rental-extension-sheet-handle" aria-hidden="true"><span /></div>
+        <header className="rental-extension-header">
+          <div>
+            <p className="rental-extension-sample-label">Sample Rentals — UI Preview</p>
+            <h2 id="rental-extension-title">Extend Rental</h2>
+          </div>
+          <button type="button" onClick={onClose} aria-label="Close Extend Rental preview" className="rental-extension-close"><FiX aria-hidden="true" /></button>
+        </header>
+
+        <p id="rental-extension-safety" className="rental-extension-safety"><FiInfo aria-hidden="true" /><span>This is fictional development data. No real rental will be extended until the backend is connected.</span></p>
+
+        <section className="rental-extension-rental" aria-label="Selected sample rental">
+          <div className="rental-extension-product-image">
+            <Image src={rental.image} alt={`${rental.name}, sample rental`} fill sizes="(max-width: 767px) 96px, 140px" className="object-cover" />
+          </div>
+          <div className="rental-extension-product-heading">
+            <div><h3>{rental.name}</h3><p>Rental ID: {rental.id}</p></div>
+            <RentalStatus rental={rental} />
+          </div>
+          <div className="rental-extension-facts">
+            <ExtensionFact icon={FiCalendar} label="Current Plan" value={`${rental.durationMonths} months`} />
+            <ExtensionFact icon={FiCalendar} label="Current End Date" value={rental.endDate} />
+            <ExtensionFact icon={FiCreditCard} label="Monthly Rent" value={`${formatINR(rental.monthlyRent)}/month`} />
+            <ExtensionFact icon={FiShield} label="Refundable Deposit" value={formatINR(rental.securityDeposit)} />
+          </div>
+        </section>
+
+        {showSummary ? (
+          <section className="rental-extension-complete" role="status" aria-live="polite">
+            <h3><FiCheckCircle aria-hidden="true" /> Preview Summary</h3>
+            <p>This is an informational preview only. The sample rental has not been changed.</p>
+            <dl><div><dt>Selected extension</dt><dd>{extensionMonths} months</dd></div><div><dt>Preview end date</dt><dd>{newEndDate}</dd></div><div><dt>Estimated extension total</dt><dd>{formatINR(estimate)}</dd></div></dl>
+            <div className="rental-extension-complete-actions"><button type="button" onClick={() => setShowSummary(false)} className="rental-extension-button rental-extension-button--secondary">Back to Options</button><button type="button" onClick={onClose} className="rental-extension-button rental-extension-button--primary">Close Preview</button></div>
+          </section>
+        ) : (
+          <>
+            <fieldset className="rental-extension-options">
+              <legend>Choose extension period</legend>
+              <div className="rental-extension-options-grid">
+                {extensionOptions.map((months) => (
+                  <label key={months} className={`rental-extension-option${extensionMonths === months ? " is-selected" : ""}`}>
+                    <input type="radio" name="extension-period" value={months} checked={extensionMonths === months} onChange={() => setExtensionMonths(months)} />
+                    <span className="rental-extension-radio" aria-hidden="true" />
+                    <span className="rental-extension-option-copy"><strong>{months} Months</strong><small>Extend by {months} months</small></span>
+                    {months === 6 && <span className="rental-extension-recommended">Recommended</span>}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <section className="rental-extension-preview" aria-live="polite">
+              <h3><FiFileText aria-hidden="true" /> Extension Preview</h3>
+              <div className="rental-extension-preview-grid">
+                <ExtensionFact icon={FiCalendar} label="New end date" value={newEndDate} />
+                <ExtensionFact icon={FiCreditCard} label="Updated monthly rent" value={`${formatINR(rental.monthlyRent)}/month`} />
+                <ExtensionFact icon={FiCreditCard} label="Estimated extension total" value={formatINR(estimate)} />
+                <ExtensionFact icon={FiShield} label="Refundable deposit (unchanged)" value={formatINR(rental.securityDeposit)} />
+              </div>
+              <p className="rental-extension-estimate-note">Estimate only. Final extension pricing, fees and deposit rules are not configured.</p>
+            </section>
+
+            <footer className="rental-extension-actions">
+              <button type="button" onClick={onClose} className="rental-extension-button rental-extension-button--secondary">Cancel</button>
+              <button type="button" onClick={() => setShowSummary(true)} className="rental-extension-button rental-extension-button--primary">Continue Preview <FiArrowRight aria-hidden="true" /></button>
+            </footer>
+          </>
+        )}
+      </section>
+    </div>
+  );
+}
+
 export default function AccountRentalsPreviewScreen({ rentals }) {
   const [filter, setFilter] = useState("active");
   const [search, setSearch] = useState("");
   const [selection, setSelection] = useState(null);
+  const extendTriggerRef = useRef(null);
+  const closePreview = useCallback(() => setSelection(null), []);
+
+  useEffect(() => {
+    if (selection || !extendTriggerRef.current?.isConnected) return;
+    extendTriggerRef.current.focus();
+    extendTriggerRef.current = null;
+  }, [selection]);
   const counts = useMemo(() => ({
     all: rentals.length,
     active: rentals.filter((rental) => rental.statusKey === "active").length,
@@ -216,7 +373,7 @@ export default function AccountRentalsPreviewScreen({ rentals }) {
           </p>
 
           <div className="mt-3 grid gap-3 sm:gap-3.5">
-            {visibleRentals.map((rental) => <RentalCard key={rental.id} rental={rental} onAction={(selectedRental, action) => setSelection({ rental: selectedRental, action })} />)}
+            {visibleRentals.map((rental) => <RentalCard key={rental.id} rental={rental} onAction={(selectedRental, action, trigger) => { extendTriggerRef.current = trigger; setSelection({ rental: selectedRental, action }); }} />)}
             {!visibleRentals.length && <p className="rounded-xl border border-dashed border-[#d8dad4] bg-[#fafbf8] px-4 py-8 text-center text-sm text-[#667068]">No sample rentals match this filter or search.</p>}
           </div>
 
@@ -226,7 +383,7 @@ export default function AccountRentalsPreviewScreen({ rentals }) {
           </footer>
         </AccountPageContainer>
       </main>
-      <RentalPreviewDialog selection={selection} onClose={() => setSelection(null)} />
+      <RentalPreviewDialog selection={selection} onClose={closePreview} triggerRef={extendTriggerRef} />
     </>
   );
 }
