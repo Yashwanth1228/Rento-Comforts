@@ -2679,19 +2679,19 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .rental-extension-close svg { width: 22px; height: 22px; }
 .rental-extension-safety { display: flex; align-items: center; gap: 10px; margin-top: 14px; border-radius: 11px; padding: 10px 14px; color: #23392c; background: #e7f3e4; font-size: 13px; line-height: 1.45; }
 .rental-extension-safety svg { width: 20px; height: 20px; flex: 0 0 auto; color: #124734; }
-.rental-extension-rental { display: grid; grid-template-columns: 136px minmax(0, 1fr); grid-template-areas: "image heading" "facts facts"; gap: 12px 16px; margin-top: 16px; border: 1px solid #e5e3dc; border-radius: 15px; padding: 12px; }
+.rental-extension-rental { display: grid; grid-template-columns: 136px minmax(0, 1fr); grid-template-areas: "image heading" "image facts"; gap: 10px 16px; margin-top: 16px; border: 1px solid #e5e3dc; border-radius: 15px; padding: 12px; }
 .rental-extension-product-image { position: relative; grid-area: image; min-height: 98px; overflow: hidden; border-radius: 10px; background: #f3f1eb; }
 .rental-extension-product-heading { display: flex; grid-area: heading; min-width: 0; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .rental-extension-product-heading h3 { color: #161a18; font-size: 18px; font-weight: 750; line-height: 1.25; }
 .rental-extension-product-heading p { margin-top: 4px; color: #4d574f; font-size: 12px; }
 .rental-extension-product-heading .rental-preview-status { flex: 0 0 auto; }
 .rental-extension-facts { display: grid; grid-area: facts; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid #ebe9e3; padding-top: 10px; }
-.rental-extension-fact { display: flex; min-width: 0; align-items: flex-start; gap: 7px; padding: 0 9px; }
+.rental-extension-fact { display: flex; min-width: 0; align-items: flex-start; gap: 6px; padding: 0 6px; }
 .rental-extension-fact + .rental-extension-fact { border-left: 1px solid #e2e1da; }
 .rental-extension-fact > svg { width: 19px; height: 19px; flex: 0 0 auto; color: #08763b; }
 .rental-extension-fact > span { display: block; min-width: 0; }
 .rental-extension-fact small { display: block; color: #4c554e; font-size: 10px; line-height: 1.3; }
-.rental-extension-fact strong { display: block; overflow-wrap: anywhere; margin-top: 3px; color: #202622; font-size: 13px; font-weight: 750; line-height: 1.3; }
+.rental-extension-fact strong { display: block; overflow-wrap: anywhere; margin-top: 3px; color: #202622; font-size: 11px; font-weight: 750; line-height: 1.3; }
 .rental-extension-options { min-width: 0; margin-top: 17px; border: 0; padding: 0; }
 .rental-extension-options legend { margin-bottom: 10px; color: #151a17; font-size: 17px; font-weight: 750; }
 .rental-extension-options-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
@@ -2736,11 +2736,11 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 
 @media (min-width: 768px) and (max-width: 1279px) {
   .rental-extension-dialog { width: min(700px, 100%); padding: 20px; }
-  .rental-extension-rental { grid-template-columns: 122px minmax(0, 1fr); gap: 10px 13px; }
+  .rental-extension-rental { grid-template-columns: 122px minmax(0, 1fr); gap: 9px 13px; }
   .rental-extension-fact { gap: 5px; padding-inline: 6px; }
   .rental-extension-fact > svg { width: 17px; height: 17px; }
   .rental-extension-fact small { font-size: 9px; }
-  .rental-extension-fact strong { font-size: 12px; }
+  .rental-extension-fact strong { font-size: 11px; }
   .rental-extension-option { gap: 8px; padding: 10px; }
   .rental-extension-option-copy strong { font-size: 14px; }
   .rental-extension-preview-grid .rental-extension-fact { padding-inline: 6px; }
@@ -2757,7 +2757,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   .rental-extension-sample-label { padding: 5px 10px; font-size: 10px; }
   .rental-extension-close { width: 34px; height: 34px; }
   .rental-extension-safety { align-items: flex-start; gap: 8px; margin-top: 12px; padding: 9px 10px; font-size: 12px; }
-  .rental-extension-rental { grid-template-columns: 88px minmax(0, 1fr); gap: 9px 11px; margin-top: 12px; padding: 9px; }
+  .rental-extension-rental { grid-template-columns: 88px minmax(0, 1fr); gap: 8px 11px; margin-top: 12px; padding: 9px; }
   .rental-extension-product-image { min-height: 66px; }
   .rental-extension-product-heading { gap: 4px; }
   .rental-extension-product-heading h3 { font-size: 15px; }
@@ -2765,29 +2765,29 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   .rental-extension-product-heading .rental-preview-status { padding: 5px 8px; font-size: 10px; }
   .rental-extension-product-heading .rental-preview-status svg { width: 13px; height: 13px; }
   .rental-extension-facts { gap: 0; padding-top: 8px; }
-  .rental-extension-fact { display: flex; flex-direction: column; gap: 4px; padding: 0 6px; }
+  .rental-extension-fact { display: flex; flex-direction: row; align-items: flex-start; gap: 4px; padding: 0 4px; }
   .rental-extension-fact:first-child { padding-left: 0; }
-  .rental-extension-fact > svg { width: 17px; height: 17px; }
-  .rental-extension-fact small { font-size: 9px; }
-  .rental-extension-fact strong { margin-top: 2px; font-size: 11px; }
-  .rental-extension-options { margin-top: 13px; }
-  .rental-extension-options legend { margin-bottom: 8px; font-size: 16px; }
-  .rental-extension-options-grid { grid-template-columns: 1fr; gap: 7px; }
-  .rental-extension-option { min-height: 58px; gap: 12px; padding: 8px 12px; }
+  .rental-extension-fact > svg { width: 14px; height: 14px; }
+  .rental-extension-fact small { font-size: 8px; }
+  .rental-extension-fact strong { margin-top: 2px; font-size: 9px; }
+  .rental-extension-options { margin-top: 11px; }
+  .rental-extension-options legend { margin-bottom: 7px; font-size: 16px; }
+  .rental-extension-options-grid { grid-template-columns: 1fr; gap: 6px; }
+  .rental-extension-option { min-height: 50px; gap: 10px; padding: 6px 11px; }
   .rental-extension-option-copy strong { font-size: 15px; }
-  .rental-extension-option-copy small { font-size: 11px; }
+  .rental-extension-option-copy small { font-size: 10px; }
   .rental-extension-recommended { top: 50%; right: 10px; transform: translateY(-50%); }
-  .rental-extension-preview { margin-top: 12px; padding: 9px; }
+  .rental-extension-preview { margin-top: 10px; padding: 8px; }
   .rental-extension-preview > h3,
   .rental-extension-complete > h3 { gap: 7px; padding-bottom: 7px; font-size: 14px; }
   .rental-extension-preview-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); padding-top: 8px; }
-  .rental-extension-preview-grid .rental-extension-fact { gap: 4px; padding-inline: 5px; }
-  .rental-extension-preview-grid .rental-extension-fact > svg { width: 16px; height: 16px; }
-  .rental-extension-preview-grid .rental-extension-fact small { font-size: 9px; }
-  .rental-extension-preview-grid .rental-extension-fact strong { font-size: 10px; }
-  .rental-extension-estimate-note { margin-top: 7px; font-size: 9px; }
-  .rental-extension-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; padding-top: 10px; }
-  .rental-extension-button { min-width: 0; min-height: 46px; padding: 8px; font-size: 13px; }
+  .rental-extension-preview-grid .rental-extension-fact { gap: 4px; padding-inline: 3px; }
+  .rental-extension-preview-grid .rental-extension-fact > svg { width: 14px; height: 14px; }
+  .rental-extension-preview-grid .rental-extension-fact small { font-size: 8px; }
+  .rental-extension-preview-grid .rental-extension-fact strong { font-size: 9px; }
+  .rental-extension-estimate-note { margin-top: 6px; font-size: 8px; }
+  .rental-extension-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 10px; padding-top: 8px; }
+  .rental-extension-button { min-width: 0; min-height: 44px; padding: 7px; font-size: 12px; }
   .rental-extension-complete { margin-top: 13px; padding: 11px; }
   .rental-extension-complete-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 }
