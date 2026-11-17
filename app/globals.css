@@ -2907,6 +2907,142 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   .rental-return-dialog > .rental-extension-close { position: absolute; }
 }
 
+/* Development-only Maintenance Request preview dialog. */
+.rental-maintenance-backdrop { z-index: 140; }
+.rental-maintenance-dialog { width: min(760px, 100%); max-height: calc(100dvh - 40px); overflow-y: auto; overscroll-behavior: contain; border: 1px solid #e5e3dc; border-radius: 22px; padding: 22px 24px 20px; background: #fff; box-shadow: 0 24px 70px rgba(21,34,26,.25); color: #252925; outline: none; }
+.rental-maintenance-header { display: grid; grid-template-columns: 54px minmax(0,1fr) 38px; align-items: center; gap: 13px; }
+.rental-maintenance-heading-icon { display: grid; width: 52px; height: 52px; place-items: center; border-radius: 50%; color: #08763b; background: #e7f3e4; }
+.rental-maintenance-heading-icon svg { width: 28px; height: 28px; }
+.rental-maintenance-heading-copy h2 { margin-top: 4px; color: #124734; font-size: 25px; font-weight: 750; line-height: 1.15; }
+.rental-maintenance-heading-copy > p:last-child { margin-top: 4px; color: #4d574f; font-size: 12px; }
+.rental-maintenance-dialog .rental-extension-sample-label { padding: 4px 10px; font-size: 9px; }
+.rental-maintenance-dialog .rental-extension-safety { margin-top: 14px; padding: 10px 13px; font-size: 12px; }
+.rental-maintenance-summary { margin-top: 14px; border: 1px solid #e5e3dc; border-radius: 14px; padding: 11px; background: #faf9f6; }
+.rental-maintenance-summary__product { display: grid; grid-template-columns: 92px minmax(0,1fr) auto; align-items: center; gap: 12px; }
+.rental-maintenance-summary__image { position: relative; width: 92px; height: 68px; overflow: hidden; border-radius: 8px; background: #f3f1eb; }
+.rental-maintenance-summary__heading { min-width: 0; }
+.rental-maintenance-summary__heading h3 { overflow: hidden; color: #171c19; font-size: 16px; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
+.rental-maintenance-summary__heading p { margin-top: 4px; color: #39433c; font-size: 11px; }
+.rental-maintenance-summary .rental-preview-status { padding: 5px 10px; font-size: 11px; }
+.rental-maintenance-summary__facts { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); margin-top: 10px; border-top: 1px solid #e5e3dc; padding-top: 9px; }
+.rental-maintenance-summary__facts > div { display: flex; min-width: 0; align-items: center; gap: 8px; padding: 0 10px; }
+.rental-maintenance-summary__facts > div + div { border-left: 1px solid #deddd7; }
+.rental-maintenance-summary__facts > div:first-child { padding-left: 2px; }
+.rental-maintenance-summary__facts svg { width: 19px; height: 19px; flex: 0 0 auto; color: #08763b; }
+.rental-maintenance-summary__facts span { min-width: 0; }
+.rental-maintenance-summary__facts small,.rental-maintenance-summary__facts strong { display: block; }
+.rental-maintenance-summary__facts small { color: #46534a; font-size: 10px; }
+.rental-maintenance-summary__facts strong { margin-top: 3px; color: #202622; font-size: 12px; font-weight: 750; }
+.rental-maintenance-form { display: grid; gap: 11px; margin-top: 14px; }
+.rental-maintenance-field { display: grid; min-width: 0; gap: 5px; }
+.rental-maintenance-field label { color: #202622; font-size: 13px; font-weight: 750; }
+.rental-maintenance-field label .rental-maintenance-required { color: #bd3429; }
+.rental-maintenance-field input,.rental-maintenance-field select,.rental-maintenance-field textarea { width: 100%; min-height: 40px; border: 1px solid #c6ccc7; border-radius: 9px; padding: 9px 12px; color: #252925; background: #fff; font: inherit; font-size: 13px; outline: none; }
+.rental-maintenance-field input:focus,.rental-maintenance-field select:focus,.rental-maintenance-field textarea:focus { border-color: #08763b; box-shadow: 0 0 0 3px rgba(8,118,59,.12); }
+.rental-maintenance-field [aria-invalid="true"] { border-color: #b42318; }
+.rental-maintenance-field textarea { min-height: 72px; resize: vertical; }
+.rental-maintenance-field textarea::placeholder { color: #68716b; }
+.rental-maintenance-counter { justify-self: end; color: #59635c; font-size: 11px; }
+.rental-maintenance-error { color: #b42318; font-size: 11px; }
+.rental-maintenance-note { color: #59635c; font-size: 10px; line-height: 1.4; }
+.rental-maintenance-select-wrap { position: relative; }
+.rental-maintenance-select-wrap select { appearance: none; padding-left: 40px; padding-right: 40px; }
+.rental-maintenance-select-wrap > svg:last-child { position: absolute; top: 50%; right: 12px; width: 17px; height: 17px; transform: translateY(-50%); pointer-events: none; }
+.rental-maintenance-select-wrap .rental-maintenance-select-icon { position: absolute; z-index: 1; top: 50%; left: 13px; width: 18px; height: 18px; transform: translateY(-50%); color: #08763b; pointer-events: none; }
+.rental-maintenance-upload { display: flex; min-height: 60px; align-items: center; justify-content: center; gap: 12px; border: 1px dashed #9db8a2; border-radius: 12px; padding: 10px 14px; color: #124734; background: #f3f8f0; text-align: left; }
+.rental-maintenance-upload:hover { background: #eaf4e7; }
+.rental-maintenance-upload > svg { width: 27px; height: 27px; flex: 0 0 auto; }
+.rental-maintenance-upload span { display: grid; gap: 3px; }
+.rental-maintenance-upload strong { color: #202622; font-size: 12px; }
+.rental-maintenance-upload small { color: #59635c; font-size: 10px; }
+.rental-maintenance-file-input { position: absolute; width: 1px !important; height: 1px !important; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; clip-path: inset(50%); }
+.rental-maintenance-file-input:focus-visible + .rental-maintenance-upload { outline: 3px solid rgba(1,127,54,.32); outline-offset: 2px; }
+.rental-maintenance-photos { display: flex; flex-wrap: wrap; gap: 9px; }
+.rental-maintenance-photos figure { position: relative; width: 82px; min-width: 0; }
+.rental-maintenance-photos img { width: 82px; height: 68px; border: 1px solid #d8ddd8; border-radius: 8px; object-fit: cover; }
+.rental-maintenance-photos figcaption { overflow: hidden; color: #59635c; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.rental-maintenance-photos button { position: absolute; top: -6px; right: -6px; display: grid; width: 24px; height: 24px; place-items: center; border: 1px solid #fff; border-radius: 50%; color: #fff; background: #35423a; }
+.rental-maintenance-photos button svg { width: 13px; height: 13px; }
+.rental-maintenance-date-wrap { position: relative; }
+.rental-maintenance-date-wrap > svg { position: absolute; top: 50%; left: 13px; z-index: 1; width: 18px; height: 18px; transform: translateY(-50%); color: #124734; pointer-events: none; }
+.rental-maintenance-date-wrap input { padding-left: 42px; }
+.rental-maintenance-date-wrap > span { position: absolute; top: 50%; left: 42px; transform: translateY(-50%); color: #48534c; font-size: 13px; pointer-events: none; }
+.rental-maintenance-date-wrap:not(.has-value) input { color: transparent; }
+.rental-maintenance-date-wrap.has-value > span { display: none; }
+.rental-maintenance-date-wrap input::-webkit-calendar-picker-indicator { cursor: pointer; }
+.rental-maintenance-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 2px; border-top: 1px solid #e8e6e0; padding-top: 12px; }
+.rental-maintenance-actions .rental-extension-button { min-width: 180px; min-height: 46px; font-size: 13px; }
+.rental-maintenance-preview { margin-top: 14px; border: 1px solid #d7ead4; border-radius: 13px; padding: 14px; background: #eff7ed; }
+.rental-maintenance-preview h3 { display: flex; align-items: center; gap: 8px; color: #124734; font-size: 16px; font-weight: 750; }
+.rental-maintenance-preview h3 svg { width: 19px; height: 19px; }
+.rental-maintenance-preview > p { margin-top: 7px; color: #435147; font-size: 12px; line-height: 1.5; }
+.rental-maintenance-preview dl { display: grid; gap: 7px; margin-top: 11px; }
+.rental-maintenance-preview dl > div { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid #dce9d9; padding-top: 7px; font-size: 12px; }
+.rental-maintenance-preview dt { color: #526057; }
+.rental-maintenance-preview dd { max-width: 70%; color: #17251c; font-weight: 700; text-align: right; overflow-wrap: anywhere; }
+.rental-maintenance-dialog button:focus-visible { outline: 3px solid rgba(1,127,54,.32); outline-offset: 2px; }
+
+@media (min-width: 768px) and (max-width: 1279px) {
+  .rental-maintenance-dialog { display: grid; width: min(940px,100%); grid-template-columns: minmax(245px,.8fr) minmax(0,1.5fr); align-content: start; gap: 0 20px; padding: 20px; }
+  .rental-maintenance-header,.rental-maintenance-dialog > .rental-extension-safety,.rental-maintenance-preview { grid-column: 1 / -1; }
+  .rental-maintenance-summary { grid-column: 1; grid-row: 3; align-self: stretch; }
+  .rental-maintenance-summary__product { grid-template-columns: 1fr; justify-items: start; }
+  .rental-maintenance-summary__image { width: 100%; height: 175px; }
+  .rental-maintenance-summary__facts { grid-template-columns: 1fr; gap: 0; }
+  .rental-maintenance-summary__facts > div { padding: 9px 2px; }
+  .rental-maintenance-summary__facts > div + div { border-top: 1px solid #deddd7; border-left: 0; }
+  .rental-maintenance-form { grid-column: 2; grid-row: 3; align-self: start; margin-top: 14px; }
+  .rental-maintenance-actions { gap: 8px; }
+  .rental-maintenance-actions .rental-extension-button { min-width: 0; flex: 1; }
+}
+
+@media (max-width: 767px) {
+  .rental-maintenance-backdrop { display: flex; align-items: flex-end; justify-content: center; overflow: hidden; padding: 0 0 calc(68px + env(safe-area-inset-bottom)); }
+  .rental-maintenance-dialog { width: 100%; max-height: calc(100dvh - 92px - env(safe-area-inset-top)); border-radius: 24px 24px 0 0; padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); }
+  .rental-maintenance-dialog .rental-extension-sheet-handle { display: flex; justify-content: center; padding: 0 0 9px; }
+  .rental-maintenance-dialog .rental-extension-sheet-handle span { width: 48px; height: 5px; border-radius: 999px; background: #c5c7c5; }
+  .rental-maintenance-header { grid-template-columns: 1fr 34px; align-items: start; gap: 4px; }
+  .rental-maintenance-heading-icon { grid-column: 1 / -1; grid-row: 1; justify-self: center; width: 52px; height: 52px; margin-bottom: 2px; }
+  .rental-maintenance-heading-copy { grid-column: 1 / -1; grid-row: 2; text-align: center; }
+  .rental-maintenance-heading-copy .rental-extension-sample-label { display: none; }
+  .rental-maintenance-heading-copy h2 { font-size: 21px; }
+  .rental-maintenance-heading-copy > p:last-child { font-size: 11px; }
+  .rental-maintenance-header .rental-extension-close { position: absolute; top: 36px; right: 10px; }
+  .rental-maintenance-dialog .rental-extension-safety { margin-top: 10px; padding: 8px 9px; font-size: 10px; }
+  .rental-maintenance-dialog .rental-extension-safety svg { width: 16px; height: 16px; }
+  .rental-maintenance-summary { margin-top: 11px; padding: 8px; }
+  .rental-maintenance-summary__product { grid-template-columns: 68px minmax(0,1fr) auto; gap: 7px; }
+  .rental-maintenance-summary__image { width: 68px; height: 54px; }
+  .rental-maintenance-summary__heading h3 { font-size: 12px; }
+  .rental-maintenance-summary__heading p { font-size: 9px; }
+  .rental-maintenance-summary .rental-preview-status { gap: 4px; padding: 4px 6px; font-size: 9px; }
+  .rental-maintenance-summary__facts { margin-top: 7px; padding-top: 7px; }
+  .rental-maintenance-summary__facts > div { align-items: flex-start; gap: 4px; padding: 0 5px; }
+  .rental-maintenance-summary__facts svg { width: 14px; height: 14px; }
+  .rental-maintenance-summary__facts small { font-size: 8px; }
+  .rental-maintenance-summary__facts strong { font-size: 9px; }
+  .rental-maintenance-form { gap: 9px; margin-top: 11px; }
+  .rental-maintenance-field { gap: 4px; }
+  .rental-maintenance-field label { font-size: 12px; }
+  .rental-maintenance-field input,.rental-maintenance-field select { min-height: 42px; font-size: 13px; }
+  .rental-maintenance-field textarea { min-height: 68px; font-size: 13px; }
+  .rental-maintenance-select-wrap select { padding-left: 38px; }
+  .rental-maintenance-upload { min-height: 58px; gap: 9px; padding: 8px; }
+  .rental-maintenance-upload > svg { width: 23px; height: 23px; }
+  .rental-maintenance-upload strong { font-size: 11px; }
+  .rental-maintenance-upload small { font-size: 9px; }
+  .rental-maintenance-photos figure,.rental-maintenance-photos img { width: 68px; }
+  .rental-maintenance-photos img { height: 58px; }
+  .rental-maintenance-date-wrap input { min-height: 42px; padding-left: 39px; font-size: 13px; }
+  .rental-maintenance-date-wrap > svg { left: 11px; width: 16px; height: 16px; }
+  .rental-maintenance-date-wrap > span { left: 39px; font-size: 12px; }
+  .rental-maintenance-note { font-size: 9px; }
+  .rental-maintenance-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; padding-top: 9px; }
+  .rental-maintenance-actions .rental-extension-button { width: 100%; min-height: 46px; font-size: 13px; }
+  .rental-maintenance-actions .rental-extension-button--primary { order: 0; }
+  .rental-maintenance-actions .rental-extension-button--secondary { order: 1; }
+}
+
 @media (min-width: 1280px) {
   .account-rentals-empty-body { padding: 8px 12px 24px; }
   .account-rentals-artwork { width: clamp(270px, 32vh, 360px); }

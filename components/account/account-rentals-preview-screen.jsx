@@ -19,6 +19,8 @@ import {
   FiTruck,
   FiX,
   FiChevronDown,
+  FiUploadCloud,
+  FiTrash2,
 } from "react-icons/fi";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
 import AccountPageContainer from "@/components/account/account-page-container";
@@ -166,6 +168,9 @@ function RentalPreviewDialog({ selection, onClose, triggerRef }) {
   if (selection.action === "Request Return") {
     return <RequestReturnDialog key={selection.rental.id} rental={selection.rental} onClose={onClose} />;
   }
+  if (selection.action === "Maintenance Request") {
+    return <MaintenanceRequestDialog key={selection.rental.id} rental={selection.rental} onClose={onClose} triggerRef={triggerRef} />;
+  }
 
   const { rental, action } = selection;
   return (
@@ -290,6 +295,164 @@ function RequestReturnDialog({ rental, onClose }) {
               <small className="rental-return-counter" aria-live="polite">{notes.length} / 250</small>
             </div>
             <footer className="rental-return-actions"><button type="button" onClick={onClose} className="rental-extension-button rental-extension-button--secondary">Cancel</button><button type="submit" className="rental-extension-button rental-extension-button--primary">Request Return</button></footer>
+          </form>
+        )}
+      </section>
+    </div>
+  ), document.body);
+}
+
+function MaintenanceRentalSummary({ rental }) {
+  return (
+    <section className="rental-maintenance-summary" aria-label="Selected rental">
+      <div className="rental-maintenance-summary__product">
+        <div className="rental-maintenance-summary__image"><Image src={rental.image} alt={`${rental.name}, sample rental`} fill sizes="(max-width: 767px) 92px, 112px" className="object-cover" /></div>
+        <div className="rental-maintenance-summary__heading"><h3>{rental.name}</h3><p>Rental ID: {rental.id}</p></div>
+        <RentalStatus rental={rental} />
+      </div>
+      <div className="rental-maintenance-summary__facts">
+        <div><FiCalendar aria-hidden="true" /><span><small>Rental Started</small><strong>{rental.startDate}</strong></span></div>
+        <div><FiCalendar aria-hidden="true" /><span><small>Current End Date</small><strong>{rental.endDate}</strong></span></div>
+        <div><FiClock aria-hidden="true" /><span><small>Rental Term</small><strong>{rental.durationMonths} Months</strong></span></div>
+      </div>
+    </section>
+  );
+}
+
+function maintenanceIssueOptions(category = "") {
+  const normalized = category.toLowerCase();
+  if (normalized.includes("furniture")) return ["Furniture repair", "Damaged or broken part", "Product not working", "Installation or fitting issue", "Other"];
+  if (normalized.includes("appliance")) return ["Appliance malfunction", "Product not working", "Damaged or broken part", "Installation or fitting issue", "Other"];
+  return ["Product not working", "Damaged or broken part", "Furniture repair", "Appliance malfunction", "Installation or fitting issue", "Other"];
+}
+
+function MaintenanceRequestDialog({ rental, onClose, triggerRef }) {
+  const dialogRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const previewUrlsRef = useRef(new Set());
+  const [issueType, setIssueType] = useState("");
+  const [description, setDescription] = useState("");
+  const [serviceDate, setServiceDate] = useState("");
+  const [photos, setPhotos] = useState([]);
+  const [errors, setErrors] = useState({});
+  const [preview, setPreview] = useState(false);
+  const minimumDate = localDateInputValue();
+  const issues = maintenanceIssueOptions(rental.category);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return undefined;
+    const photoUrls = previewUrlsRef.current;
+    const triggerElement = triggerRef.current;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    dialog.focus();
+    function trapFocus(event) {
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = [...dialogRef.current.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')];
+      if (!focusable.length) { event.preventDefault(); dialogRef.current.focus(); return; }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && (document.activeElement === first || document.activeElement === dialogRef.current)) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }
+    window.addEventListener("keydown", trapFocus);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", trapFocus);
+      photoUrls.forEach((url) => URL.revokeObjectURL(url));
+      photoUrls.clear();
+      if (triggerElement?.isConnected) triggerElement.focus();
+    };
+  }, [triggerRef]);
+
+  function handleFiles(event) {
+    const incoming = [...(event.target.files || [])];
+    event.target.value = "";
+    const nextErrors = {};
+    const accepted = [];
+    const availableSlots = Math.max(0, 3 - photos.length);
+    incoming.forEach((file) => {
+      if (!(["image/jpeg", "image/png"].includes(file.type))) nextErrors.photos = "Only JPG and PNG images are allowed.";
+      else if (file.size > 5 * 1024 * 1024) nextErrors.photos = "Each image must be 5 MB or smaller.";
+      else if (accepted.length < availableSlots) accepted.push(file);
+      else nextErrors.photos = "You can add up to 3 images.";
+    });
+    const added = accepted.map((file) => {
+      const url = URL.createObjectURL(file);
+      previewUrlsRef.current.add(url);
+      return { file, url };
+    });
+    if (incoming.length > availableSlots && !nextErrors.photos) nextErrors.photos = "You can add up to 3 images.";
+    setPhotos((current) => [...current, ...added]);
+    setErrors((current) => ({ ...current, photos: nextErrors.photos || "" }));
+  }
+
+  function removePhoto(url) {
+    URL.revokeObjectURL(url);
+    previewUrlsRef.current.delete(url);
+    setPhotos((current) => current.filter((photo) => photo.url !== url));
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    const nextErrors = {};
+    if (!issueType) nextErrors.issueType = "Select an issue type.";
+    if (!description.trim()) nextErrors.description = "Describe the issue before continuing.";
+    if (description.length > 500) nextErrors.description = "Keep the description within 500 characters.";
+    if (!serviceDate) nextErrors.serviceDate = "Choose a preferred service date.";
+    else if (serviceDate < minimumDate) nextErrors.serviceDate = "Choose today or a future date.";
+    setErrors((current) => ({ ...current, ...nextErrors }));
+    if (!Object.keys(nextErrors).length) setPreview(true);
+  }
+
+  return createPortal((
+    <div className="rental-extension-backdrop rental-maintenance-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+      <section ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="rental-maintenance-title" aria-describedby="rental-maintenance-safety" className="rental-maintenance-dialog">
+        <div className="rental-extension-sheet-handle" aria-hidden="true"><span /></div>
+        <header className="rental-maintenance-header">
+          <div className="rental-maintenance-heading-icon"><FiTool aria-hidden="true" /></div>
+          <div className="rental-maintenance-heading-copy"><p className="rental-extension-sample-label">Sample Rentals — UI Preview</p><h2 id="rental-maintenance-title">Maintenance Request</h2><p>Raise a service request for your rented item.</p></div>
+          <button type="button" onClick={onClose} aria-label="Close Maintenance Request preview" className="rental-extension-close"><FiX aria-hidden="true" /></button>
+        </header>
+        <p id="rental-maintenance-safety" className="rental-extension-safety"><FiInfo aria-hidden="true" /><span>Fictional development data only. No real maintenance ticket will be created.</span></p>
+        <MaintenanceRentalSummary rental={rental} />
+        {preview ? (
+          <section className="rental-maintenance-preview" role="status" aria-live="polite">
+            <h3><FiCheckCircle aria-hidden="true" /> Sample request preview</h3>
+            <p>No ticket was created and the sample rental is unchanged. Review the information below; nothing was uploaded or sent.</p>
+            <dl><div><dt>Issue type</dt><dd>{issueType}</dd></div><div><dt>Issue description</dt><dd>{description.trim()}</dd></div><div><dt>Preferred service date</dt><dd>{serviceDate}</dd></div><div><dt>Photos selected</dt><dd>{photos.length ? photos.map(({ file }) => file.name).join(", ") : "None"}</dd></div></dl>
+            <div className="rental-maintenance-actions"><button type="button" onClick={() => setPreview(false)} className="rental-extension-button rental-extension-button--secondary">Edit Details</button><button type="button" onClick={onClose} className="rental-extension-button rental-extension-button--primary">Close Preview</button></div>
+          </section>
+        ) : (
+          <form className="rental-maintenance-form" onSubmit={handleSubmit} noValidate>
+            <div className="rental-maintenance-field">
+              <label htmlFor="maintenance-issue">Issue Type <span aria-hidden="true" className="rental-maintenance-required">*</span></label>
+              <div className="rental-maintenance-select-wrap"><FiTool aria-hidden="true" className="rental-maintenance-select-icon" /><select id="maintenance-issue" value={issueType} onChange={(event) => { setIssueType(event.target.value); setErrors((current) => ({ ...current, issueType: "" })); }} aria-invalid={Boolean(errors.issueType)} aria-describedby={errors.issueType ? "maintenance-issue-error" : undefined}><option value="">Select issue type</option>{issues.map((issue) => <option key={issue}>{issue}</option>)}</select><FiChevronDown aria-hidden="true" /></div>
+              {errors.issueType && <small id="maintenance-issue-error" className="rental-maintenance-error" role="alert">{errors.issueType}</small>}
+            </div>
+            <div className="rental-maintenance-field">
+              <label htmlFor="maintenance-description">Describe the Issue <span aria-hidden="true" className="rental-maintenance-required">*</span></label>
+              <textarea id="maintenance-description" maxLength={500} value={description} onChange={(event) => { setDescription(event.target.value); setErrors((current) => ({ ...current, description: "" })); }} placeholder="e.g., Not working, loose leg, fabric tear, cleaning, etc." aria-invalid={Boolean(errors.description)} aria-describedby={errors.description ? "maintenance-description-error maintenance-description-count" : "maintenance-description-count"} />
+              <small id="maintenance-description-count" className="rental-maintenance-counter" aria-live="polite">{description.length} / 500</small>
+              {errors.description && <small id="maintenance-description-error" className="rental-maintenance-error" role="alert">{errors.description}</small>}
+            </div>
+            <div className="rental-maintenance-field">
+              <label htmlFor="maintenance-photos">Add Photos <span>(Optional)</span></label>
+              <input ref={fileInputRef} id="maintenance-photos" type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" multiple onChange={handleFiles} className="rental-maintenance-file-input" aria-describedby={errors.photos ? "maintenance-photo-help maintenance-photo-error" : "maintenance-photo-help"} />
+              <button type="button" className="rental-maintenance-upload" onClick={() => fileInputRef.current?.click()} aria-label="Choose up to three JPG or PNG photos">
+                <FiUploadCloud aria-hidden="true" /><span><strong>{photos.length ? "Add more photos, or browse" : "Click to browse or choose photos"}</strong><small id="maintenance-photo-help">JPG or PNG, up to 5 MB each (maximum 3 photos)</small></span>
+              </button>
+              {errors.photos && <small id="maintenance-photo-error" className="rental-maintenance-error" role="alert">{errors.photos}</small>}
+              {!!photos.length && <div className="rental-maintenance-photos" aria-label="Selected photos">{photos.map(({ file, url }) => <figure key={url}><Image src={url} alt={`Selected preview: ${file.name}`} width={82} height={68} unoptimized /><figcaption>{file.name}</figcaption><button type="button" onClick={() => removePhoto(url)} aria-label={`Remove ${file.name}`}><FiTrash2 aria-hidden="true" /></button></figure>)}</div>}
+            </div>
+            <div className="rental-maintenance-field">
+              <label htmlFor="maintenance-service-date">Preferred Service Date <span aria-hidden="true" className="rental-maintenance-required">*</span></label>
+              <div className={`rental-maintenance-date-wrap${serviceDate ? " has-value" : ""}`}><FiCalendar aria-hidden="true" /><input id="maintenance-service-date" type="date" min={minimumDate} value={serviceDate} onChange={(event) => { setServiceDate(event.target.value); setErrors((current) => ({ ...current, serviceDate: "" })); }} aria-invalid={Boolean(errors.serviceDate)} aria-describedby={errors.serviceDate ? "maintenance-date-error" : "maintenance-date-note"} /><span>Select preferred date</span></div>
+              <small id="maintenance-date-note" className="rental-maintenance-note">This is a preferred date only, not a confirmed appointment.</small>
+              {errors.serviceDate && <small id="maintenance-date-error" className="rental-maintenance-error" role="alert">{errors.serviceDate}</small>}
+            </div>
+            <footer className="rental-maintenance-actions"><button type="button" onClick={onClose} className="rental-extension-button rental-extension-button--secondary">Cancel</button><button type="submit" className="rental-extension-button rental-extension-button--primary">Submit Request</button></footer>
           </form>
         )}
       </section>
