@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import {
   FiArrowRight,
   FiCalendar,
@@ -17,6 +18,7 @@ import {
   FiTool,
   FiTruck,
   FiX,
+  FiChevronDown,
 } from "react-icons/fi";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
 import AccountPageContainer from "@/components/account/account-page-container";
@@ -130,6 +132,9 @@ function RentalCard({ rental, onAction }) {
 
 const extensionOptions = [3, 6, 12];
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const subscribeClientMount = () => () => {};
+const getClientMountSnapshot = () => true;
+const getServerMountSnapshot = () => false;
 
 function addCalendarMonths(dateLabel, monthCount) {
   const match = /^(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})$/.exec(dateLabel);
@@ -158,6 +163,9 @@ function RentalPreviewDialog({ selection, onClose, triggerRef }) {
   if (selection.action === "Extend Rental") {
     return <ExtendRentalDialog key={selection.rental.id} rental={selection.rental} onClose={onClose} triggerRef={triggerRef} />;
   }
+  if (selection.action === "Request Return") {
+    return <RequestReturnDialog key={selection.rental.id} rental={selection.rental} onClose={onClose} />;
+  }
 
   const { rental, action } = selection;
   return (
@@ -178,6 +186,115 @@ function RentalPreviewDialog({ selection, onClose, triggerRef }) {
       </section>
     </div>
   );
+}
+
+function localDateInputValue() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+}
+
+function ReturnRentalSummary({ rental }) {
+  return (
+    <section className="rental-return-summary" aria-label="Selected rental">
+      <div className="rental-return-summary__product">
+        <div className="rental-return-summary__image"><Image src={rental.image} alt={`${rental.name}, sample rental`} fill sizes="(max-width: 767px) 64px, 72px" className="object-cover" /></div>
+        <div className="rental-return-summary__heading"><h3>{rental.name}</h3><p>Rental ID: {rental.id}</p></div>
+        <RentalStatus rental={rental} />
+      </div>
+      <div className="rental-return-summary__facts">
+        <div><FiCalendar aria-hidden="true" /><span><small>Rental Started</small><strong>{rental.startDate}</strong></span></div>
+        <div><FiCalendar aria-hidden="true" /><span><small>Current End Date</small><strong>{rental.endDate}</strong></span></div>
+        <div><FiClock aria-hidden="true" /><span><small>Rental Duration</small><strong>{rental.durationMonths} months</strong></span></div>
+      </div>
+    </section>
+  );
+}
+
+function RequestReturnDialog({ rental, onClose }) {
+  const dialogRef = useRef(null);
+  const mounted = useSyncExternalStore(subscribeClientMount, getClientMountSnapshot, getServerMountSnapshot);
+  const [pickupDate, setPickupDate] = useState("");
+  const [reason, setReason] = useState("");
+  const [notes, setNotes] = useState("");
+  const [errors, setErrors] = useState({});
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const minimumDate = localDateInputValue();
+
+  useEffect(() => {
+    if (!mounted) return undefined;
+    const dialog = dialogRef.current;
+    if (!dialog) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    dialog.focus();
+
+    function trapFocus(event) {
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = [...dialogRef.current.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')];
+      if (!focusable.length) { event.preventDefault(); dialogRef.current.focus(); return; }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && (document.activeElement === first || document.activeElement === dialogRef.current)) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }
+
+    window.addEventListener("keydown", trapFocus);
+    return () => { document.body.style.overflow = previousOverflow; window.removeEventListener("keydown", trapFocus); };
+  }, [mounted]);
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    const nextErrors = {};
+    if (!pickupDate) nextErrors.pickupDate = "Choose a preferred pickup date.";
+    else if (pickupDate < minimumDate) nextErrors.pickupDate = "Choose today or a future date.";
+    if (!reason) nextErrors.reason = "Choose a reason for return.";
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length === 0) setShowConfirmation(true);
+  }
+
+  if (!mounted) return null;
+
+  return createPortal((
+    <div className="rental-extension-backdrop rental-return-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+      <section ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="rental-return-title" aria-describedby="rental-return-safety" className="rental-return-dialog">
+        <div className="rental-extension-sheet-handle" aria-hidden="true"><span /></div>
+        <header className="rental-return-header">
+          <div className="rental-return-heading-icon"><FiRotateCcw aria-hidden="true" /></div>
+          <div className="rental-return-heading-copy"><p className="rental-extension-sample-label">Sample Rentals — UI Preview</p><h2 id="rental-return-title">Request Return</h2><p>Schedule a pickup to return your rented item.</p></div>
+          <button type="button" onClick={onClose} aria-label="Close Request Return preview" className="rental-extension-close"><FiX aria-hidden="true" /></button>
+        </header>
+        <p id="rental-return-safety" className="rental-extension-safety"><FiInfo aria-hidden="true" /><span>Fictional development data only. This date is a preference, not a confirmed pickup. No return request will be sent.</span></p>
+        <ReturnRentalSummary rental={rental} />
+        {showConfirmation ? (
+          <section className="rental-return-confirmation" role="status" aria-live="polite">
+            <h3><FiCheckCircle aria-hidden="true" /> Sample return preview</h3>
+            <p>No request was submitted and the sample rental remains unchanged. Your entered details are shown for review only.</p>
+            <dl><div><dt>Preferred pickup date</dt><dd>{pickupDate}</dd></div><div><dt>Reason</dt><dd>{reason}</dd></div>{notes.trim() && <div><dt>Additional notes</dt><dd>{notes.trim()}</dd></div>}</dl>
+            <div className="rental-return-actions"><button type="button" onClick={() => setShowConfirmation(false)} className="rental-extension-button rental-extension-button--secondary">Edit Details</button><button type="button" onClick={onClose} className="rental-extension-button rental-extension-button--primary">Close Preview</button></div>
+          </section>
+        ) : (
+          <form className="rental-return-form" onSubmit={handleSubmit} noValidate>
+            <div className="rental-return-field">
+              <label htmlFor="return-pickup-date">Preferred Pickup Date <span aria-hidden="true">*</span></label>
+              <div className={`rental-return-date-wrap${pickupDate ? " has-value" : ""}`}><FiCalendar aria-hidden="true" className="rental-return-date-leading" /><span className="rental-return-date-placeholder" aria-hidden="true">Select pickup date</span><input id="return-pickup-date" type="date" min={minimumDate} value={pickupDate} onChange={(event) => { setPickupDate(event.target.value); setErrors((previous) => ({ ...previous, pickupDate: "" })); }} aria-invalid={Boolean(errors.pickupDate)} aria-describedby={errors.pickupDate ? "return-pickup-error" : undefined} /><FiCalendar aria-hidden="true" className="rental-return-date-trailing" /></div>
+              {errors.pickupDate && <small id="return-pickup-error" className="rental-return-error" role="alert">{errors.pickupDate}</small>}
+            </div>
+            <div className="rental-return-field">
+              <label htmlFor="return-reason">Reason for Return <span aria-hidden="true">*</span></label>
+              <div className="rental-return-select-wrap"><select id="return-reason" value={reason} onChange={(event) => { setReason(event.target.value); setErrors((previous) => ({ ...previous, reason: "" })); }} aria-invalid={Boolean(errors.reason)} aria-describedby={errors.reason ? "return-reason-error" : undefined}><option value="">Select a reason</option><option>Rental period completed</option><option>No longer required</option><option>Relocating</option><option>Product-related issue</option><option>Other</option></select><FiChevronDown aria-hidden="true" /></div>
+              {errors.reason && <small id="return-reason-error" className="rental-return-error" role="alert">{errors.reason}</small>}
+            </div>
+            <div className="rental-return-field">
+              <label htmlFor="return-notes">Additional Notes (Optional)</label>
+              <textarea id="return-notes" maxLength={250} value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="e.g., Moving to a new location, no longer needed, etc." />
+              <small className="rental-return-counter" aria-live="polite">{notes.length} / 250</small>
+            </div>
+            <footer className="rental-return-actions"><button type="button" onClick={onClose} className="rental-extension-button rental-extension-button--secondary">Cancel</button><button type="submit" className="rental-extension-button rental-extension-button--primary">Request Return</button></footer>
+          </form>
+        )}
+      </section>
+    </div>
+  ), document.body);
 }
 
 function ExtensionFact({ icon: Icon, label, value }) {
