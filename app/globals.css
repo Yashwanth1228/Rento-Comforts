@@ -1796,6 +1796,99 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   .account-address-empty-actions .account-address-add-button { width: min(100%, 330px); }
 }
 
+/* Add New Address local form preview. */
+.account-address-form-heading { display: flex; align-items: center; gap: 12px; }
+.account-address-form-heading .account-address-back { width: 34px; height: 34px; }
+.account-address-form-layout { display: grid; min-height: 0; flex: 1; grid-template-columns: minmax(220px, 28%) minmax(0, 1fr); gap: 22px; }
+.account-address-form-aside { display: flex; min-height: 100%; flex-direction: column; align-items: center; justify-content: center; border-radius: 18px; background: linear-gradient(160deg, #f5faf1, #edf5e8); padding: 22px; text-align: center; }
+.account-address-form-aside .account-address-illustration { width: min(100%, 280px); height: auto; }
+.account-address-form-aside h2 { margin-top: 14px; color: #252925; font-size: 21px; font-weight: 800; line-height: 1.25; }
+.account-address-form-aside p { max-width: 250px; margin-top: 8px; color: #445264; font-size: 14px; line-height: 1.55; }
+.account-address-form { display: flex; min-width: 0; flex-direction: column; gap: 16px; }
+.account-address-type-fieldset { min-width: 0; border: 0; padding: 0; }
+.account-address-type-fieldset legend,.account-address-form-field > span { display: block; margin-bottom: 7px; color: #252925; font-size: 14px; font-weight: 750; }
+.account-address-type-fieldset legend > span,.account-address-form-field b { color: #b82f28; }
+.account-address-type-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.account-address-type-option { position: relative; display: flex; min-height: 48px; align-items: center; justify-content: center; gap: 9px; border: 1px solid #d7ddd7; border-radius: 11px; background: #fff; color: #252925; cursor: pointer; font-size: 14px; font-weight: 700; }
+.account-address-type-option.is-selected { border-color: #08763b; background: #eef8e9; color: #155c2c; box-shadow: inset 0 0 0 1px #08763b; }
+.account-address-type-option input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.account-address-type-option:focus-within { outline: 3px solid rgba(1, 127, 54, .28); outline-offset: 2px; }
+.account-address-type-option svg { width: 21px; height: 21px; }
+.account-address-form-grid { display: grid; min-width: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px 16px; }
+.account-address-form-field { display: block; min-width: 0; }
+.account-address-form-field--wide { grid-column: 1 / -1; }
+.account-address-form-field input { display: block; width: 100%; min-width: 0; min-height: 44px; border: 1px solid #cfd6d2; border-radius: 10px; background: #fff; padding: 9px 12px; color: #252925; font-size: 14px; }
+.account-address-form-field input:focus { border-color: #08763b; outline: 3px solid rgba(1, 127, 54, .15); }
+.account-address-form-field input[aria-invalid="true"] { border-color: #b82f28; }
+.account-address-form-field small { display: block; margin-top: 4px; color: #a62e27; font-size: 11px; line-height: 1.35; }
+.account-address-default-checkbox { display: grid; grid-template-columns: 20px minmax(0, max-content); align-items: center; gap: 5px 9px; color: #303831; font-size: 13px; font-weight: 700; }
+.account-address-default-checkbox input { width: 18px; height: 18px; accent-color: #08763b; }
+.account-address-default-checkbox small { grid-column: 2; color: #68776b; font-size: 10px; font-weight: 500; }
+.account-address-form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: auto; padding-top: 4px; }
+.account-address-form-actions button { min-width: 150px; min-height: 48px; border: 1px solid #cfd6d2; border-radius: 11px; padding: 10px 18px; font-size: 15px; font-weight: 750; }
+.account-address-form-cancel { background: #fff; color: #252925; }
+.account-address-form-save { border-color: #08763b !important; background: #08763b; color: #fff; }
+.account-address-form-save:hover { background: #124734; }
+.account-address-form-preview { width: min(100%, 820px); margin: auto; border: 1px solid #cfe4c9; border-radius: 18px; background: #f7fbf4; padding: 26px; }
+.account-address-form-preview .account-address-preview-label { margin: 0; }
+.account-address-form-preview h2 { margin-top: 7px; color: #124734; font-size: 25px; font-weight: 800; }
+.account-address-preview-notice { margin-top: 6px; color: #445264; font-size: 14px; line-height: 1.5; }
+.account-address-form-preview dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 20px; }
+.account-address-form-preview dl > div { min-width: 0; border-top: 1px solid #dbe7d7; padding-top: 10px; }
+.account-address-form-preview dt { color: #68776b; font-size: 12px; font-weight: 700; }
+.account-address-form-preview dd { margin-top: 4px; color: #252925; font-size: 14px; overflow-wrap: anywhere; }
+
+@media (min-width: 768px) and (max-width: 1279px) {
+  .account-address-form-layout { grid-template-columns: minmax(0, 1fr); }
+  .account-address-form-aside { display: none; }
+  .account-address-form-grid { gap: 12px; }
+}
+
+@media (max-width: 767px) {
+  .account-address-form-layout { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .account-address-form-aside { display: none; }
+  .account-address-form { gap: 14px; }
+  .account-address-form-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .account-address-form-field--wide { grid-column: auto; }
+  .account-address-type-options { gap: 7px; }
+  .account-address-type-option { min-height: 48px; gap: 5px; font-size: 13px; }
+  .account-address-type-option svg { width: 18px; height: 18px; }
+  .account-address-form-field > span { font-size: 13px; }
+  .account-address-form-field input { min-height: 48px; font-size: 16px; }
+  .account-address-default-checkbox { padding: 10px; border-radius: 10px; background: #f0f7ec; }
+  .account-address-form-actions { position: sticky; bottom: calc(72px + env(safe-area-inset-bottom)); z-index: 2; margin-inline: -13px; padding: 12px 13px max(12px, env(safe-area-inset-bottom)); background: rgba(248, 247, 242, .96); }
+  .account-address-form-actions button { min-width: 0; flex: 1; min-height: 50px; padding: 9px 10px; font-size: 14px; }
+  .account-address-form-preview { padding: 18px 14px; }
+  .account-address-form-preview dl { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+}
+
+/* Match the approved compact Add Address panel and its delivery illustration. */
+.account-address-form-layout { grid-template-columns: minmax(270px, 26%) minmax(0, 1fr); gap: 20px; }
+.account-address-form-aside .account-address-form-artwork { display: block; width: min(100%, 330px); max-width: 330px; height: auto; margin-bottom: 2px; }
+.account-address-form { gap: 10px; }
+.account-address-type-fieldset legend,.account-address-form-field > span { margin-bottom: 4px; }
+.account-address-type-options { gap: 9px; }
+.account-address-type-option { min-height: 43px; }
+.account-address-form-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px 14px; }
+.account-address-form-field { grid-column: span 3; }
+.account-address-form-field--wide { grid-column: 1 / -1; }
+.account-address-form-field--third { grid-column: span 2; }
+.account-address-location-grid { display: grid; min-width: 0; grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.account-address-location-grid .account-address-form-field { grid-column: auto; }
+.account-address-form-field input { min-height: 40px; padding-block: 7px; }
+.account-address-form-actions button { min-height: 44px; }
+
+@media (min-width: 768px) and (max-width: 1279px) {
+  .account-address-form-layout { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .account-address-form-grid { gap: 9px 12px; }
+}
+
+@media (max-width: 767px) {
+  .account-address-form-grid { grid-template-columns: minmax(0, 1fr); gap: 11px; }
+  .account-address-form-field,.account-address-form-field--wide,.account-address-form-field--third { grid-column: 1 / -1; }
+  .account-address-location-grid { grid-column: 1; grid-template-columns: minmax(0, 1fr); gap: 11px; }
+}
+
 /* Populated cart layout: explicit rules keep the product and summary columns reliable. */
 .cart-populated-layout { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; gap: 20px; }
 .cart-populated-items { min-width: 0; }

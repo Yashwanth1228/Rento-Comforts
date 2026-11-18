@@ -6,6 +6,7 @@ import { FiArrowLeft, FiBriefcase, FiCheck, FiEdit2, FiHome, FiMapPin, FiMoreVer
 import AccountPageContainer from "@/components/account/account-page-container";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
 import AddressEmptyIllustration from "@/components/account/address-empty-illustration";
+import AddressFormIllustration from "@/components/account/address-form-illustration";
 
 function AccountMessage({ title, description, signedOut, onRetry }) {
   return (
@@ -28,6 +29,18 @@ const SAMPLE_ADDRESSES = [
   { id: "sample-work", type: "Work", recipient: "Sample Resident Two", address: "Rento Comforts Sample Office, 4th Floor, Prestige Tech Park, Marathahalli, Bengaluru – 560037, Karnataka", phone: "+91 90000 10002", isDefault: false },
   { id: "sample-other", type: "Other", recipient: "Sample Resident Three", address: "#18, 1st Main, 3rd Cross, JP Nagar 6th Phase, Bengaluru – 560078, Karnataka", phone: "+91 90000 10003", isDefault: false },
 ];
+
+const EMPTY_ADDRESS_FORM = {
+  addressType: "Home",
+  fullName: "",
+  mobile: "",
+  line1: "",
+  line2: "",
+  city: "",
+  state: "",
+  pinCode: "",
+  isDefault: false,
+};
 
 function AddAddressInfoDialog({ title, description, onClose, triggerRef }) {
   const dialogRef = useRef(null);
@@ -81,6 +94,10 @@ export default function AccountAddressesScreen({ isDevelopmentPreview = false })
   const [showInfo, setShowInfo] = useState(false);
   const [infoContent, setInfoContent] = useState(null);
   const [showPopulatedPreview, setShowPopulatedPreview] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  const [formValues, setFormValues] = useState(EMPTY_ADDRESS_FORM);
+  const [formErrors, setFormErrors] = useState({});
+  const [formPreview, setFormPreview] = useState(null);
   const addAddressButtonRef = useRef(null);
   const closeInfo = useCallback(() => setShowInfo(false), []);
 
@@ -134,6 +151,19 @@ export default function AccountAddressesScreen({ isDevelopmentPreview = false })
   }
 
   function showActionPreview(event, action) {
+    if (action === "Add New Address") {
+      if (!isDevelopmentPreview) {
+        addAddressButtonRef.current = event.currentTarget;
+        setInfoContent({ title: "Address management is not available yet", description: "Address management will be available once the saved-address service is connected." });
+        setShowInfo(true);
+        return;
+      }
+      setFormValues({ ...EMPTY_ADDRESS_FORM });
+      setFormErrors({});
+      setFormPreview(null);
+      setFormOpen(true);
+      return;
+    }
     addAddressButtonRef.current = event.currentTarget;
     const descriptions = {
       "Add New Address": "The address form is planned for Step 20H-3. No address has been added or saved.",
@@ -145,23 +175,77 @@ export default function AccountAddressesScreen({ isDevelopmentPreview = false })
     setShowInfo(true);
   }
 
+  function updateFormField(event) {
+    const { name, value, checked, type } = event.target;
+    setFormValues((current) => ({ ...current, [name]: type === "checkbox" ? checked : value }));
+    setFormErrors((current) => ({ ...current, [name]: "" }));
+  }
+
+  function validateAddressForm() {
+    const errors = {};
+    const required = [
+      ["fullName", "Enter the recipient’s full name."],
+      ["mobile", "Enter a valid 10-digit Indian mobile number."],
+      ["line1", "Enter the house or flat number, street, and area."],
+      ["city", "Enter the city."],
+      ["state", "Enter the state."],
+      ["pinCode", "Enter a six-digit PIN code."],
+    ];
+    for (const [field, message] of required) {
+      if (!String(formValues[field]).trim()) errors[field] = message;
+    }
+    const normalizedMobile = formValues.mobile.trim().replace(/[\s()-]/g, "");
+    if (formValues.mobile.trim() && !/^(?:\+?91)?[6-9]\d{9}$/.test(normalizedMobile)) {
+      errors.mobile = "Enter a valid 10-digit Indian mobile number, with or without +91.";
+    }
+    if (formValues.pinCode.trim() && !/^\d{6}$/.test(formValues.pinCode.trim())) {
+      errors.pinCode = "PIN code must contain exactly six digits.";
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  }
+
+  function handleAddressFormSubmit(event) {
+    event.preventDefault();
+    if (!isDevelopmentPreview || !validateAddressForm()) return;
+    const digits = formValues.mobile.replace(/\D/g, "");
+    setFormPreview({ ...formValues, fullName: formValues.fullName.trim(), mobile: digits.slice(-10) });
+  }
+
+  function returnToAddresses() {
+    setFormOpen(false);
+    setFormValues({ ...EMPTY_ADDRESS_FORM });
+    setFormErrors({});
+    setFormPreview(null);
+  }
+
   return (
     <>
       <div className="hidden xl:block">
         <AccountWelcomeBanner fullName={account?.fullName ?? ""} title="My Account" description="Manage your profile, orders, rentals, and account preferences." compact />
       </div>
       <header className="account-address-mobile-heading xl:hidden">
-        <Link href="/account" aria-label="Back to account overview" className="account-address-back"><FiArrowLeft aria-hidden="true" /></Link>
-        <h1>My Addresses</h1>
+        {formOpen ? (
+          <button type="button" onClick={returnToAddresses} aria-label="Back to My Addresses" className="account-address-back"><FiArrowLeft aria-hidden="true" /></button>
+        ) : (
+          <Link href="/account" aria-label="Back to account overview" className="account-address-back"><FiArrowLeft aria-hidden="true" /></Link>
+        )}
+        <h1>{formOpen ? "Add New Address" : "My Addresses"}</h1>
       </header>
 
       <main className="account-address-main">
         <AccountPageContainer as="section" className="account-address-panel" aria-label="My Addresses">
           <header className="account-address-panel__heading hidden xl:block">
-            <h1 id="account-address-title">My Addresses</h1>
-            <p>Manage your delivery and pickup addresses for rentals and purchases.</p>
+            {formOpen ? (
+              <div className="account-address-form-heading">
+                <button type="button" onClick={returnToAddresses} aria-label="Back to My Addresses" className="account-address-back"><FiArrowLeft aria-hidden="true" /></button>
+                <div><h1 id="account-address-title">Add New Address</h1><p>Save your address for faster rentals and purchases.</p></div>
+              </div>
+            ) : (
+              <><h1 id="account-address-title">My Addresses</h1><p>Manage your delivery and pickup addresses for rentals and purchases.</p></>
+            )}
           </header>
-          <p className="account-address-panel__mobile-description xl:hidden">Manage your delivery and pickup addresses for rentals and purchases.</p>
+          {!formOpen && <p className="account-address-panel__mobile-description xl:hidden">Manage your delivery and pickup addresses for rentals and purchases.</p>}
 
           {loading ? (
             <div className="account-address-loading" role="status" aria-live="polite"><span /><span /><span className="sr-only">Checking your account...</span></div>
@@ -171,6 +255,55 @@ export default function AccountAddressesScreen({ isDevelopmentPreview = false })
             <AccountMessage title="Account profile not available" description="We could not find a customer profile for this account." onRetry={retry} />
           ) : pageState === "error" ? (
             <AccountMessage title="Account information unavailable" description="We could not verify your account right now. Check your connection and try again." onRetry={retry} />
+          ) : pageState === "ready" && isDevelopmentPreview && formOpen ? (
+            formPreview ? (
+              <section className="account-address-form-preview" aria-labelledby="address-form-preview-title">
+                <p className="account-address-preview-label">Sample Addresses — UI Preview</p>
+                <h2 id="address-form-preview-title">Address Form Preview</h2>
+                <p className="account-address-preview-notice">This form has been validated locally. No address has been saved to your account.</p>
+                <dl>
+                  <div><dt>Address type</dt><dd>{formPreview.addressType}{formPreview.isDefault ? " · Set as default" : ""}</dd></div>
+                  <div><dt>Recipient</dt><dd>{formPreview.fullName}</dd></div>
+                  <div><dt>Mobile number</dt><dd>+91 {formPreview.mobile}</dd></div>
+                  <div><dt>Address</dt><dd>{[formPreview.line1, formPreview.line2, formPreview.city, formPreview.state, formPreview.pinCode].filter(Boolean).join(", ")}</dd></div>
+                </dl>
+                <div className="account-address-form-actions"><button type="button" className="account-address-form-cancel" onClick={returnToAddresses}>Back to My Addresses</button><button type="button" className="account-address-form-save" onClick={returnToAddresses}>Done</button></div>
+              </section>
+            ) : (
+              <div className="account-address-form-layout">
+                <aside className="account-address-form-aside">
+                  <AddressFormIllustration />
+                  <h2>Add a Delivery Address</h2>
+                  <p>Save your address for faster rentals and purchases.</p>
+                </aside>
+                <form className="account-address-form" noValidate onSubmit={handleAddressFormSubmit}>
+                  <fieldset className="account-address-type-fieldset">
+                    <legend>Address Type <span aria-hidden="true">*</span></legend>
+                    <div className="account-address-type-options">
+                      {[{ value: "Home", Icon: FiHome }, { value: "Work", Icon: FiBriefcase }, { value: "Other", Icon: FiMapPin }].map(({ value, Icon }) => (
+                        <label key={value} className={`account-address-type-option${formValues.addressType === value ? " is-selected" : ""}`}>
+                          <input type="radio" name="addressType" value={value} checked={formValues.addressType === value} required onChange={updateFormField} />
+                          <Icon aria-hidden="true" /><span>{value}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                  <div className="account-address-form-grid">
+                    <label className="account-address-form-field"><span>Recipient Name <b>*</b></span><input name="fullName" autoComplete="name" required value={formValues.fullName} onChange={updateFormField} aria-invalid={Boolean(formErrors.fullName)} aria-describedby={formErrors.fullName ? "address-full-name-error" : undefined} />{formErrors.fullName && <small id="address-full-name-error" role="alert">{formErrors.fullName}</small>}</label>
+                    <label className="account-address-form-field"><span>Mobile Number <b>*</b></span><input name="mobile" type="tel" inputMode="tel" autoComplete="tel-national" maxLength={16} required value={formValues.mobile} onChange={updateFormField} aria-invalid={Boolean(formErrors.mobile)} aria-describedby={formErrors.mobile ? "address-mobile-error" : undefined} />{formErrors.mobile && <small id="address-mobile-error" role="alert">{formErrors.mobile}</small>}</label>
+                    <label className="account-address-form-field account-address-form-field--wide"><span>Address Line 1 <b>*</b></span><input name="line1" autoComplete="address-line1" required value={formValues.line1} onChange={updateFormField} aria-invalid={Boolean(formErrors.line1)} aria-describedby={formErrors.line1 ? "address-line1-error" : undefined} />{formErrors.line1 && <small id="address-line1-error" role="alert">{formErrors.line1}</small>}</label>
+                    <label className="account-address-form-field account-address-form-field--wide"><span>Address Line 2 (Optional)</span><input name="line2" autoComplete="address-line2" value={formValues.line2} onChange={updateFormField} /></label>
+                    <div className="account-address-location-grid">
+                      <label className="account-address-form-field"><span>City <b>*</b></span><input name="city" autoComplete="address-level2" required value={formValues.city} onChange={updateFormField} aria-invalid={Boolean(formErrors.city)} aria-describedby={formErrors.city ? "address-city-error" : undefined} />{formErrors.city && <small id="address-city-error" role="alert">{formErrors.city}</small>}</label>
+                      <label className="account-address-form-field"><span>State <b>*</b></span><input name="state" autoComplete="address-level1" required value={formValues.state} onChange={updateFormField} aria-invalid={Boolean(formErrors.state)} aria-describedby={formErrors.state ? "address-state-error" : undefined} />{formErrors.state && <small id="address-state-error" role="alert">{formErrors.state}</small>}</label>
+                      <label className="account-address-form-field"><span>PIN Code <b>*</b></span><input name="pinCode" type="text" inputMode="numeric" autoComplete="postal-code" maxLength={6} required value={formValues.pinCode} onChange={updateFormField} aria-invalid={Boolean(formErrors.pinCode)} aria-describedby={formErrors.pinCode ? "address-pin-error" : undefined} />{formErrors.pinCode && <small id="address-pin-error" role="alert">{formErrors.pinCode}</small>}</label>
+                    </div>
+                  </div>
+                  <label className="account-address-default-checkbox"><input type="checkbox" name="isDefault" checked={formValues.isDefault} onChange={updateFormField} /><span>Set as Default Address</span></label>
+                  <div className="account-address-form-actions"><button type="button" className="account-address-form-cancel" onClick={returnToAddresses}>Cancel</button><button type="submit" className="account-address-form-save">Save Address</button></div>
+                </form>
+              </div>
+            )
           ) : pageState === "ready" && isDevelopmentPreview && showPopulatedPreview ? (
             <div className="account-address-list-view">
               <div className="account-address-list-toolbar">
