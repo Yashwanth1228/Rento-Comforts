@@ -19,7 +19,7 @@ const sidebarItems = [
   { label: "Personal Information", Icon: FiUser, href: "/account/personal-information", section: "personal-information" },
   { label: "My Orders", Icon: FiBox, href: "/account/orders", section: "orders" },
   { label: "My Rentals", Icon: FiTruck, href: "/account/rentals", section: "rentals" },
-  { label: "My Addresses", Icon: FiMapPin },
+  { label: "My Addresses", Icon: FiMapPin, href: "/account/addresses", section: "addresses" },
   { label: "Payments & Invoices", Icon: FiCreditCard },
   { label: "Help & Support", Icon: FiHeadphones },
   { label: "Account Settings", Icon: FiSettings },

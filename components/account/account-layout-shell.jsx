@@ -10,6 +10,7 @@ import { AccountCompactNavigation, AccountSidebar } from "@/components/account/a
 function getActiveSection(pathname) {
   if (pathname === "/account/orders" || pathname === "/dev/orders-preview") return "orders";
   if (pathname?.startsWith("/account/rentals")) return "rentals";
+  if (pathname?.startsWith("/account/addresses")) return "addresses";
   if (pathname === "/account/personal-information") return "personal-information";
   return "overview";
 }
