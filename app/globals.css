@@ -1730,6 +1730,72 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   }
 }
 
+/* Populated My Addresses development preview. */
+.account-address-list-view { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 16px; }
+.account-address-list-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 0 2px 4px; }
+.account-address-list-toolbar .account-address-preview-label { margin: 0 0 3px; color: #68776b; }
+.account-address-list-toolbar h2 { color: #252925; font-size: 25px; font-weight: 800; line-height: 1.2; }
+.account-address-list-toolbar .account-address-add-button { min-width: 210px; min-height: 50px; margin: 0; border-radius: 12px; padding: 10px 18px; font-size: 16px; }
+.account-address-list-toolbar .account-address-add-button svg { width: 22px; height: 22px; }
+.account-address-cards { display: flex; min-width: 0; flex-direction: column; gap: 14px; }
+.account-address-card { display: grid; min-width: 0; grid-template-columns: 68px minmax(0, 1fr) auto; align-items: center; gap: 18px; border: 1px solid #e2e5df; border-radius: 16px; background: #fff; padding: 18px 20px; box-shadow: 0 3px 12px rgba(37, 41, 37, .035); }
+.account-address-card--default { border-color: #86bd8a; background: linear-gradient(110deg, #f4faf1, #fff 72%); }
+.account-address-card__icon { display: grid; width: 68px; height: 68px; place-items: center; border-radius: 14px; color: #08763b; background: #eaf5e5; }
+.account-address-card__icon svg { width: 34px; height: 34px; }
+.account-address-card__details { min-width: 0; }
+.account-address-card__title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 9px 12px; }
+.account-address-card__title-row h3 { color: #252925; font-size: 21px; font-weight: 800; line-height: 1.25; }
+.account-address-default-badge,.account-address-card__current-default { display: inline-flex; min-height: 28px; align-items: center; gap: 6px; border-radius: 999px; background: #e5f3df; padding: 3px 11px; color: #155c2c; font-size: 12px; font-weight: 750; white-space: nowrap; }
+.account-address-default-badge svg,.account-address-card__current-default svg { width: 15px; height: 15px; }
+.account-address-card__recipient { margin-top: 5px; color: #59635c; font-size: 13px; font-weight: 650; }
+.account-address-card__recipient span { color: #778178; font-size: 11px; font-weight: 500; }
+.account-address-card__address,.account-address-card__phone { display: flex; min-width: 0; align-items: flex-start; gap: 9px; color: #343b36; font-size: 14px; line-height: 1.45; }
+.account-address-card__address { margin-top: 7px; }
+.account-address-card__phone { align-items: center; margin-top: 8px; }
+.account-address-card__address svg,.account-address-card__phone svg { width: 17px; height: 17px; flex: 0 0 auto; margin-top: 2px; color: #124734; }
+.account-address-card__phone svg { margin-top: 0; }
+.account-address-card__actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; border-left: 1px solid #e4e7e1; padding-left: 18px; }
+.account-address-card__actions button { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; gap: 7px; border: 1px solid #d8ddd7; border-radius: 10px; background: #fff; padding: 0 12px; color: #252925; font-size: 13px; font-weight: 700; white-space: nowrap; }
+.account-address-card__actions button svg { width: 16px; height: 16px; }
+.account-address-card__actions .account-address-card__delete { border-color: #e9b0aa; color: #a6322b; }
+.account-address-card__actions .account-address-card__set-default { border-color: #9ac89a; color: #155c2c; }
+.account-address-card__current-default { margin-inline: 2px; }
+.account-address-card__actions .account-address-card__more { display: none; width: 40px; padding: 0; }
+.account-address-preview-exit { align-self: flex-start; min-height: 38px; border: 0; background: transparent; padding: 4px 2px; color: #526257; font-size: 12px; text-decoration: underline; text-underline-offset: 3px; }
+.account-address-open-preview { min-height: 36px; border: 1px solid #9ac89a; border-radius: 9px; background: #fff; padding: 0 14px; color: #155c2c; font-size: 12px; font-weight: 700; }
+.account-address-empty-actions { display: flex; flex-direction: column; align-items: center; gap: 11px; margin-top: 34px; }
+.account-address-empty-actions .account-address-add-button { margin-top: 0; }
+
+@media (min-width: 768px) and (max-width: 1279px) {
+  .account-address-list-toolbar h2 { font-size: 23px; }
+  .account-address-card { grid-template-columns: 58px minmax(0, 1fr); gap: 13px; padding: 16px; }
+  .account-address-card__icon { width: 58px; height: 58px; }
+  .account-address-card__icon svg { width: 30px; height: 30px; }
+  .account-address-card__actions { grid-column: 2; justify-content: flex-start; flex-wrap: wrap; border-top: 1px solid #e4e7e1; border-left: 0; padding: 12px 0 0; }
+}
+
+@media (max-width: 767px) {
+  .account-address-list-view { gap: 13px; }
+  .account-address-list-toolbar { align-items: stretch; flex-direction: column; gap: 12px; }
+  .account-address-list-toolbar h2 { font-size: 22px; }
+  .account-address-list-toolbar .account-address-add-button { width: 100%; min-height: 50px; }
+  .account-address-card { grid-template-columns: 48px minmax(0, 1fr) 32px; align-items: start; gap: 11px; border-radius: 15px; padding: 14px 12px; }
+  .account-address-card__icon { width: 48px; height: 48px; border-radius: 12px; }
+  .account-address-card__icon svg { width: 25px; height: 25px; }
+  .account-address-card__title-row { align-items: flex-start; flex-direction: column; gap: 6px; }
+  .account-address-card__title-row h3 { font-size: 19px; }
+  .account-address-card__recipient { font-size: 12px; }
+  .account-address-card__recipient span { display: block; }
+  .account-address-card__address,.account-address-card__phone { font-size: 13px; }
+  .account-address-card__actions { grid-column: 2 / 4; justify-content: flex-start; flex-wrap: wrap; gap: 5px; border-top: 1px solid #e4e7e1; border-left: 0; padding: 10px 0 0; }
+  .account-address-card__actions button { min-height: 42px; gap: 6px; padding-inline: 10px; font-size: 12px; }
+  .account-address-card__actions .account-address-card__more { display: inline-flex; margin-left: auto; }
+  .account-address-card__current-default { display: none; }
+  .account-address-preview-exit { align-self: center; }
+  .account-address-empty-actions { width: 100%; margin-top: 20px; }
+  .account-address-empty-actions .account-address-add-button { width: min(100%, 330px); }
+}
+
 /* Populated cart layout: explicit rules keep the product and summary columns reliable. */
 .cart-populated-layout { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; gap: 20px; }
 .cart-populated-items { min-width: 0; }
