@@ -11,6 +11,7 @@ import {
   FiLoader,
   FiLock,
   FiMail,
+  FiMapPin,
   FiPhone,
   FiRefreshCw,
   FiShield,
@@ -342,6 +343,18 @@ export default function AccountPersonalInformationScreen() {
                         {saveMessage && <p className="mt-2 text-xs font-semibold text-[#155b2d]" role="status" aria-live="polite">{saveMessage}</p>}
                       </div>
                     </div>
+                  </section>
+
+                  <section aria-labelledby="saved-addresses-heading" className="flex flex-col gap-3 rounded-2xl border border-[#e5e3dc] bg-white p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+                    <div className="flex min-w-0 items-start gap-3">
+                      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#e9f1e9] text-[#124734]"><FiMapPin aria-hidden="true" className="size-5" /></span>
+                      <div>
+                        <h2 id="saved-addresses-heading" className="text-lg font-bold text-[#252925]">Saved Addresses</h2>
+                        <p className="mt-1 text-sm text-[#59635c]">Manage your delivery, installation and pickup addresses.</p>
+                        <p className="mt-1 text-sm text-[#687169]">Your saved addresses will appear here when address management is connected.</p>
+                      </div>
+                    </div>
+                    <Link href="/account/addresses" className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg border border-[#08763b] px-4 text-sm font-bold text-[#124734] hover:bg-[#e9f1e9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017f36]">Manage Addresses</Link>
                   </section>
 
                   <section className="rounded-2xl border border-[#e5e3dc] bg-white p-5 xl:hidden">

@@ -1578,6 +1578,12 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .account-address-dialog h2 { padding-right: 30px; color: #124734; font-size: 21px; font-weight: 750; }
 .account-address-dialog p { margin-top: 10px; color: #59635c; font-size: 14px; line-height: 1.6; }
 .account-address-dialog__button { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; margin-top: 22px; border: 0; border-radius: 10px; background: #08763b; padding: 0 22px; color: #fff; font-weight: 700; }
+.account-address-dialog__actions { display: flex; justify-content: flex-end; gap: 10px; }
+.account-address-dialog__actions .account-address-dialog__button { min-width: 122px; }
+.account-address-dialog__button--cancel { border: 1px solid #cfd6d2; background: #fff; color: #124734; }
+.account-address-dialog__button--destructive { background: #b42318; }
+.account-address-dialog__button--destructive:hover { background: #921d15; }
+.account-address-dialog__actions button:focus-visible { outline: 3px solid rgba(1,127,54,.35); outline-offset: 3px; }
 
 @media (min-width: 640px) {
   .account-address-mobile-heading { padding-inline: 28px; }
@@ -1732,6 +1738,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 
 /* Populated My Addresses development preview. */
 .account-address-list-view { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 16px; }
+.account-address-list-view > .account-address-preview-notice { margin: -8px 0 0; }
 .account-address-list-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 0 2px 4px; }
 .account-address-list-toolbar .account-address-preview-label { margin: 0 0 3px; color: #68776b; }
 .account-address-list-toolbar h2 { color: #252925; font-size: 25px; font-weight: 800; line-height: 1.2; }

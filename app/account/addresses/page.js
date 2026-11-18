@@ -5,6 +5,8 @@ export const metadata = {
   description: "Manage your delivery and pickup addresses for Rento Comforts.",
 };
 
-export default function AccountAddressesPage() {
-  return <AccountAddressesScreen isDevelopmentPreview={process.env.NODE_ENV === "development"} />;
+export default async function AccountAddressesPage() {
+  const isDevelopmentPreview = process.env.NODE_ENV === "development";
+  const sampleAddresses = isDevelopmentPreview ? (await import("@/data/sample-addresses.preview")).sampleAddresses : [];
+  return <AccountAddressesScreen isDevelopmentPreview={isDevelopmentPreview} sampleAddresses={sampleAddresses} />;
 }

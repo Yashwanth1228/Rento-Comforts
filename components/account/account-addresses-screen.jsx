@@ -24,12 +24,6 @@ function AccountMessage({ title, description, signedOut, onRetry }) {
   );
 }
 
-const SAMPLE_ADDRESSES = [
-  { id: "sample-home", type: "Home", recipient: "Sample Resident One", address: "#42, 2nd Cross, Kengeri Satellite Town, Bengaluru – 560060, Karnataka", phone: "+91 90000 10001", isDefault: true },
-  { id: "sample-work", type: "Work", recipient: "Sample Resident Two", address: "Rento Comforts Sample Office, 4th Floor, Prestige Tech Park, Marathahalli, Bengaluru – 560037, Karnataka", phone: "+91 90000 10002", isDefault: false },
-  { id: "sample-other", type: "Other", recipient: "Sample Resident Three", address: "#18, 1st Main, 3rd Cross, JP Nagar 6th Phase, Bengaluru – 560078, Karnataka", phone: "+91 90000 10003", isDefault: false },
-];
-
 const EMPTY_ADDRESS_FORM = {
   addressType: "Home",
   fullName: "",
@@ -42,7 +36,7 @@ const EMPTY_ADDRESS_FORM = {
   isDefault: false,
 };
 
-function AddAddressInfoDialog({ title, description, onClose, triggerRef }) {
+function AddAddressInfoDialog({ title, description, onClose, triggerRef, confirmLabel, onConfirm, destructive = false }) {
   const dialogRef = useRef(null);
 
   useEffect(() => {
@@ -50,7 +44,9 @@ function AddAddressInfoDialog({ title, description, onClose, triggerRef }) {
     const previousFocus = document.activeElement;
     const trigger = triggerRef.current;
     if (!dialog) return undefined;
-    dialog.focus();
+    const initialFocus = dialog.querySelector("[data-dialog-initial-focus]");
+    if (initialFocus instanceof HTMLElement) initialFocus.focus();
+    else dialog.focus();
 
     function handleKeyDown(event) {
       if (event.key === "Escape") onClose();
@@ -71,22 +67,30 @@ function AddAddressInfoDialog({ title, description, onClose, triggerRef }) {
       window.removeEventListener("keydown", handleKeyDown);
       if (trigger?.isConnected) trigger.focus();
       else if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
+      else document.querySelector(".account-address-list-view h2, .account-address-empty-state h2")?.focus();
     };
   }, [onClose, triggerRef]);
 
   return (
     <div className="account-address-dialog-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
       <section ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="address-dialog-title" className="account-address-dialog">
-        <button type="button" onClick={onClose} aria-label="Close information" className="account-address-dialog__close"><FiX aria-hidden="true" /></button>
+        <button type="button" onClick={onClose} aria-label="Close dialog" className="account-address-dialog__close"><FiX aria-hidden="true" /></button>
         <h2 id="address-dialog-title">{title}</h2>
         <p>{description}</p>
-        <button type="button" onClick={onClose} className="account-address-dialog__button">Close</button>
+        {onConfirm ? (
+          <div className="account-address-dialog__actions">
+            <button type="button" data-dialog-initial-focus onClick={onClose} className="account-address-dialog__button account-address-dialog__button--cancel">Cancel</button>
+            <button type="button" onClick={onConfirm} className={`account-address-dialog__button${destructive ? " account-address-dialog__button--destructive" : ""}`}>{confirmLabel}</button>
+          </div>
+        ) : (
+          <button type="button" data-dialog-initial-focus onClick={onClose} className="account-address-dialog__button">Close</button>
+        )}
       </section>
     </div>
   );
 }
 
-export default function AccountAddressesScreen({ isDevelopmentPreview = false }) {
+export default function AccountAddressesScreen({ isDevelopmentPreview = false, sampleAddresses = [] }) {
   const [retryKey, setRetryKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [account, setAccount] = useState(null);
@@ -94,7 +98,12 @@ export default function AccountAddressesScreen({ isDevelopmentPreview = false })
   const [showInfo, setShowInfo] = useState(false);
   const [infoContent, setInfoContent] = useState(null);
   const [showPopulatedPreview, setShowPopulatedPreview] = useState(false);
+  const [previewAddresses, setPreviewAddresses] = useState([]);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [previewNotice, setPreviewNotice] = useState("");
   const [formOpen, setFormOpen] = useState(false);
+  const [formMode, setFormMode] = useState("add");
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [formValues, setFormValues] = useState(EMPTY_ADDRESS_FORM);
   const [formErrors, setFormErrors] = useState({});
   const [formPreview, setFormPreview] = useState(null);
@@ -150,7 +159,7 @@ export default function AccountAddressesScreen({ isDevelopmentPreview = false })
     setRetryKey((value) => value + 1);
   }
 
-  function showActionPreview(event, action) {
+  function showActionPreview(event, action, address) {
     if (action === "Add New Address") {
       if (!isDevelopmentPreview) {
         addAddressButtonRef.current = event.currentTarget;
@@ -158,21 +167,55 @@ export default function AccountAddressesScreen({ isDevelopmentPreview = false })
         setShowInfo(true);
         return;
       }
+      setFormMode("add");
+      setSelectedAddressId(null);
       setFormValues({ ...EMPTY_ADDRESS_FORM });
       setFormErrors({});
       setFormPreview(null);
       setFormOpen(true);
       return;
     }
+    if (action === "Delete" && address && isDevelopmentPreview) {
+      addAddressButtonRef.current = event.currentTarget;
+      setDeleteTarget({ id: address.id, type: address.type, isDefault: address.isDefault });
+      return;
+    }
+    if (action === "Set as Default" && address && isDevelopmentPreview) {
+      setPreviewAddresses((current) => current.map((item) => ({ ...item, isDefault: item.id === address.id })));
+      setPreviewNotice(`${address.type} is marked as the default in this sample preview. No account address was updated.`);
+      return;
+    }
     addAddressButtonRef.current = event.currentTarget;
     const descriptions = {
-      "Add New Address": "The address form is planned for Step 20H-3. No address has been added or saved.",
-      Edit: "Address editing is not available in this preview. No address has been changed.",
       Delete: "Address deletion is not available in this preview. No address has been deleted.",
       "Set as Default": "Changing the default address is not available in this preview. No address settings have changed.",
     };
     setInfoContent({ title: `${action} — Sample Preview`, description: descriptions[action] });
     setShowInfo(true);
+  }
+
+  function openEditAddress(event, addressId) {
+    if (!isDevelopmentPreview) return;
+    const address = previewAddresses.find((item) => item.id === addressId);
+    if (!address) return;
+    addAddressButtonRef.current = event.currentTarget;
+    setFormMode("edit");
+    setSelectedAddressId(address.id);
+    setFormValues({
+      ...EMPTY_ADDRESS_FORM,
+      addressType: address.type,
+      fullName: address.recipient,
+      mobile: address.phone,
+      line1: address.line1,
+      line2: address.line2,
+      city: address.city,
+      state: address.state,
+      pinCode: address.pinCode,
+      isDefault: address.isDefault,
+    });
+    setFormErrors({});
+    setFormPreview(null);
+    setFormOpen(true);
   }
 
   function updateFormField(event) {
@@ -209,14 +252,41 @@ export default function AccountAddressesScreen({ isDevelopmentPreview = false })
     event.preventDefault();
     if (!isDevelopmentPreview || !validateAddressForm()) return;
     const digits = formValues.mobile.replace(/\D/g, "");
-    setFormPreview({ ...formValues, fullName: formValues.fullName.trim(), mobile: digits.slice(-10) });
+    setFormPreview({ ...formValues, fullName: formValues.fullName.trim(), mobile: digits.slice(-10), addressId: selectedAddressId });
   }
 
   function returnToAddresses() {
     setFormOpen(false);
+    setFormMode("add");
+    setSelectedAddressId(null);
     setFormValues({ ...EMPTY_ADDRESS_FORM });
     setFormErrors({});
     setFormPreview(null);
+  }
+
+  function enterPopulatedPreview() {
+    setPreviewAddresses(sampleAddresses.map((address) => ({ ...address })));
+    setPreviewNotice("");
+    setShowPopulatedPreview(true);
+  }
+
+  function exitPopulatedPreview() {
+    setShowPopulatedPreview(false);
+    setPreviewAddresses([]);
+    setPreviewNotice("");
+  }
+
+  function confirmDeleteAddress() {
+    if (!deleteTarget) return;
+    setPreviewAddresses((current) => {
+      const remaining = current.filter((address) => address.id !== deleteTarget.id);
+      if (deleteTarget.isDefault && remaining.length > 0) {
+        return remaining.map((address, index) => ({ ...address, isDefault: index === 0 }));
+      }
+      return remaining.map((address) => ({ ...address, isDefault: address.isDefault && !deleteTarget.isDefault }));
+    });
+    setPreviewNotice(`${deleteTarget.type} sample address removed from this preview only. No real address was deleted.`);
+    setDeleteTarget(null);
   }
 
   return (
@@ -230,7 +300,7 @@ export default function AccountAddressesScreen({ isDevelopmentPreview = false })
         ) : (
           <Link href="/account" aria-label="Back to account overview" className="account-address-back"><FiArrowLeft aria-hidden="true" /></Link>
         )}
-        <h1>{formOpen ? "Add New Address" : "My Addresses"}</h1>
+        <h1>{formOpen ? `${formMode === "edit" ? "Edit" : "Add New"} Address` : "My Addresses"}</h1>
       </header>
 
       <main className="account-address-main">
@@ -239,7 +309,7 @@ export default function AccountAddressesScreen({ isDevelopmentPreview = false })
             {formOpen ? (
               <div className="account-address-form-heading">
                 <button type="button" onClick={returnToAddresses} aria-label="Back to My Addresses" className="account-address-back"><FiArrowLeft aria-hidden="true" /></button>
-                <div><h1 id="account-address-title">Add New Address</h1><p>Save your address for faster rentals and purchases.</p></div>
+                <div><h1 id="account-address-title">{formMode === "edit" ? "Edit Address" : "Add New Address"}</h1><p>Save your address for faster rentals and purchases.</p></div>
               </div>
             ) : (
               <><h1 id="account-address-title">My Addresses</h1><p>Manage your delivery and pickup addresses for rentals and purchases.</p></>
@@ -259,8 +329,8 @@ export default function AccountAddressesScreen({ isDevelopmentPreview = false })
             formPreview ? (
               <section className="account-address-form-preview" aria-labelledby="address-form-preview-title">
                 <p className="account-address-preview-label">Sample Addresses — UI Preview</p>
-                <h2 id="address-form-preview-title">Address Form Preview</h2>
-                <p className="account-address-preview-notice">This form has been validated locally. No address has been saved to your account.</p>
+                <h2 id="address-form-preview-title">{formMode === "edit" ? "Edit Address Preview" : "Address Form Preview"}</h2>
+                <p className="account-address-preview-notice">{formMode === "edit" ? "Your changes have been validated locally. No address has been updated in your account." : "This form has been validated locally. No address has been saved to your account."}</p>
                 <dl>
                   <div><dt>Address type</dt><dd>{formPreview.addressType}{formPreview.isDefault ? " · Set as default" : ""}</dd></div>
                   <div><dt>Recipient</dt><dd>{formPreview.fullName}</dd></div>
@@ -300,21 +370,34 @@ export default function AccountAddressesScreen({ isDevelopmentPreview = false })
                     </div>
                   </div>
                   <label className="account-address-default-checkbox"><input type="checkbox" name="isDefault" checked={formValues.isDefault} onChange={updateFormField} /><span>Set as Default Address</span></label>
-                  <div className="account-address-form-actions"><button type="button" className="account-address-form-cancel" onClick={returnToAddresses}>Cancel</button><button type="submit" className="account-address-form-save">Save Address</button></div>
+                  <div className="account-address-form-actions"><button type="button" className="account-address-form-cancel" onClick={returnToAddresses}>Cancel</button><button type="submit" className="account-address-form-save">{formMode === "edit" ? "Save Changes" : "Save Address"}</button></div>
                 </form>
               </div>
             )
+          ) : pageState === "ready" && isDevelopmentPreview && showPopulatedPreview && previewAddresses.length === 0 ? (
+            <div className="account-address-empty-state">
+              <AddressEmptyIllustration />
+              <p className="account-address-preview-label">Sample Addresses — UI Preview · Fictional local data</p>
+              <h2 tabIndex={-1}>No addresses saved yet</h2>
+              <p>There are no sample addresses left in this preview.</p>
+              <div className="account-address-empty-actions">
+                <button ref={addAddressButtonRef} type="button" onClick={(event) => showActionPreview(event, "Add New Address")} className="account-address-add-button"><FiPlus aria-hidden="true" /><span>Add New Address</span></button>
+                <button type="button" className="account-address-open-preview" onClick={exitPopulatedPreview}>Return to My Addresses</button>
+              </div>
+              {previewNotice && <p className="account-address-preview-notice" role="status" aria-live="polite">{previewNotice}</p>}
+            </div>
           ) : pageState === "ready" && isDevelopmentPreview && showPopulatedPreview ? (
             <div className="account-address-list-view">
               <div className="account-address-list-toolbar">
                 <div>
                   <p className="account-address-preview-label">Sample Addresses — UI Preview · Fictional local data</p>
-                  <h2>Saved Addresses</h2>
+                  <h2 tabIndex={-1}>Saved Addresses</h2>
                 </div>
                 <button ref={addAddressButtonRef} type="button" onClick={(event) => showActionPreview(event, "Add New Address")} className="account-address-add-button"><FiPlus aria-hidden="true" /><span>Add New Address</span></button>
               </div>
+              {previewNotice && <p className="account-address-preview-notice" role="status" aria-live="polite">{previewNotice}</p>}
               <div className="account-address-cards">
-                {SAMPLE_ADDRESSES.map((address) => {
+                {previewAddresses.map((address) => {
                   const TypeIcon = address.type === "Home" ? FiHome : address.type === "Work" ? FiBriefcase : FiMapPin;
                   return (
                     <article key={address.id} className={`account-address-card${address.isDefault ? " account-address-card--default" : ""}`}>
@@ -329,20 +412,20 @@ export default function AccountAddressesScreen({ isDevelopmentPreview = false })
                         <p className="account-address-card__phone"><FiPhone aria-hidden="true" /><span>{address.phone}</span></p>
                       </div>
                       <div className="account-address-card__actions">
-                        <button type="button" onClick={(event) => showActionPreview(event, "Edit")}><FiEdit2 aria-hidden="true" /> Edit</button>
-                        <button type="button" className="account-address-card__delete" onClick={(event) => showActionPreview(event, "Delete")}><FiTrash2 aria-hidden="true" /> Delete</button>
+                        <button type="button" onClick={(event) => openEditAddress(event, address.id)}><FiEdit2 aria-hidden="true" /> Edit</button>
+                        <button type="button" className="account-address-card__delete" onClick={(event) => showActionPreview(event, "Delete", address)}><FiTrash2 aria-hidden="true" /> Delete</button>
                         {address.isDefault ? (
                           <span className="account-address-card__current-default"><FiCheck aria-hidden="true" /> Default</span>
                         ) : (
-                          <button type="button" className="account-address-card__set-default" onClick={(event) => showActionPreview(event, "Set as Default")}><FiStar aria-hidden="true" /> Set as Default</button>
+                          <button type="button" className="account-address-card__set-default" onClick={(event) => showActionPreview(event, "Set as Default", address)}><FiStar aria-hidden="true" /> Set as Default</button>
                         )}
-                        <button type="button" className="account-address-card__more" aria-label={`More actions for ${address.type} address`} onClick={(event) => showActionPreview(event, "Edit")}><FiMoreVertical aria-hidden="true" /></button>
+                        <button type="button" className="account-address-card__more" aria-label={`More actions for ${address.type} address`} onClick={(event) => openEditAddress(event, address.id)}><FiMoreVertical aria-hidden="true" /></button>
                       </div>
                     </article>
                   );
                 })}
               </div>
-              <button type="button" className="account-address-preview-exit" onClick={() => setShowPopulatedPreview(false)}>Return to My Addresses empty state</button>
+              <button type="button" className="account-address-preview-exit" onClick={exitPopulatedPreview}>Return to My Addresses empty state</button>
             </div>
           ) : pageState === "ready" ? (
             <div className="account-address-empty-state">
@@ -352,13 +435,14 @@ export default function AccountAddressesScreen({ isDevelopmentPreview = false })
               <p>{isDevelopmentPreview ? "Add a delivery address to make your rentals and purchases faster and easier." : "Your saved delivery and pickup addresses will appear here once address management is connected."}</p>
               <div className="account-address-empty-actions">
                 <button ref={addAddressButtonRef} type="button" onClick={(event) => showActionPreview(event, "Add New Address")} className="account-address-add-button"><FiPlus aria-hidden="true" /><span>Add New Address</span></button>
-                {isDevelopmentPreview && <button type="button" className="account-address-open-preview" onClick={() => setShowPopulatedPreview(true)}>Open populated sample preview</button>}
+                {isDevelopmentPreview && <button type="button" className="account-address-open-preview" onClick={enterPopulatedPreview}>Open populated sample preview</button>}
               </div>
             </div>
           ) : null}
         </AccountPageContainer>
       </main>
       {showInfo && infoContent && <AddAddressInfoDialog title={infoContent.title} description={infoContent.description} onClose={closeInfo} triggerRef={addAddressButtonRef} />}
+      {deleteTarget && <AddAddressInfoDialog title="Delete Address?" description={`Remove the ${deleteTarget.type} sample address from the current preview? ${deleteTarget.isDefault ? "This is the current default; after confirmation, the first remaining sample address will become the preview default. " : ""}No real customer address will be deleted.`} onClose={() => setDeleteTarget(null)} onConfirm={confirmDeleteAddress} confirmLabel="Delete Address" destructive triggerRef={addAddressButtonRef} />}
     </>
   );
 }
