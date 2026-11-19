@@ -41,6 +41,7 @@
 .payment-preview-upcoming { background: #fff0d5; color: #8a4e00; }
 .payment-preview-actions { display: flex; flex-wrap: wrap; gap: 5px; }
 .payment-preview-actions button { min-height: 36px; border: 1px solid #91c69c; border-radius: 8px; padding: 5px 9px; color: #075c32; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.payment-preview-actions button:disabled { cursor: not-allowed; border-color: #d0d8d1; color: #65746a; background: #f4f6f4; }
 .payment-preview-noResults { padding: 25px; color: #59635c; text-align: center; }
 .payment-preview-exit { display: inline-flex; margin-top: 16px; color: #124734; font-size: 12px; font-weight: 700; text-decoration: underline; }
 .payment-preview-dialog { width: min(440px,calc(100% - 32px)); margin: auto; border: 1px solid #d9e2da; border-radius: 18px; padding: 24px; color: #303831; box-shadow: 0 20px 70px rgba(0,0,0,.25); }
