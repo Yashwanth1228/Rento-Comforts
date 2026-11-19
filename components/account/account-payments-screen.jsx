@@ -65,6 +65,7 @@ export default function AccountPaymentsScreen() {
                 <Link href="/account/orders" className="inline-flex min-h-12 flex-1 items-center justify-center rounded-xl bg-[#08763b] px-5 py-3 text-sm font-bold text-white hover:bg-[#124734] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017f36]">View My Orders</Link>
                 <Link href="/account/rentals" className="inline-flex min-h-12 flex-1 items-center justify-center rounded-xl border border-[#08763b] bg-white px-5 py-3 text-sm font-bold text-[#124734] hover:bg-[#e9f1e9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017f36]">View My Rentals</Link>
               </div>
+              {process.env.NODE_ENV === "development" && <Link href="/account/payments/preview" className="mt-5 rounded-full border border-[#b8d2bf] bg-[#f3f8f1] px-4 py-2 text-xs font-semibold text-[#124734] hover:bg-[#e9f1e9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#017f36]">Open sample payments preview</Link>}
             </section>
           ) : (
             <section className="rounded-xl border border-[#e5e3dc] bg-white p-6" role={pageState === "signed-out" ? undefined : "alert"}>
