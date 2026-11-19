@@ -45,6 +45,8 @@ export default function AccountPaymentsPreview({ records }) {
   const [search, setSearch] = useState("");
   const [action, setAction] = useState(null);
   const [invoiceId, setInvoiceId] = useState(null);
+  const [downloadingId, setDownloadingId] = useState(null);
+  const [downloadError, setDownloadError] = useState("");
 
   useEffect(() => {
     let current = true;
@@ -75,13 +77,28 @@ export default function AccountPaymentsPreview({ records }) {
   const visible = records.filter((item) => matchesFilter(item, filter) && [item.product, item.id, item.invoiceId, item.relatedId, item.reference].some((value) => value?.toLowerCase().includes(query)));
   const selectedInvoice = records.find((item) => item.invoiceId && item.invoiceId === invoiceId);
 
+  async function handleDownload(selectedId) {
+    if (process.env.NODE_ENV !== "development" || downloadingId) return;
+    setDownloadError("");
+    setDownloadingId(selectedId);
+    try {
+      const { downloadSampleInvoice } = await import("@/lib/sample-invoice-pdf.preview");
+      await downloadSampleInvoice(selectedId, records);
+    } catch (error) {
+      setDownloadError(error instanceof Error ? error.message : "The sample PDF could not be generated. Please try again.");
+    } finally {
+      setDownloadingId(null);
+    }
+  }
+
   return <>
     <div className="hidden xl:block"><AccountWelcomeBanner fullName={fullName} title="My Account" description="Manage your profile, orders, rentals, and account preferences." compact /></div>
     <main className="bg-[#f8f7f2] px-4 pb-[calc(7rem+env(safe-area-inset-bottom))] pt-5 sm:px-7 sm:pb-8 lg:px-10 xl:px-0 xl:py-4">
       <AccountPageContainer className={styles.panel}>
         {!selectedInvoice && <header className={styles.heading}><span><FiCreditCard aria-hidden="true" /></span><div><h1>Payments &amp; Invoices</h1><p>Track your rental payments, invoices, receipts, and deposit refunds in one place.</p></div></header>}
-        {pageState === "loading" ? <p role="status">Checking your account...</p> : pageState !== "ready" ? <section className={styles.accountMessage}><h2>{pageState === "signed-out" ? "Sign in to view your account" : pageState === "missing-profile" ? "Account profile not available" : "Account information unavailable"}</h2><p>{pageState === "signed-out" ? "Your session may have expired. Sign in using the Login control in the site header, then return here." : pageState === "missing-profile" ? "We could not find a customer profile for this account." : "We could not verify your account right now. Check your connection and try again."}</p>{pageState === "signed-out" ? <Link href="/">Go to the home page</Link> : <button type="button" onClick={() => { setPageState("loading"); setRetryKey((n) => n + 1); }}>Retry</button>}</section> : selectedInvoice ? <SampleInvoice record={selectedInvoice} onBack={() => setInvoiceId(null)} /> : <>
+        {pageState === "loading" ? <p role="status">Checking your account...</p> : pageState !== "ready" ? <section className={styles.accountMessage}><h2>{pageState === "signed-out" ? "Sign in to view your account" : pageState === "missing-profile" ? "Account profile not available" : "Account information unavailable"}</h2><p>{pageState === "signed-out" ? "Your session may have expired. Sign in using the Login control in the site header, then return here." : pageState === "missing-profile" ? "We could not find a customer profile for this account." : "We could not verify your account right now. Check your connection and try again."}</p>{pageState === "signed-out" ? <Link href="/">Go to the home page</Link> : <button type="button" onClick={() => { setPageState("loading"); setRetryKey((n) => n + 1); }}>Retry</button>}</section> : selectedInvoice ? <SampleInvoice record={selectedInvoice} onBack={() => { setInvoiceId(null); setDownloadError(""); }} onDownload={() => handleDownload(selectedInvoice.invoiceId)} downloading={Boolean(downloadingId)} downloadError={downloadError} /> : <>
           <p className={styles.previewNotice}>Sample Payments — UI Preview · Fictional records, local development only</p>
+          {downloadError && <p role="alert" className="payment-preview-download-error">{downloadError}</p>}
           <div className={styles.summaryGrid}>
             <SummaryCard label="Total Paid" value={formatMoney(totalPaid)} note="Completed payments" tone="paid" Icon={FiCreditCard} />
             <SummaryCard label="Upcoming Due" value={formatMoney(upcoming)} note="Scheduled payments" tone="due" Icon={FiCalendar} />
@@ -92,7 +109,7 @@ export default function AccountPaymentsPreview({ records }) {
           <h2 className={styles.listHeading}>Transaction History</h2>
           <div className={styles.tableWrap}><table className={styles.table}><caption className="sr-only">Sample financial activity</caption><thead><tr><th>Transaction</th><th>Type</th><th>Date</th><th>Amount</th><th>Status</th><th>Invoice / Receipt</th><th>Actions</th></tr></thead><tbody>{visible.map((record) => <tr key={record.id}>
             <td data-label="Transaction"><div className={styles.transaction}>{record.image ? <Image src={record.image} width={58} height={48} alt="" /> : <span className={styles.recordIcon}><FiShield aria-hidden="true" /></span>}<div><strong>{record.product}</strong><small>{record.type} · {record.id}<br />{record.relatedId}</small></div></div></td>
-            <td data-label="Type">{record.type}</td><td data-label={record.status === "Upcoming" ? "Due date" : "Date"}>{formatDate(record.date)}</td><td data-label="Amount" className={styles.amount}>{formatMoney(record.amount)}</td><td data-label="Status"><span className={`${styles.status} ${record.status === "Upcoming" ? styles.upcoming : ""}`}><FiCheckCircle aria-hidden="true" />{record.status}</span></td><td data-label="Invoice / Receipt">{record.invoiceId || record.reference || "—"}</td><td data-label="Actions"><div className={styles.actions}>{record.invoiceId ? <><button type="button" onClick={() => setInvoiceId(record.invoiceId)}>View Invoice<span className="sr-only"> for {record.product}</span></button><button type="button" disabled title="PDF download is not available yet" aria-label={`Download invoice for ${record.product} unavailable`}>Download</button></> : <button type="button" onClick={() => setAction("Details")}>Details<span className="sr-only"> for {record.product}</span></button>}</div></td>
+            <td data-label="Type">{record.type}</td><td data-label={record.status === "Upcoming" ? "Due date" : "Date"}>{formatDate(record.date)}</td><td data-label="Amount" className={styles.amount}>{formatMoney(record.amount)}</td><td data-label="Status"><span className={`${styles.status} ${record.status === "Upcoming" ? styles.upcoming : ""}`}><FiCheckCircle aria-hidden="true" />{record.status}</span></td><td data-label="Invoice / Receipt">{record.invoiceId || record.reference || "—"}</td><td data-label="Actions"><div className={styles.actions}>{record.invoiceId ? <><button type="button" onClick={() => { setDownloadError(""); setInvoiceId(record.invoiceId); }}>View Invoice<span className="sr-only"> for {record.product}</span></button><button type="button" disabled={Boolean(downloadingId)} onClick={() => handleDownload(record.invoiceId)} aria-label={`Download sample invoice for ${record.product}`}>{downloadingId === record.invoiceId ? "Preparing…" : "Download"}</button></> : <button type="button" onClick={() => setAction("Details")}>Details<span className="sr-only"> for {record.product}</span></button>}</div></td>
           </tr>)}</tbody></table>{visible.length === 0 && <p className={styles.noResults} role="status">No sample activity matches your search and filter.</p>}</div>
           <Link href="/account/payments" className={styles.exit}>Exit preview and return to Payments &amp; Invoices</Link>
         </>}
