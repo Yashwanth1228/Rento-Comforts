@@ -1,0 +1,34 @@
+.payment-details-drawer { position: fixed; inset: 0 0 0 auto; width: min(460px,100%); max-width: 100%; height: 100dvh; max-height: 100dvh; margin: 0; overflow-y: auto; overscroll-behavior: contain; border: 0; border-radius: 18px 0 0 18px; background: #fff; padding: 28px 24px max(24px,env(safe-area-inset-bottom)); color: #252925; box-shadow: -12px 0 45px rgba(20,35,26,.18); }
+.payment-details-drawer::backdrop { background: rgba(16,31,22,.46); }
+.payment-details-drawer__handle { display: none; }
+.payment-details-drawer__heading { display: flex; align-items: center; gap: 13px; }
+.payment-details-drawer__heading-icon { display: grid; width: 56px; height: 56px; flex: none; place-items: center; border-radius: 50%; background: #fff3df; color: #bd6800; font-size: 27px; }
+.payment-details-drawer__heading h2 { font-size: 23px; font-weight: 800; line-height: 1.2; }
+.payment-details-drawer__heading p { margin-top: 4px; color: #4a554e; font-size: 13px; line-height: 1.4; }
+.payment-details-drawer__close { display: grid; width: 42px; height: 42px; flex: none; align-self: flex-start; place-items: center; margin-left: auto; border-radius: 50%; font-size: 22px; }
+.payment-details-drawer__close:hover { background: #f0f4ef; }
+.payment-details-drawer__amount { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 22px; border-radius: 12px; background: #eaf6eb; padding: 16px 18px; }
+.payment-details-drawer__amount div span,.payment-details-drawer__amount strong { display: block; }
+.payment-details-drawer__amount div span { font-size: 14px; font-weight: 750; }
+.payment-details-drawer__amount strong { margin-top: 3px; font-size: 27px; font-weight: 800; line-height: 1.1; }
+.payment-details-drawer__status { display: inline-flex; align-items: center; gap: 6px; border-radius: 99px; background: #ffe8a9; padding: 7px 11px; color: #834400; font-size: 13px; font-weight: 800; }
+.payment-details-drawer__product { display: flex; min-width: 0; align-items: center; gap: 14px; padding: 18px 4px; }
+.payment-details-drawer__product img { width: 96px; height: 72px; flex: none; border-radius: 10px; background: #f6f3ee; object-fit: cover; }
+.payment-details-drawer__product div { min-width: 0; }
+.payment-details-drawer__product span,.payment-details-drawer__product strong { display: block; }
+.payment-details-drawer__product span,.payment-details-drawer__product p { font-size: 13px; }
+.payment-details-drawer__product strong { overflow-wrap: anywhere; margin: 3px 0; font-size: 16px; font-weight: 800; }
+.payment-details-drawer__facts > div { display: flex; align-items: center; gap: 16px; border-top: 1px solid #e7ebe6; padding: 13px 8px; }
+.payment-details-drawer__facts svg { width: 25px; height: 25px; flex: none; color: #124734; }
+.payment-details-drawer__facts dt { color: #46534a; font-size: 13px; }
+.payment-details-drawer__facts dd { overflow-wrap: anywhere; margin-top: 2px; font-size: 15px; font-weight: 750; }
+.payment-details-drawer__notice { display: flex; align-items: flex-start; gap: 11px; margin-top: 13px; border-radius: 11px; background: #e8f5eb; padding: 14px; color: #124734; font-size: 12px; line-height: 1.5; }
+.payment-details-drawer__notice svg { width: 20px; height: 20px; flex: none; }
+.payment-details-drawer__done { width: 100%; min-height: 48px; margin-top: 18px; border-radius: 10px; background: #005b35; color: #fff; font-size: 15px; font-weight: 800; }
+.payment-details-drawer button:focus-visible { outline: 3px solid #70ab79; outline-offset: 3px; }
+.payment-details-drawer--failed .payment-details-drawer__heading-icon { background: #fdebea; color: #b42318; }
+.payment-details-drawer--failed .payment-details-drawer__amount { background: #fcebea; }
+.payment-details-drawer--failed .payment-details-drawer__status { background: #ffd0cc; color: #a32019; }
+.payment-details-drawer__next-step { margin-top: 12px; color: #59635c; font-size: 12px; line-height: 1.45; }
+@media (max-width: 767px) { .payment-details-drawer { inset: auto 0 0; width: 100%; height: auto; max-height: min(88dvh, 780px); border-radius: 20px 20px 0 0; padding: 10px 18px max(18px,env(safe-area-inset-bottom)); box-shadow: 0 -10px 40px rgba(20,35,26,.2); } .payment-details-drawer__handle { display: block; width: 42px; height: 4px; margin: 0 auto 12px; border-radius: 9px; background: #b8c0ba; } .payment-details-drawer__heading-icon { width: 48px; height: 48px; font-size: 23px; } .payment-details-drawer__heading h2 { font-size: 20px; } .payment-details-drawer__amount { margin-top: 16px; } .payment-details-drawer__product { padding: 14px 2px; } .payment-details-drawer__facts > div { padding: 11px 5px; } }
+@media (prefers-reduced-motion: reduce) { .payment-details-drawer { scroll-behavior: auto; animation: none; transition: none; } }

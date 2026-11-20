@@ -5,4 +5,5 @@ export const samplePayments = [
   { id: "DEP-SAMPLE-001", relatedId: "RT-UI-SAMPLE-003", product: "Security Deposit – Sofa Rental", category: "deposit", type: "Refundable deposit", amount: 3000, date: "2026-10-28", status: "Held" },
   { id: "REF-SAMPLE-001", relatedId: "RT-UI-SAMPLE-001", product: "Security Deposit – Previous Rental", category: "refund", type: "Deposit refund", amount: 2500, date: "2026-10-25", status: "Refunded", reference: "REF-UI-SAMPLE-001" },
   { id: "PAY-SAMPLE-003", relatedId: "RT-UI-SAMPLE-002", product: "Bed + Mattress", image: "/images/product-gallery/bed-2.webp", category: "payment", type: "Rental payment", amount: 1999, date: "2026-12-05", status: "Upcoming" },
+  { id: "PAY-SAMPLE-004", relatedId: "RT-UI-SAMPLE-004", product: "Ergonomic Study Desk", image: "/images/product-gallery/study-table-2.webp", category: "payment", type: "Rental payment", amount: 4999, date: "2026-11-19", status: "Failed" },
 ];
