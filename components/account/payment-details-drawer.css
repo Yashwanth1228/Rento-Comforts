@@ -29,6 +29,20 @@
 .payment-details-drawer--failed .payment-details-drawer__heading-icon { background: #fdebea; color: #b42318; }
 .payment-details-drawer--failed .payment-details-drawer__amount { background: #fcebea; }
 .payment-details-drawer--failed .payment-details-drawer__status { background: #ffd0cc; color: #a32019; }
+.payment-details-drawer--refund .payment-details-drawer__amount { background: #fff4e7; }
+.payment-details-drawer--refund .payment-details-drawer__status { background: #ffe8c2; color: #834400; }
+.payment-details-drawer__refund-label { display: inline-block; margin-top: 16px; border-radius: 8px; background: #fff1dd; padding: 6px 10px; color: #70420a; font-size: 12px; font-weight: 700; }
+.payment-details-drawer--refund .payment-details-drawer__refund-label + .payment-details-drawer__amount { margin-top: 12px; }
+.payment-details-drawer__progress { margin-top: 16px; border: 1px solid #e7ebe6; border-radius: 10px; padding: 12px; }
+.payment-details-drawer__progress h3 { font-size: 15px; font-weight: 800; }
+.payment-details-drawer__progress ol { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0,1fr); gap: 4px; margin-top: 16px; }
+.payment-details-drawer__progress ol::before { position: absolute; top: 12px; right: 12.5%; left: 12.5%; height: 2px; background: #c2ccc3; content: ""; }
+.payment-details-drawer__progress li { position: relative; display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 5px; text-align: center; font-size: 11px; line-height: 1.25; overflow-wrap: anywhere; }
+.payment-details-drawer__progress-marker { display: grid; width: 26px; height: 26px; flex: none; place-items: center; border: 2px solid #aab4ac; border-radius: 50%; background: #fff; color: #fff; }
+.payment-details-drawer__progress-marker svg { width: 18px; height: 18px; }
+.payment-details-drawer__progress .is-completed .payment-details-drawer__progress-marker { border-color: #08763b; background: #08763b; }
+.payment-details-drawer__progress-caption { color: #59635c; font-size: 10px; }
+.payment-details-drawer__back { width: 100%; min-height: 48px; margin-top: 10px; border: 1px solid #08763b; border-radius: 10px; color: #075c32; font-size: 15px; font-weight: 800; }
 .payment-details-drawer__next-step { margin-top: 12px; color: #59635c; font-size: 12px; line-height: 1.45; }
 @media (max-width: 767px) { .payment-details-drawer { inset: auto 0 0; width: 100%; height: auto; max-height: min(88dvh, 780px); border-radius: 20px 20px 0 0; padding: 10px 18px max(18px,env(safe-area-inset-bottom)); box-shadow: 0 -10px 40px rgba(20,35,26,.2); } .payment-details-drawer__handle { display: block; width: 42px; height: 4px; margin: 0 auto 12px; border-radius: 9px; background: #b8c0ba; } .payment-details-drawer__heading-icon { width: 48px; height: 48px; font-size: 23px; } .payment-details-drawer__heading h2 { font-size: 20px; } .payment-details-drawer__amount { margin-top: 16px; } .payment-details-drawer__product { padding: 14px 2px; } .payment-details-drawer__facts > div { padding: 11px 5px; } }
 @media (prefers-reduced-motion: reduce) { .payment-details-drawer { scroll-behavior: auto; animation: none; transition: none; } }
