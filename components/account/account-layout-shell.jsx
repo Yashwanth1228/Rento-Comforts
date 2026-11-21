@@ -16,7 +16,7 @@ function getActiveSection(pathname) {
   return "overview";
 }
 
-export default function AccountLayoutShell({ children }) {
+export default function AccountLayoutShell({ children, hideUtilityBar = false, showAccountBanner = true }) {
   const pathname = usePathname();
   const shellRef = useRef(null);
   const activeSection = getActiveSection(pathname);
@@ -54,11 +54,11 @@ export default function AccountLayoutShell({ children }) {
 
   return (
     <>
-      <SiteHeader />
+      <SiteHeader hideUtilityBar={hideUtilityBar} />
       <div
         ref={shellRef}
-        className={`account-layout-shell${isRentalPreview ? " account-layout-shell--rental-preview" : ""}`}
-        style={{ "--account-sidebar-flow-offset": `${activeSection === "orders" ? 136 : activeSection === "personal-information" ? 192 : 184}px` }}
+        className={`account-layout-shell${isRentalPreview ? " account-layout-shell--rental-preview" : ""}${showAccountBanner ? "" : " account-layout-shell--hide-banner"}`}
+        style={{ "--account-sidebar-flow-offset": `${showAccountBanner ? (activeSection === "orders" ? 136 : activeSection === "personal-information" ? 192 : 184) : 0}px` }}
       >
         <AccountSidebar activeSection={activeSection} className="account-layout-sidebar" />
         <div className="account-layout-content">

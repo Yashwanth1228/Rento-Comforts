@@ -46,7 +46,7 @@ function MobileStatusRow({ label, verified }) {
 function MobileHero() {
   return (
     <header
-      className="relative isolate mb-4 overflow-hidden bg-[#e9f1e9] xl:hidden"
+      className="account-personal-information-hero relative isolate mb-4 overflow-hidden bg-[#e9f1e9] xl:hidden"
       style={{
         backgroundImage: "linear-gradient(90deg, rgba(233,241,233,0.98) 0%, rgba(233,241,233,0.91) 42%, rgba(233,241,233,0.08) 100%), url('/images/account-welcome-banner-v1.png')",
         backgroundSize: "100% 100%, auto 340px",

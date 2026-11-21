@@ -110,7 +110,7 @@ function getAccountInitial(fullName, email) {
   return emailInitial ? emailInitial.toUpperCase() : "";
 }
 
-export function SiteHeader() {
+export function SiteHeader({ hideUtilityBar = false }) {
   const pathname = usePathname();
   const isRentalPreview = pathname === "/account/rentals/preview";
   const router = useRouter();
@@ -419,7 +419,7 @@ async function handleLogout() {
   return (
     <header ref={headerRef} className={`site-header${pathname.startsWith("/account/orders") ? " site-header--orders" : pathname.startsWith("/account/rentals") ? " site-header--rentals" : ""}${isRentalPreview ? " site-header--rental-preview" : ""}`} onKeyDown={handleKeyDown}>
       {/* 1. Top Utility Bar (Full-width, no outer margin) */}
-      <div className="site-header__utility-bar">
+      {!hideUtilityBar && <div className="site-header__utility-bar">
         <div className="w-full flex items-center justify-between px-4 sm:px-6 lg:px-8 py-1 text-xs text-white">
           {/* Left: Location Dropdown Trigger */}
           <button
@@ -464,7 +464,7 @@ async function handleLogout() {
             <a href="#site-footer" className="hover:text-white transition-colors">Contact Us</a>
           </nav>
         </div>
-      </div>
+      </div>}
 
       <div className="orders-mobile-header" aria-label="Rento Comforts mobile header">
         <button

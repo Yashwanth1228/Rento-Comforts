@@ -1487,6 +1487,21 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .catalogue-subcategory-scroll { scrollbar-width: none; -ms-overflow-style: none; }
 .catalogue-subcategory-scroll::-webkit-scrollbar { display: none; }
 
+.account-layout-shell--hide-banner .account-welcome-banner { display: none; }
+.account-layout-shell--hide-banner .account-personal-information-hero,
+.account-layout-shell--hide-banner .mobile-orders-hero,
+.account-layout-shell--hide-banner .account-rentals-mobile-hero {
+  min-height: 0;
+  background-color: transparent;
+  background-image: none !important;
+}
+.account-layout-shell--hide-banner .account-personal-information-hero > div,
+.account-layout-shell--hide-banner .mobile-orders-hero > div,
+.account-layout-shell--hide-banner .account-rentals-mobile-hero > div {
+  min-height: 0;
+  padding-block: 16px;
+}
+
 @media (min-width: 1280px) {
   .account-layout-shell {
     --account-sidebar-column: clamp(280px, 19.6vw, 328px);
