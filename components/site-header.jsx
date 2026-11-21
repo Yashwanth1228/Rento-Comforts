@@ -110,7 +110,7 @@ function getAccountInitial(fullName, email) {
   return emailInitial ? emailInitial.toUpperCase() : "";
 }
 
-export function SiteHeader({ hideUtilityBar = false }) {
+export function SiteHeader({ hideUtilityBar = false, showCategories = true }) {
   const pathname = usePathname();
   const isRentalPreview = pathname === "/account/rentals/preview";
   const router = useRouter();
@@ -817,7 +817,7 @@ async function handleLogout() {
       </div>
 
       {/* 3. Category Navigation Row (Full-width, no outer margin) */}
-      <div className="category-navigation" onMouseEnter={() => window.clearTimeout(closeTimer.current)} onMouseLeave={scheduleClose}>
+      {showCategories && <div className="category-navigation" onMouseEnter={() => window.clearTimeout(closeTimer.current)} onMouseLeave={scheduleClose}>
         <div className="w-full flex items-center gap-6 px-4 sm:px-6 lg:px-8 category-navigation__inner">
           {menuTabs.map((tab) => {
             const expanded = activeMenu === tab.id;
@@ -833,7 +833,7 @@ async function handleLogout() {
             <p className="mega-menu__disclaimer">These categories are planned. Product listings, bundle availability and moving-service operations are not configured.</p>
           </div>
         </div>}
-      </div>
+      </div>}
 
       <p className={`header-notice${notice ? " is-visible" : ""}`} role="status">{notice}</p>
 
