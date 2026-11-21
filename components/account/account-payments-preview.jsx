@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FiCalendar, FiCheckCircle, FiClock, FiCreditCard, FiFileText, FiSearch, FiShield, FiX, FiXCircle } from "react-icons/fi";
+import { FiCalendar, FiCheckCircle, FiClock, FiCreditCard, FiFileText, FiRefreshCcw, FiSearch, FiShield, FiX, FiXCircle } from "react-icons/fi";
 import AccountPageContainer from "@/components/account/account-page-container";
 import AccountWelcomeBanner from "@/components/account/account-welcome-banner";
 import SampleInvoice from "@/components/account/sample-invoice";
@@ -17,6 +17,21 @@ const styles = Object.fromEntries([
 const formatMoney = (value) => `₹${value.toLocaleString("en-IN")}`;
 const formatDate = (date) => new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${date}T00:00:00Z`));
 const matchesFilter = (record, filter) => filter === "All Activity" || (filter === "Payments" && record.category === "payment") || (filter === "Invoices" && Boolean(record.invoiceId)) || (filter === "Refunds & Deposits" && ["refund", "deposit"].includes(record.category));
+
+function TransactionStatus({ status }) {
+  const statusPresentation = {
+    Paid: { Icon: FiCheckCircle, tone: "paid" },
+    Completed: { Icon: FiCheckCircle, tone: "paid" },
+    Upcoming: { Icon: FiClock, tone: "upcoming" },
+    Pending: { Icon: FiClock, tone: "upcoming" },
+    Processing: { Icon: FiClock, tone: "processing" },
+    Failed: { Icon: FiXCircle, tone: "failed" },
+    Held: { Icon: FiShield, tone: "held" },
+    Refunded: { Icon: FiRefreshCcw, tone: "refunded" },
+  };
+  const { Icon, tone } = statusPresentation[status] || { Icon: FiClock, tone: "unknown" };
+  return <span className={`${styles.status} payment-preview-status--${tone}${tone === "processing" ? " payment-preview-processing" : ""}`}><Icon aria-hidden="true" />{status}</span>;
+}
 
 function PreviewDialog({ action, close }) {
   const dialogRef = useRef(null);
@@ -113,7 +128,7 @@ export default function AccountPaymentsPreview({ records }) {
           <h2 className={styles.listHeading}>Transaction History</h2>
           <div className={styles.tableWrap}><table className={styles.table}><caption className="sr-only">Sample financial activity</caption><thead><tr><th>Transaction</th><th>Type</th><th>Date</th><th>Amount</th><th>Status</th><th>Invoice / Receipt</th><th>Actions</th></tr></thead><tbody>{visible.map((record) => <tr key={record.id}>
             <td data-label="Transaction"><div className={styles.transaction}>{record.image ? <Image src={record.image} width={58} height={48} alt="" /> : <span className={styles.recordIcon}><FiShield aria-hidden="true" /></span>}<div><strong>{record.product}</strong><small>{record.type} · {record.id}<br />{record.relatedId}</small></div></div></td>
-            <td data-label="Type">{record.type}</td><td data-label={record.status === "Upcoming" ? "Due date" : "Date"}>{formatDate(record.date)}</td><td data-label="Amount" className={styles.amount}>{formatMoney(record.amount)}</td><td data-label="Status"><span className={`${styles.status} ${record.status === "Upcoming" ? styles.upcoming : record.status === "Failed" ? "payment-preview-failed" : ""}`}>{record.status === "Failed" ? <FiXCircle aria-hidden="true" /> : <FiCheckCircle aria-hidden="true" />}{record.status}</span></td><td data-label="Invoice / Receipt">{record.invoiceId || record.reference || "—"}</td><td data-label="Actions"><div className={styles.actions}>{record.invoiceId ? <><button type="button" onClick={() => { setDownloadError(""); setInvoiceId(record.invoiceId); }}>View Invoice<span className="sr-only"> for {record.product}</span></button><button type="button" disabled={Boolean(downloadingId)} onClick={() => handleDownload(record.invoiceId)} aria-label={`Download sample invoice for ${record.product}`}>{downloadingId === record.invoiceId ? "Preparing…" : "Download"}</button></> : <button type="button" onClick={(event) => { if (["refund", "deposit"].includes(record.category) || (record.category === "payment" && ["Upcoming", "Failed"].includes(record.status))) { dueTriggerRef.current = event.currentTarget; setDuePaymentId(record.id); } else setAction("Details"); }}>Details<span className="sr-only"> for {record.product}</span></button>}</div></td>
+            <td data-label="Type">{record.type}</td><td data-label={record.status === "Upcoming" ? "Due date" : "Date"}>{formatDate(record.date)}</td><td data-label="Amount" className={styles.amount}>{formatMoney(record.amount)}</td><td data-label="Status"><TransactionStatus status={record.status} /></td><td data-label="Invoice / Receipt">{record.invoiceId || record.reference || "—"}</td><td data-label="Actions"><div className={styles.actions}>{record.invoiceId ? <><button type="button" onClick={() => { setDownloadError(""); setInvoiceId(record.invoiceId); }}>View Invoice<span className="sr-only"> for {record.product}</span></button><button type="button" disabled={Boolean(downloadingId)} onClick={() => handleDownload(record.invoiceId)} aria-label={`Download sample invoice for ${record.product}`}>{downloadingId === record.invoiceId ? "Preparing…" : "Download"}</button></> : <button type="button" onClick={(event) => { if (["refund", "deposit"].includes(record.category) || (record.category === "payment" && ["Upcoming", "Failed"].includes(record.status))) { dueTriggerRef.current = event.currentTarget; setDuePaymentId(record.id); } else setAction("Details"); }}>Details<span className="sr-only"> for {record.product}</span></button>}</div></td>
           </tr>)}</tbody></table>{visible.length === 0 && <p className={styles.noResults} role="status">No sample activity matches your search and filter.</p>}</div>
           <Link href="/account/payments" className={styles.exit}>Exit preview and return to Payments &amp; Invoices</Link>
         </>}

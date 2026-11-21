@@ -41,6 +41,10 @@
 .payment-preview-status { display: inline-flex; align-items: center; gap: 5px; border-radius: 99px; background: #e5f5df; padding: 5px 8px; color: #12612e; font-weight: 700; white-space: nowrap; }
 .payment-preview-upcoming,.payment-preview-processing { background: #fff0d5; color: #8a4e00; }
 .payment-preview-failed { background: #fde5e3; color: #a32019; }
+.payment-preview-status--upcoming { background: #fff0d5; color: #8a4e00; }
+.payment-preview-status--failed { background: #fde5e3; color: #a32019; }
+.payment-preview-status--held,.payment-preview-status--unknown { background: #e9eff3; color: #294758; }
+.payment-preview-status--refunded { background: #eee9f8; color: #573a85; }
 .payment-preview-actions { display: flex; flex-wrap: wrap; gap: 5px; }
 .payment-preview-actions button { min-height: 36px; border: 1px solid #91c69c; border-radius: 8px; padding: 5px 9px; color: #075c32; font-size: 11px; font-weight: 700; white-space: nowrap; }
 .payment-preview-actions button:disabled { cursor: not-allowed; border-color: #d0d8d1; color: #65746a; background: #f4f6f4; }
